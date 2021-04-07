@@ -1,0 +1,40 @@
+2021-04-01 14:15:33.444 CEST [17092] LOG:  starting PostgreSQL 12.2, compiled by Visual C++ build 1916, 64-bit
+2021-04-01 14:15:33.450 CEST [17092] LOG:  listening on IPv6 address "::1", port 5432
+2021-04-01 14:15:33.450 CEST [17092] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2021-04-01 14:15:33.513 CEST [11980] LOG:  database system was shut down at 2021-04-01 14:14:18 CEST
+2021-04-01 14:15:33.583 CEST [17092] LOG:  database system is ready to accept connections
+2021-04-01 14:25:33.697 CEST [17092] LOG:  could not open file "postmaster.pid": No such file or directory
+2021-04-01 14:25:33.697 CEST [17092] LOG:  performing immediate shutdown because data directory lock file is invalid
+2021-04-01 14:25:33.698 CEST [17092] LOG:  received immediate shutdown request
+2021-04-01 14:25:33.701 CEST [17092] LOG:  could not open file "postmaster.pid": No such file or directory
+2021-04-01 14:25:33.708 CEST [12936] WARNING:  terminating connection because of crash of another server process
+2021-04-01 14:25:33.708 CEST [12936] DETAIL:  The postmaster has commanded this server process to roll back the current transaction and exit, because another server process exited abnormally and possibly corrupted shared memory.
+2021-04-01 14:25:33.708 CEST [12936] HINT:  In a moment you should be able to reconnect to the database and repeat your command.
+2021-04-01 14:25:33.710 CEST [5676] LOG:  could not open temporary statistics file "pg_stat/global.tmp": No such file or directory
+2021-04-01 14:25:33.730 CEST [17092] LOG:  database system is shut down
+2021-04-06 09:40:59.373 CEST [14556] LOG:  starting PostgreSQL 12.2, compiled by Visual C++ build 1916, 64-bit
+2021-04-06 09:40:59.378 CEST [14556] LOG:  listening on IPv6 address "::1", port 5432
+2021-04-06 09:40:59.378 CEST [14556] LOG:  listening on IPv4 address "127.0.0.1", port 5432
+2021-04-06 09:40:59.452 CEST [16600] LOG:  database system was shut down at 2021-04-01 16:13:37 CEST
+2021-04-06 09:40:59.496 CEST [14556] LOG:  database system is ready to accept connections
+2021-04-06 09:41:09.386 CEST [3780] FATAL:  database "lila9" does not exist
+2021-04-06 09:41:26.064 CEST [2876] FATAL:  database "db_cryogrid" does not exist
+2021-04-06 09:45:11.998 CEST [10692] FATAL:  role "cgdb_admin" does not exist
+2021-04-06 09:47:55.529 CEST [20232] FATAL:  role "cgdb_admin" does not exist
+2021-04-06 09:48:43.332 CEST [17532] FATAL:  role "cgdb_admin" does not exist
+2021-04-06 13:47:39.782 CEST [1924] FATAL:  database "lila9" does not exist
+2021-04-06 13:50:04.921 CEST [11560] ERROR:  source database "template1" is being accessed by other users
+2021-04-06 13:50:04.921 CEST [11560] DETAIL:  There is 1 other session using the database.
+2021-04-06 13:50:04.921 CEST [11560] STATEMENT:  CREATE DATABASE lila9;
+2021-04-06 13:58:32.218 CEST [14040] FATAL:  role "postgres" does not exist
+2021-04-06 16:18:09.757 CEST [16140] ERROR:  database "lila9" already exists
+2021-04-06 16:18:09.757 CEST [16140] STATEMENT:  CREATE DATABASE lila9;
+2021-04-06 17:07:44.388 CEST [21072] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2021-04-06 17:12:08.611 CEST [15696] FATAL:  role "postgres" does not exist
+2021-04-06 17:13:33.625 CEST [12120] FATAL:  role "postgres" does not exist
+2021-04-06 17:21:00.083 CEST [4328] ERROR:  syntax error at or near "ALTER" at character 23
+2021-04-06 17:21:00.083 CEST [4328] STATEMENT:  ALTER USER cgdb_admin
+	ALTER USER cgdb_admin CREATEDB;
+2021-04-06 17:21:11.471 CEST [4328] ERROR:  syntax error at or near "CREATEDB" at character 1
+2021-04-06 17:21:11.471 CEST [4328] STATEMENT:  CREATEDB;
