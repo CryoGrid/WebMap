@@ -1,0 +1,22 @@
+{% load leaflet_tags %}
+<html>
+    <head>
+        {% leaflet_js %}
+        {% leaflet_css %}
+        <style>
+            .leaflet-container { height: 100%; }
+        </style>
+        <script>
+            window.addEventListener("map:init", function (e) {
+                var detail = e.detail;
+                ...
+                L.marker([50.5, 30.5]).addTo(detail.map);
+                ...
+            }, false);
+        </script>
+    </head>
+    <body>
+        <h1>Temperature Map</h1>
+        {% leaflet_map "main" %}
+    </body>
+</html>

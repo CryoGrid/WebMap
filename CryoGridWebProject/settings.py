@@ -17,6 +17,18 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# geodjango setup
+if os.name == 'nt':
+    import platform
+    OSGEO4W = r"C:\OSGeo4W"
+    if '64' in platform.architecture()[0]:
+        OSGEO4W += "64"
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -29,6 +41,16 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Leaflet configurations
+LEAFLET_CONFIG = {
+    #'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 64),
+    'DEFAULT_CENTER': (52.38131276242783, 13.066351933955268),
+    'DEFAULT_ZOOM': 16,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'DEFAULT_PRECISION': 6,
+}
+
 
 # Application definition
 
@@ -39,6 +61,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'leaflet',
+    'djgeojson',
     'cgmap',
 ]
 
@@ -80,7 +104,7 @@ DATABASES = {
     'default': {
         # local configurations for db
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'cryogrid_db',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': str(os.getenv('LOCAL_DB_KEY')),
         'HOST': 'localhost',
