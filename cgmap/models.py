@@ -7,9 +7,12 @@ from django.contrib.postgres.fields import ArrayField
 
 class CryoGridData(models.Model):
     db_table = 'cryo_grid_data'
+    lat = models.DecimalField(max_digits=9, decimal_places=6, default=None)
+    long = models.DecimalField(max_digits=9, decimal_places=6, default=None)
     start_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
+
 
 
 class ForcingData(models.Model):
@@ -41,6 +44,9 @@ class SoilType(models.Model):
     min_depth = models.PositiveBigIntegerField()
     max_depth = models.PositiveBigIntegerField()
 
+    def __str__(self):
+        return self.name
+
 
 class SoilCharacteristics(models.Model):
     db_table = 'soil_characteristics'
@@ -56,3 +62,5 @@ class SoilCharacteristics(models.Model):
     min_depth = models.PositiveBigIntegerField()
     max_depth = models.PositiveBigIntegerField()
 
+    def __str__(self):
+        return self.name

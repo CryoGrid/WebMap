@@ -1,4 +1,5 @@
 {% load leaflet_tags %}
+{% load static %}
 <html>
     <head>
         {% leaflet_js %}
@@ -14,9 +15,10 @@
                 ...
             }, false);
         </script>
+        <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
     </head>
     <body>
-        <h1>Temperature Map</h1>
+        <!--<h1>Temperature Map</h1> -->
         {% leaflet_map "main" %}
     </body>
 </html>
