@@ -7,14 +7,7 @@
         <style>
             .leaflet-container { height: 100%; }
         </style>
-        <script>
-            window.addEventListener("map:init", function (e) {
-                var detail = e.detail;
-                ...
-                L.marker([50.5, 30.5]).addTo(detail.map);
-                ...
-            }, false);
-        </script>
+        <script src="{% static 'cgmap/map.js' %}"></script>
         <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
     </head>
     <body>

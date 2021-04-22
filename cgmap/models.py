@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+
 # from django.contrib.gis.db import models -> throws error: GDAL lib is missing
 
 
@@ -12,7 +14,6 @@ class CryoGridData(models.Model):
     start_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)
-
 
 
 class ForcingData(models.Model):
