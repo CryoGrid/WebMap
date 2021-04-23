@@ -16,8 +16,7 @@ window.addEventListener("map:init", function (e) {
             if(marker != undefined){
                 detail.map.removeLayer(marker);
             };
-            // add a new marker
+            // add a new marker with a popup
             marker = L.marker([lat, long]).addTo(detail.map).bindPopup("You clicked the map at Lat: "+ lat+" and Long: "+long).openPopup();
-            //popup.setLatLng([lat, long]).setContent( "You clicked the map at Lat: "+ lat+" and Long: "+long ).openOn(detail.map);
         });
     }, false);
