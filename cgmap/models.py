@@ -6,16 +6,6 @@ from django.contrib.postgres.fields import ArrayField
 
 
 # Create your models here.
-
-class CryoGridData(models.Model):
-    db_table = 'cryo_grid_data'
-    lat = models.DecimalField(max_digits=9, decimal_places=6, default=None)
-    long = models.DecimalField(max_digits=9, decimal_places=6, default=None)
-    start_date = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
-
-
 class ForcingData(models.Model):
     db_table = 'forcing_data'
     name = models.CharField(max_length=256)
@@ -65,3 +55,28 @@ class SoilCharacteristics(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CryoGridData(models.Model):
+    db_table = 'cryo_grid_data'
+    lat = models.DecimalField(max_digits=9, decimal_places=6, default=None)
+    long = models.DecimalField(max_digits=9, decimal_places=6, default=None)
+    start_date = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    forcing_data = models.ForeignKey(
+        ForcingData,
+        on_delete=models.CASCADE,
+        verbose_name="related forcing data",
+        blank=False,
+        null=False,
+        default=None,
+    )
+    soil_characteristics = models.ForeignKey(
+        SoilCharacteristics,
+        on_delete=models.CASCADE,
+        verbose_name="related soil characteristics",
+        blank=False,
+        null=False,
+        default=None,
+    )
