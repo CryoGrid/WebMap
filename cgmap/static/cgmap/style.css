@@ -1,0 +1,151 @@
+/****************
+* Colour Scheme *
+****************/
+:root{
+    --primary: #2BB3C0;
+    --primary_light: #EAF7F9;
+    --secondary: #EF6C35;
+    --tertiary: #FAF7F2;
+    --dark: #161C2E;
+    --success: #69DE05;
+    --error: #DE0E05;
+    --text: #4A4A68;
+    --subtle_text: #8C8CA1;
+    --accent: #ECF1F4;
+    --light: #FAFCFE;
+}
+
+/*************
+* Typography *
+*************/
+header1{
+    Font Family: Work Sans
+    Weight: Bold
+    Font Size: 64px
+    Letter Spacing: -2%
+}
+
+header2{
+    Font Family: Work Sans
+    Weight: Bold
+    Font Size: 40px
+    Letter Spacing: -2%
+}
+
+header3{
+    Font Family: Work Sans
+    Weight: Bold
+    Font Size: 24px
+    Letter Spacing: -2%
+}
+
+default-text-large{
+    Font Family: Work Sans
+    Weight: Medium
+    Font Size: 24px
+}
+
+default-text{
+    Font Family: Work Sans
+    Weight: Medium
+    Font Size: 16px
+    Line Height: 75px
+    Line Height: 140%
+}
+
+default-text-bold{
+    Weight: Bold
+}
+
+default-text-small{
+    Font Family: Work Sans
+    Weight: Medium
+    Font Size: 14px
+}
+
+pre-title{
+    Font Family: Work Sans
+    Weight: Bold
+    Font Size: 12px
+    Letter Spacing: 3%
+}
+
+button-text{
+    Font Family: Work Sans
+    Font Style: Bold
+    Font Size: 16px
+    Letter Spacing: 3%
+}
+
+ling-text{
+    Font Family: Work Sans
+    Weight: Bold
+    Font Size: 16px
+    decoration: underline
+}
+
+
+/************************
+* Leaflet Customization *
+************************/
+
+.leaflet-popup-content-wrapper {
+    color: var(--text)
+    background: var(--accent);
+    opacity: 0.9;
+}
+
+.leaflet-popup-content-wrapper .leaflet-popup-content {
+    /* Auto Layout */
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    position: static;
+    left: 11.53%;
+    right: 11.53%;
+    top: 13.02%;
+    bottom: 9.52%;
+
+
+    /* Inside Auto Layout */
+
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+}
+
+hr {
+    /* Hairline */
+    background: var(--primary);
+    border: none;
+    height: 2px;
+    /*left: calc(50% - 267px/2);
+    top: calc(50% - 0px/2 + 22px);*/
+
+}
+
+.leaflet-popup-tip-container {
+}
+
+.leaflet-popup-tip-container .leaflet-popup-tip{
+    color: var(--text)
+    background: var(--accent);
+
+}
+
+.leaflet-container a.leaflet-popup-close-button{
+    color: var(--primary);
+    /*border: 1px solid var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    width: 18px;
+    height: 18px;
+    right: 4px;
+    top: 4px;
+    border-radius: 4px;*/
+}

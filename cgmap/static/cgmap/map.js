@@ -11,12 +11,16 @@ window.addEventListener("map:init", function (e) {
             lat = pos.latlng.lat;
             long = pos.latlng.lng;
 
+            content = "<h3 class=header3>This is a header</h3><div><hr> You clicked the map at Lat: "+ lat+" and Long: "+long +"</div>"
+
             console.log( "You clicked the map at Lat: "+ lat+" and Long: "+long );
             // delete existing marker
             if(marker != undefined){
                 detail.map.removeLayer(marker);
             };
             // add a new marker with a popup
-            marker = L.marker([lat, long]).addTo(detail.map).bindPopup("You clicked the map at Lat: "+ lat+" and Long: "+long).openPopup();
+            marker = L.marker([lat, long]).addTo(detail.map)
+                        .bindPopup(content)
+                        .openPopup();
         });
     }, false);
