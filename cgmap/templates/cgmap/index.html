@@ -1,18 +1,27 @@
+{% extends 'base_template.html' %}
 {% load leaflet_tags %}
 {% load static %}
-<html>
-    <head>
-        {% leaflet_js %}
-        {% leaflet_css %}
-        <style>
-            .leaflet-container { height: 100%; }
-        </style>
-        <script src="{% static 'cgmap/map.js' %}"></script>
-        <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
-    </head>
-    <body>
-        <!--<h1>Temperature Map</h1> -->
-        <div>{% leaflet_map "main" %}</div>
 
-    </body>
-</html>
+
+{% block title %} Soil Temperature Map {% endblock %}
+{% block head_meta_page %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock head_meta_page %}
+
+{% block head_css_page %}
+    <style>
+        .leaflet-container { height: 100%; }
+    </style>
+    <script src="{% static 'cgmap/map.js' %}"></script>
+{% endblock head_css_page %}
+
+{% block footer_javascript_page %}
+    <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
+{% endblock footer_javascript_page %}
+
+
+{% block content %}
+    <!--<h1>Temperature Map</h1> -->
+    <div>{% leaflet_map "main" %}</div>
+{% endblock content %}
