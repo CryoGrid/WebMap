@@ -149,3 +149,20 @@ hr {
     top: 4px;
     border-radius: 4px;*/
 }
+
+/************************
+* Bootstrap Customization *
+************************/
+
+.btn-secondary {
+    color: var(--primary);
+    background: var(--primary_light);
+    border-color: 1px solid var(--primary);
+}
+.btn-secondary:hover {
+    color: var(--primary_light);
+    background: var(--primary);
+    border-color: var(--primary);
+}
+.btn-group-vertical { display:block; text-align: right; }
+.btn-group-vertical .dropdown { float: none; }
