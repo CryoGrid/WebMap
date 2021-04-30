@@ -22,8 +22,28 @@
 
 
 {% block content %}
-    <!--<h1>Temperature Map</h1> -->
-    <div>
-        {% leaflet_map "main" %}
+    <div id="map-wrapper">
+        <div id="map">
+            {% leaflet_map "main" %}
+        </div>
+        <div class="depth-container">
+            <div class="depth-title-wrapper">
+                <div class="depth-container description default-text-small">Depth in cm</div>
+                <div class="depth-btn-wrapper">
+                    <div class="depth-btn icon-wrapper">&#xe5cc;</div>
+                </div>
+            </div>
+            <div class="depth-container scale-container"></div>
+        </div>
+        <div class="temperature-container">
+            <div class="temperature-title-wrapper">
+                <div class="temperature-container description default-text-small">Temperature in °C</div>
+                <div class="temperature-btn-wrapper">
+                    <div class="arrow-btn icon-wrapper">&#xe5cc;</div>
+                </div>
+            </div>
+            <div class="temperature-container scale-container"></div>
+        </div>
     </div>
+
 {% endblock content %}

@@ -19,68 +19,68 @@
 * Typography *
 *************/
 header1{
-    Font Family: Work Sans
-    Weight: Bold
-    Font Size: 64px
-    Letter Spacing: -2%
+    font-family: "Work Sans"
+    weight: bold
+    font-size: 64px
+    letter-spacing: -2%
 }
 
 header2{
-    Font Family: Work Sans
-    Weight: Bold
-    Font Size: 40px
-    Letter Spacing: -2%
+    font-family: "Work Sans"
+    weight: bold
+    font-size: 40px
+    letter-spacing: -2%
 }
 
 header3{
-    Font Family: Work Sans
-    Weight: Bold
-    Font Size: 24px
-    Letter Spacing: -2%
+    font-family: "Work Sans"
+    weight: bold
+    font-size: 24px
+    letter-spacing: -2%
 }
 
 default-text-large{
-    Font Family: Work Sans
-    Weight: Medium
-    Font Size: 24px
+    font-family: "Work Sans"
+    weight: medium
+    font-size: 24px
 }
 
 default-text{
-    Font Family: Work Sans
-    Weight: Medium
-    Font Size: 16px
-    Line Height: 75px
-    Line Height: 140%
+    font-family: "Work Sans"
+    weight: Medium
+    font-size: 16px
+    line-height: 75px
+    line-height: 140%
 }
 
 default-text-bold{
-    Weight: Bold
+    weight: bold
 }
 
 default-text-small{
-    Font Family: Work Sans
-    Weight: Medium
-    Font Size: 14px
+    font-family: "Work Sans"
+    weight: medium
+    font-size: 14px
 }
 
 pre-title{
-    Font Family: Work Sans
-    Weight: Bold
-    Font Size: 12px
-    Letter Spacing: 3%
+    font-family: "Work Sans"
+    weight: bold
+    font-size: 12px
+    letter-spacing: 3%
 }
 
 button-text{
-    Font Family: Work Sans
-    Font Style: Bold
-    Font Size: 16px
+    font-family: "Work Sans"
+    font-style: bold
+    font-size: 16px
     Letter Spacing: 3%
 }
 
 ling-text{
-    Font Family: Work Sans
-    Weight: Bold
-    Font Size: 16px
+    font-family: "Work Sans"
+    weight: bold
+    font-size: 16px
     decoration: underline
 }
 
@@ -150,9 +150,9 @@ hr {
     border-radius: 4px;*/
 }
 
-/************************
+/**************************
 * Bootstrap Customization *
-************************/
+**************************/
 
 .btn-secondary {
     color: var(--primary);
@@ -166,3 +166,294 @@ hr {
 }
 .btn-group-vertical { display:block; text-align: right; }
 .btn-group-vertical .dropdown { float: none; }
+
+/*************
+* Custom CSS *
+*************/
+#nav-menu {
+    position: relative;
+    right: 50px;
+    top: 100px;
+    opacity: 0.8;
+    z-index: 1;
+}
+
+#footer {
+    position:relative;
+    bottom: 30px;
+    width: 100%;
+}
+
+#map {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+#map-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#button-wrapper {
+    position: relative;
+    left: 10px;
+}
+
+.depth-title-wrapper {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 0px;
+
+    position: static;
+    width: 115px;
+    height: 24px;
+    left: 8px;
+    top: 8px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 4px 0px;
+}
+
+.depth-btn-wrapper {
+    /* Icon/Arrow */
+    position: static;
+    width: 24px;
+    height: 24px;
+    left: 91px;
+    top: 0px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 4px;
+}
+
+.depth-btn .icon-wrapper {
+    /* Polygon 1 */
+    position: absolute;
+    left: 0%;
+    right: 0%;
+    top: 100%;
+    bottom: -100%;
+
+    /* Turquoise-10 */
+    background: var(--primary_light);
+
+    /* Turquoise */
+    border: 1px solid var(--primary);
+    box-sizing: border-box;
+    border-radius: 2px;
+    transform: rotate(-90deg);
+}
+
+.depth-container {
+    /* Temperature Scale */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+
+    position: absolute;
+    width: 131px;
+    height: 564px;
+    left: 6px;
+    top: 286px;
+
+    /* Accent */
+    background: var(--accent);
+    opacity: 0.9;
+
+    /* Turquoise-10 */
+    border: 1px solid var(--primary_light);
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.depth-container .description {
+    /* Depth in cm */
+    position: static;
+    width: 87px;
+    height: 20px;
+    left: 0px;
+    top: 0px;
+
+    /* identical to box height, or 20px */
+    display: flex;
+    align-items: center;
+    text-transform: capitalize;
+    color: var(--dark);
+
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0px 4px;
+}
+
+.depth-container .scale-container {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 8px;
+
+    position: static;
+    width: 66px;
+    height: 520px;
+    left: 32.5px;
+    top: 36px;
+
+    background: #FFFFFF;
+
+    /* Turquoise */
+    border: 1px solid var(--primary);
+    box-sizing: border-box;
+    box-shadow: 0px 0px 0px 4px rgba(43, 179, 192, 0.2);
+    border-radius: 8px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 4px 0px;
+}
+
+.temperature-container {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+
+    position: absolute;
+    width: 136px;
+    height: 676px;
+    left: 1297px;
+    top: 240px;
+
+    /* Accent */
+    background: var(--accent);
+    opacity: 0.9;
+    /* Turquoise-10 */
+    border: 1px solid var(--primary_light);
+    border-radius: 8px;
+}
+
+.temperature-title-wrapper {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+
+    position: static;
+    width: 120px;
+    height: 40px;
+    left: 8px;
+    top: 8px;
+
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 4px 0px;
+}
+
+.temperature-container .scale-container {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 8px 12px;
+
+    position: static;
+    width: 72px;
+    height: 616px;
+    left: 32px;
+    top: 52px;
+
+    background: #FFFFFF;
+    /* Turquoise */
+    border: 1px solid var(--primary);
+    box-sizing: border-box;
+    box-shadow: 0px 0px 0px 4px rgba(43, 179, 192, 0.2);
+    border-radius: 8px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 4px 0px;
+}
+
+.temperature-container .description {
+    /* Temperature in °C */
+    position: static;
+    width: 92px;
+    height: 40px;
+    left: 28px;
+    top: 0px;
+
+    /* or 20px */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    text-transform: capitalize;
+
+    color: var(--dark);
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 4px;
+}
+
+.temperature-btn-wrapper {
+    /* Icon/Arrow */
+    position: static;
+    width: 24px;
+    height: 24px;
+    left: 24px;
+    top: 32px;
+
+    transform: rotate(-180deg);
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0px 4px;
+}
+
+.arrow-btn .icon-wrapper {
+    /* Polygon 1 */
+    position: absolute;
+    left: 100%;
+    right: -100%;
+    top: 0%;
+    bottom: 0%;
+
+    /* Turquoise-10 */
+    background: var(--primary_light);
+
+    /* Turquoise */
+    border: 1px solid var(--primary);
+    box-sizing: border-box;
+    border-radius: 2px;
+    transform: rotate(90deg);
+}
