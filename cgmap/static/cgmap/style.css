@@ -171,26 +171,27 @@ hr {
 * Custom CSS *
 *************/
 #nav-menu {
-    position: relative;
-    right: 50px;
-    top: 100px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
     opacity: 0.8;
     z-index: 1;
 }
 
+/* footer location on map */
 #footer {
-    position:relative;
-    bottom: 30px;
+    position:absolute;
+    bottom: 5px;
     width: 100%;
 }
-
+/* size of map in background */
 #map {
     position: absolute;
     width: 100%;
     height: 100%;
     z-index: 0;
 }
-
+/* wrapper to display the map behind the ui elements*/
 #map-wrapper {
     width: 100%;
     height: 100%;
@@ -267,7 +268,7 @@ hr {
     width: 131px;
     height: 564px;
     left: 6px;
-    top: 286px;
+    top: 25%;
 
     /* Accent */
     background: var(--accent);
@@ -290,7 +291,6 @@ hr {
     /* identical to box height, or 20px */
     display: flex;
     align-items: center;
-    text-transform: capitalize;
     color: var(--dark);
 
 
@@ -298,7 +298,7 @@ hr {
     flex: none;
     order: 0;
     flex-grow: 0;
-    margin: 0px 4px;
+    margin: 4px 4px;
 }
 
 .depth-container .scale-container {
@@ -341,8 +341,8 @@ hr {
     position: absolute;
     width: 136px;
     height: 676px;
-    left: 1297px;
-    top: 240px;
+    top: 25%;
+    right: 6px;
 
     /* Accent */
     background: var(--accent);
@@ -412,15 +412,13 @@ hr {
     display: flex;
     align-items: center;
     text-align: center;
-    text-transform: capitalize;
-
     color: var(--dark);
 
     /* Inside Auto Layout */
     flex: none;
     order: 1;
     flex-grow: 0;
-    margin: 0px 4px;
+    margin: 4px 4px;
 }
 
 .temperature-btn-wrapper {
@@ -456,4 +454,124 @@ hr {
     box-sizing: border-box;
     border-radius: 2px;
     transform: rotate(90deg);
+}
+
+.timeline-container {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+
+    position: absolute;
+    width: 495px;
+    height: 72px;
+    left: 25%;
+    bottom: 0;
+
+    /* Turquoise */
+    background: var(--primary);
+    opacity: 0.9;
+    /* Accent */
+    border: 1px solid var(--accent);
+    box-sizing: border-box;
+    border-radius: 8px;
+}
+
+.timeline {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 1px 20px 0px;
+
+    position: static;
+    width: 305px;
+    height: 56px;
+    left: 182px;
+    top: 8px;
+
+    background: #FFFFFF;
+
+    /* Turquoise */
+    border: 1px solid #2BB3C0;
+    box-sizing: border-box;
+    box-shadow: 0px 0px 0px 2px rgba(43, 179, 192, 0.2);
+    border-radius: 8px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 8px;
+}
+
+.timeline-group {
+    /* Auto Layout */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+
+    position: static;
+    width: 304px;
+    height: 16px;
+    left: 0px;
+    top: 20px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 10px 0px;
+}
+
+.timeline-element {
+    /* _Scale/Timeline Indicator */
+    position: static;
+    width: 48px;
+    height: 16px;
+    left: 192px;
+    top: 0px;
+    /* Inside Auto Layout */
+    flex: none;
+    order: 4;
+    flex-grow: 0;
+    margin: 0px 0px;
+}
+
+.timeline-element-line {
+    position: relative;
+    left: 66.67%;
+    right: -33.33%;
+    top: 43.75%;
+    bottom: 56.25%;
+    z-index:0;
+
+    /* Turquoise */
+    border: 2px solid var(--primary);
+    transform: rotate(180deg);
+}
+
+.timeline-element-circle {
+    height: 18px;
+    width: 18px;
+
+    position: relative;
+    left: 150%;
+    right: 0;
+    top: -25%;
+    bottom: 0;
+    z-index:1;
+
+    /* Light */
+    background: var(--light);
+
+    /* Turquoise */
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: inline-block;
 }
