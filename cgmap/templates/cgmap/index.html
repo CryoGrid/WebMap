@@ -28,32 +28,47 @@
         </div>
         <div class="depth-container">
             <div class="depth-title-wrapper">
-                <div class="depth-container description default-text-small">Depth in cm</div>
-                <div class="depth-btn-wrapper">
-                    <div class="depth-btn icon-wrapper">&#xe5cc;</div>
+                <div class="description default-text-small">Depth in cm</div>
+                <button class="btn btn-primary btn-sm">
+                    <span class="material-icons md-18">chevron_left</span>
+                </button>
+            </div>
+            <div class="depth-container scale-container">
+                <div class="scale-group">
+                    <div class="depth-scale-element-group depth-scale-element-group-hidden">
+                        <div class="depth-scale-element"></div>
+                        <div class="depth-scale-element"></div>
+                        <div class="depth-scale-element"></div>
+                        <div class="depth-scale-element"></div>
+                        <div class="depth-scale-element"></div>
+                    </div>
                 </div>
             </div>
-            <div class="depth-container scale-container"></div>
         </div>
         <div class="temperature-container">
             <div class="temperature-title-wrapper">
-                <div class="temperature-container description default-text-small">Temperature in °C</div>
-                <div class="temperature-btn-wrapper">
-                    <div class="arrow-btn icon-wrapper">&#xe5cc;</div>
-                </div>
+                <div class="description default-text-small">Temperature in °C</div>
+                <button class="btn btn-primary btn-sm">
+                    <span class="material-icons md-18">chevron_right</span>
+                </button>
             </div>
-            <div class="temperature-container scale-container"></div>
+            <div class="temperature-container scale-container">
+                <div class="scale-group"></div>
+            </div>
         </div>
         <div class="timeline-container">
             <div class="btn-group btn-group-toggle justify-content-start" id="timeline-nav" data-toggle="buttons">
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="previous" autocomplete="off" checked>&#xe045;
+                    <input type="radio" name="options" id="previous" autocomplete="off" checked>
+                    <span class="material-icons md-24">skip_previous</span>
                 </label>
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="start" autocomplete="off">&#xe037;
+                    <input type="radio" name="options" id="start" autocomplete="off">
+                    <span class="material-icons md-24">play_arrow</span>
                 </label>
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="next" autocomplete="off">&#xe044;
+                    <input type="radio" name="options" id="next" autocomplete="off">
+                    <span class="material-icons md-24">skip_next</span>
                 </label>
             </div>
             <div class="timeline">
@@ -73,6 +88,14 @@
                     <div class="timeline-element" id="4-timeline-element">
                         <div class="timeline-element-line"></div>
                         <div class="timeline-element-circle"></div>
+                    </div>
+                    <div class="timeline-element" id="5-timeline-element">
+                        <div class="timeline-element-line"></div>
+                        <div class="timeline-element-circle"></div>
+                    </div>
+                    <div class="timeline-element" id="6-timeline-element">
+                        <div class="timeline-element-line"></div>
+                        <div class="timeline-element-arrow"></div>
                     </div>
                 </div>
             </div>
