@@ -1,3 +1,8 @@
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
 /****************
 * Colour Scheme *
 ****************/
@@ -283,7 +288,7 @@ hr {
     position: absolute;
     width: 136px;
     height: 600px;
-    left: 6px;
+    left: -110px;
     top: 25%;
 
     /* Accent */
@@ -297,6 +302,17 @@ hr {
 
     -webkit-box-shadow: 2px 2px 12px 4px rgba(0,0,0,0.4);
     box-shadow: 2px 2px 12px 4px rgba(0,0,0,0.4)
+}
+
+.left-transition {
+    -webkit-transition: left 0.3s ease-out;  /* Chrome 1-25, Safari 3.2+ */
+         -moz-transition: left 0.3s ease-out;  /* Firefox 4-15 */
+           -o-transition: left 0.3s ease-out;  /* Opera 10.50–12.00 */
+              transition: left 0.3s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+}
+
+.depth-container-open {
+    left: 6px !important;
 }
 
 .depth-container .description {
@@ -413,7 +429,7 @@ hr {
     width: 136px;
     height: 676px;
     top: 20%;
-    right: 6px;
+    right: -110px;
 
     /* Accent */
     background: var(--accent);
@@ -424,6 +440,17 @@ hr {
 
     -webkit-box-shadow: 2px 2px 12px 4px rgba(0,0,0,0.4);
     box-shadow: 2px 2px 12px 4px rgba(0,0,0,0.4)
+}
+
+.right-transition {
+    -webkit-transition: right 0.3s ease-out;  /* Chrome 1-25, Safari 3.2+ */
+         -moz-transition: right 0.3s ease-out;  /* Firefox 4-15 */
+           -o-transition: right 0.3s ease-out;  /* Opera 10.50–12.00 */
+              transition: right 0.3s ease-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
+}
+
+.temperature-container-open {
+    right: 6px !important;
 }
 
 .temperature-title-wrapper {

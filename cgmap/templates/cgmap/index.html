@@ -13,11 +13,38 @@
     <style>
         .leaflet-container { height: 100%; overflow: hidden}
     </style>
-    <script src="{% static 'cgmap/map.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
 {% endblock head_css_page %}
 
 {% block footer_javascript_page %}
-    <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="{% static 'cgmap/map.js' %}"></script>
+    {# jquary for scale animation #}
+    <script>
+        $('#depth-slider').on('click', function(){
+            console.log( "Button depth-slider was clicked!" );
+            $('#left-slider').toggleClass('depth-container-open');
+            var icon = $('#depth_chevron');
+            icon.toggleClass('left');
+            if( icon.hasClass('left')){
+                icon.text('chevron_left');
+            } else {
+                icon.text('chevron_right');
+            }
+        });
+
+        $('#temperature-slider').on('click', function(){
+            console.log( "Button temperature-slider was clicked!" );
+            $('#right-slider').toggleClass('temperature-container-open');
+            var icon = $('#temperature_chevron');
+            icon.toggleClass('right');
+            if( icon.hasClass('right')){
+                icon.text('chevron_right');
+            } else {
+                icon.text('chevron_left');
+            }
+        });
+    </script>
 {% endblock footer_javascript_page %}
 
 
@@ -26,11 +53,11 @@
         <div id="map">
             {% leaflet_map "main" %}
         </div>
-        <div class="depth-container">
+        <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
                 <div class="description default-text-small">Depth in cm</div>
-                <button class="btn btn-primary btn-sm">
-                    <span class="material-icons md-18">chevron_left</span>
+                <button class="btn btn-primary btn-sm" id="depth-slider">
+                    <span class="material-icons md-18 right" id="depth_chevron">chevron_right</span>
                 </button>
             </div>
             <div class="depth-container scale-container">
@@ -45,11 +72,11 @@
                 </div>
             </div>
         </div>
-        <div class="temperature-container">
+        <div class="temperature-container right-transition" id="right-slider">
             <div class="temperature-title-wrapper">
                 <div class="description default-text-small">Temperature in °C</div>
-                <button class="btn btn-primary btn-sm">
-                    <span class="material-icons md-18">chevron_right</span>
+                <button class="btn btn-primary btn-sm" id="temperature-slider">
+                    <span class="material-icons md-18 left" id="temperature_chevron">chevron_left</span>
                 </button>
             </div>
             <div class="temperature-container scale-container">
@@ -59,15 +86,15 @@
         <div class="timeline-container">
             <div class="btn-group btn-group-toggle justify-content-start" id="timeline-nav" data-toggle="buttons">
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="previous" autocomplete="off" checked>
+                    <input type="radio" name="options" id="previous" autocomplete="off" value="previous">
                     <span class="material-icons md-24">skip_previous</span>
                 </label>
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="start" autocomplete="off">
+                    <input type="radio" name="options" id="start" autocomplete="off" value="start">
                     <span class="material-icons md-24">play_arrow</span>
                 </label>
                 <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="next" autocomplete="off">
+                    <input type="radio" name="options" id="next" autocomplete="off" value="next">
                     <span class="material-icons md-24">skip_next</span>
                 </label>
             </div>
