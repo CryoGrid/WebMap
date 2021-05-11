@@ -18,6 +18,18 @@ html, body {
     --subtle_text: #8C8CA1;
     --accent: #ECF1F4;
     --light: #FAFCFE;
+
+    --dark_brown: #3E2400;
+    --brown: #693D00;
+    --sand_brown: #BA700B;
+    --orange_brown: #EB8702;
+    --yellow: #F2C94C;
+
+    --red: #EB5757;
+    --orange: #F2994A;
+    --green: #6FCF97;
+    --blue: #2D9CDB;
+    --purple: #9B51E0;
 }
 
 /*************
@@ -365,16 +377,18 @@ hr {
     margin: 8px 0px;
 }
 
-.depth-scale-element-group {
+.scale-element-group {
     position: relative;
+    width: 16px;
+    height: 100px;
     left: 0%;
     right: -525%;
-    top: 100%;
-    bottom: -3.2%;
-    transform: rotate(-90deg);
+    top: 0%;
+    bottom: 0%;
+    background: #FFFFFF;
 }
 
-.depth-scale-element-group-hidden {
+.scale-element-group-hidden {
     position: relative;
     visibility: hidden;
     left: 0%;
@@ -387,15 +401,16 @@ hr {
 }
 
 .depth-scale-element {
-    position: absolute;
+    position: relative;
+    width: 16px;
+    height: 20px;
     left: 0%;
-    right: 80%;
-    top: 125%;
-    bottom: -131.25%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    z-index: 1;
 
-    background: #3E2400;
-    opacity: 0.15;
-    transform: rotate(-90deg);
+    background: var(--dark_brown);
 }
 
 .scale-group {
@@ -404,6 +419,7 @@ hr {
     height: 500px;
     left: 8px;
     top: 10px;
+    z-index: 2;
 
     /* Accent */
     border: 1px solid var(--accent);
@@ -415,6 +431,31 @@ hr {
     order: 0;
     flex-grow: 0;
     margin: 0px 8px;
+
+}
+
+.scale-indicator {
+    position: absolute;
+    left: 0%;
+    right: -525%;
+    top: 100%;
+    bottom: -3.2%;
+
+    transform: rotate(-90deg);
+}
+
+.rectangle {
+    z-index: 1;
+    position: relative;
+    width: 16px;
+    height: 20px;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+    z-index: 1;
+
+    background: #FFFFFF;
 }
 
 .temperature-container {
@@ -656,3 +697,22 @@ hr {
     transform: rotate(-45deg);
     -webkit-transform: rotate(-45deg);
 }
+
+.opacity0{opacity:0}
+.opacity075{opacity:0.75}
+.opacity05{opacity:0.5}
+.opacity025{opacity:0.25}
+.opacity015{opacity:0.15}
+
+.dark_brown{background: var(--dark_brown);}
+.brown{background: var(--brown);}
+.sand_brown{background: var(--sand_brown);}
+.orange_brown{background: var(--orange_brown);}
+
+
+.red{background: var(--red);}
+.orange{background: var(--orange);}
+.yellow{background: var(--yellow);}
+.green{background: var(--green);}
+.blue{background: var(--blue);}
+.purple{background: var(--purple);}
