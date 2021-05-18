@@ -8,7 +8,7 @@ from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 class ForcingData(models.Model):
     db_table = 'forcing_data'
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=50)
     description = models.TextField()
     start_date = models.DateTimeField()
     precipitation = ArrayField(
@@ -30,7 +30,7 @@ class ForcingData(models.Model):
 
 class SoilType(models.Model):
     db_table = 'soil_type'
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=50)
     description = models.TextField()
     min_depth = models.PositiveBigIntegerField()
     max_depth = models.PositiveBigIntegerField()
@@ -41,7 +41,7 @@ class SoilType(models.Model):
 
 class SoilCharacteristics(models.Model):
     db_table = 'soil_characteristics'
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=50)
     description = models.TextField()
     soil_type = models.ForeignKey(
         SoilType,
@@ -59,8 +59,16 @@ class SoilCharacteristics(models.Model):
 
 class CryoGridData(models.Model):
     db_table = 'cryo_grid_data'
+    name = models.CharField(max_length=50)
     lat = models.DecimalField(max_digits=9, decimal_places=6, default=None)
     long = models.DecimalField(max_digits=9, decimal_places=6, default=None)
+    alt = models.DecimalField(max_digits=9, decimal_places=6, default=None)
+    z_level = ArrayField(models.BigIntegerField())
+    tsoil = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=18, decimal_places=15, default=None)
+        )
+    )
     start_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
     modified_at = models.DateTimeField(auto_now=True, editable=False)

@@ -7,7 +7,8 @@ from ..models import ForcingData, SoilCharacteristics, SoilType, CryoGridData
 class MapModelTestCase(TestCase):
 
     def setUp(self):
-        self.cg_data = CryoGridData(lat=52.38131276242783,
+        self.cg_data = CryoGridData(name='5213',
+                                    lat=52.38131276242783,
                                     long=13.066351933955268,
                                     start_date='01.01.2020')
         self.forcing_data = ForcingData(name='wind speed',
@@ -29,10 +30,9 @@ class MapModelTestCase(TestCase):
         pass
 
     def test_cryo_grid_data_display(self):
-        cryo_grid_data = CryoGridData(
-            lat=52.38131276242783,
-            long=13.066351933955268,
-        )
+        data = CryoGridData.objects.all()
+        for val in data:
+            self.assertEqual(val.name, '5213')
 
     def test_forcing_data_display(self):
         self.assertEqual(str(self.forcing_data), self.forcing_data.name)
