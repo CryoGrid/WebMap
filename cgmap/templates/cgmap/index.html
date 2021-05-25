@@ -10,16 +10,18 @@
 {% endblock head_meta_page %}
 
 {% block head_css_page %}
-    <style>
+    <style xmlns="http://www.w3.org/1999/html">
         .leaflet-container { height: 100%; overflow: hidden}
+        {#.leaflet-tile { border: solid black 2px; }#}
     </style>
     <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}">
 {% endblock head_css_page %}
 
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="{% static 'cgmap/map.js' %}"></script>
-    {# jquery for scale animation #}
+    <script src="{% static 'cgmap/basemap.js' %}"></script>
+    <script src="{% static 'cgmap/gridlayer.js' %}"></script>
+{# jquery for scale animation #}
     <script>
         $('#depth-slider').on('click', function(){
             console.log( "Button depth-slider was clicked!" );
@@ -53,6 +55,25 @@
         <div id="map">
             {% leaflet_map "main" %}
         </div>
+ <!--       <div class="dialog-container">
+            <div class="dialog-content">
+                <div class="dialog-content-title header3">
+                    {% for data in cg_data %}
+                        {{ data.name }}
+                    {% endfor %}
+                </div>
+                <div class="dialog-content-text default-text-small">
+                    {% for data in cg_data%}
+                       at the location with latitude {{ data.lat }} and longitude {{ data.long }}. </br>
+                    {% endfor %}
+                    With forcing data:
+                    {% for forcing in fd_data%}
+                        {{ forcing.name }}
+                    {% endfor%}
+
+                </div>
+            </div>
+        </div>-->
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
                 <div class="description default-text-small">Depth in cm</div>

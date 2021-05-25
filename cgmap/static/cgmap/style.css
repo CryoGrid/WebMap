@@ -272,6 +272,7 @@ hr {
     left: 10px;
 }
 
+/* depth related ui */
 .depth-title-wrapper {
     /* Auto Layout */
     display: flex;
@@ -380,6 +381,7 @@ hr {
     margin: 8px 0px;
 }
 
+/* scale related ui */
 .scale-element-group {
     position: relative;
     width: 16px;
@@ -447,7 +449,6 @@ hr {
 }
 
 .rectangle {
-    z-index: 1;
     position: relative;
     width: 16px;
     height: 20px;
@@ -481,6 +482,7 @@ hr {
 
 }
 
+/* ui for temperature scale */
 .temperature-container {
     /* Auto Layout */
     display: flex;
@@ -586,6 +588,7 @@ hr {
     margin: 4px 4px;
 }
 
+/* ui for timeline element */
 .timeline-container {
     /* Auto Layout */
     display: flex;
@@ -721,6 +724,88 @@ hr {
     -webkit-transform: rotate(-45deg);
 }
 
+/* dialog ui element */
+.dialog-container {
+/* layout */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+
+    position: static;
+    width: 641px;
+
+/* design */
+    background: #ECF1F4;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+    opacity: 0.9;
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 8px 0px;
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+
+    position: static;
+    left: 6.24%;
+    right: 6.24%;
+    top: 16.73%;
+    bottom: 16.33%;
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 0px 0px;
+}
+
+.dialog-content-title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+
+    position: static;
+    width: 561px;
+    height: 44px;
+    left: 0px;
+    top: 0px;
+
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 10px 0px;
+}
+
+.dialog-content-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+
+    position: static;
+    width: 561px;
+    left: 0px;
+    top: 84px;
+
+    flex: none;
+    order: 1;
+    align-self: stretch;
+    flex-grow: 0;
+    margin: 10px 0px;
+}
+
+/*****************************
+* Opacity and Color elements *
+*****************************/
+
 .opacity0{opacity:0}
 .opacity075{opacity:0.75}
 .opacity05{opacity:0.5}
@@ -731,7 +816,6 @@ hr {
 .brown{background: var(--brown);}
 .sand_brown{background: var(--sand_brown);}
 .orange_brown{background: var(--orange_brown);}
-
 
 .red{background: var(--red);}
 .orange{background: var(--orange);}

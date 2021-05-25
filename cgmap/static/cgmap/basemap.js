@@ -1,5 +1,5 @@
 /**
-javascript file for all map related javascript code
+javascript file for the basemap related javascript code
 **/
 
 window.addEventListener("map:init", function (e) {
@@ -23,4 +23,12 @@ window.addEventListener("map:init", function (e) {
                         .bindPopup(content)
                         .openPopup();
         });
+
+
+        setInterval(function(){
+            map.setView([0, 0]);
+            setTimeout(function(){
+                map.setView([60, 0]);
+            }, 2000);
+        }, 4000);
     }, false);

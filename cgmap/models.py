@@ -18,7 +18,7 @@ class ForcingData(models.Model):
     )
     tair = ArrayField(
         ArrayField(
-            models.DecimalField(max_digits=19, decimal_places=16, default=None)
+            models.DecimalField(max_digits=6, decimal_places=3, default=None)
         )
     )
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -66,7 +66,7 @@ class CryoGridData(models.Model):
     z_level = ArrayField(models.BigIntegerField())
     tsoil = ArrayField(
         ArrayField(
-            models.DecimalField(max_digits=18, decimal_places=15, default=None)
+            models.DecimalField(max_digits=6, decimal_places=3, default=None)
         )
     )
     time = ArrayField(models.DateTimeField())
