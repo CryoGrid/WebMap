@@ -102,7 +102,8 @@ WSGI_APPLICATION = 'CryoGridWebProject.wsgi.application'
 DATABASES = {
     'default': {
         # local configurations for db
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': str(os.getenv('LOCAL_DB_KEY')),

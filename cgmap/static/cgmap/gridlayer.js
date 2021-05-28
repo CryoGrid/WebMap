@@ -2,7 +2,6 @@
 $(window).on('map:init', function (e) {
     var detail = e.originalEvent ?
                  e.originalEvent.detail : e.detail;
-    var db_data = "{{cg_data}}"
 
     var marker2 = L.marker([52.25, 12.75]).addTo(detail.map);
 

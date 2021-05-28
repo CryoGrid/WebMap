@@ -1,5 +1,6 @@
 # Create your views here.
-
+from django.contrib.postgres import serializers
+from django.core.serializers import serialize
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import loader
@@ -15,4 +16,5 @@ class MapView(TemplateView):
     def get(self, request, *args, **kwargs):
         cg = CryoGridData.objects.all()
         fd = ForcingData.objects.all()
-        return render(request, self.template_name, {'cg_data': cg, 'fd_data': fd})
+        data_json = serialize("json", cg)
+        return render(request, self.template_name, {'data': data_json})
