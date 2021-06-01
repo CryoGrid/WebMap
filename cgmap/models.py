@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-
-
-# from django.contrib.gis.db import models -> throws error: GDAL lib is missing
+from django.contrib.gis.db import models # -> throws error: GDAL lib is missing
 
 
 # Create your models here.
@@ -89,3 +87,14 @@ class CryoGridData(models.Model):
         null=False,
         default=None,
     )
+
+
+class MapGrid(models.Model):
+    left = models.FloatField()
+    top = models.FloatField()
+    right = models.FloatField()
+    bottom = models.FloatField()
+    geom = models.MultiPolygonField(srid=4326)
+
+    def __str__(self):
+        return self.left
