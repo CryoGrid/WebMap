@@ -90,6 +90,8 @@ class CryoGridData(models.Model):
 
 
 class MapGrid(models.Model):
+    auto_id = models.AutoField(primary_key=True)
+    id = models.FloatField()
     left = models.FloatField()
     top = models.FloatField()
     right = models.FloatField()
@@ -97,4 +99,4 @@ class MapGrid(models.Model):
     geom = models.MultiPolygonField(srid=4326)
 
     def __str__(self):
-        return self.left
+        return str(self.id)
