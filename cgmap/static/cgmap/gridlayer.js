@@ -3,9 +3,25 @@ $(window).on('map:init', function (e) {
     var detail = e.originalEvent ?
                  e.originalEvent.detail : e.detail;
 
+    var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
+   console.log('grid features: ', data.features, 'data type: ', typeof data.features, 'data length: ', data.features.length);
+    var myStyle = {
+        "color": "#ff7800",
+        "weight": 5,
+        "opacity": 0.65
+    };
+    for (var i = 0; i < data.features.length; i++){
+        var polygon = L.polygon([
+            [data.features[i].properties.top, data.features[i].properties.left],
+            [data.features[i].properties.top, data.features[i].properties.right],
+            [data.features[i].properties.bottom, data.features[i].properties.right],
+            [data.features[i].properties.bottom, data.features[i].properties.left]
+        ]).addTo(detail.map);
+    };
+
     var marker2 = L.marker([52.25, 12.75]).addTo(detail.map);
 
-    var h = 0.5;
+    /**var h = 0.5;
     var w = 0.5;
     var deltay = h/4;
     var deltax = w/2;
@@ -26,7 +42,7 @@ $(window).on('map:init', function (e) {
         topRightCorner, topRightCorner2 , bottomRightCorner2, bottomRightCorner
     ]).addTo(detail.map);
 
-    /**L.TileLayer.Gird = L.TileLayer.extend({
+    L.TileLayer.Gird = L.TileLayer.extend({
         var latlng = L.latLng(52.25, 12.75)
         var h = 20.0;
         var w = 20.0;

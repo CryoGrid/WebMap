@@ -20,6 +20,8 @@
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="{% static 'cgmap/basemap.js' %}"></script>
+    {# to get access from view in external js files #}
+    {{grid_data|json_script:"grid_data"}}
     <script src="{% static 'cgmap/gridlayer.js' %}"></script>
 {# jquery for scale animation #}
     <script>
