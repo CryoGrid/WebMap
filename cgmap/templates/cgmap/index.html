@@ -18,11 +18,19 @@
 {% endblock head_css_page %}
 
 {% block footer_javascript_page %}
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="{% static 'cgmap/basemap.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     {# to get access from view in external js files #}
     {{grid_data|json_script:"grid_data"}}
+    {{context|json_script:"context"}}
+    {#cg_data|json_script:"cg_data"#}
+    {#fd_data|json_script:"fd_data"#}
+    <script src="{% static 'cgmap/basemap.js' %}"></script>
     <script src="{% static 'cgmap/gridlayer.js' %}"></script>
+    <script type="text/Javascript">
+        function isSelected(){
+            results = document.querySelector
+        }
+    </script>
 {# jquery for scale animation #}
     <script>
         $('#depth-slider').on('click', function(){
@@ -84,42 +92,44 @@
                 </button>
             </div>
             <div class="depth-container scale-container">
-                <div class="scale-group">
-                    <div class="scale-element-group yellow">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <div class="scale-element-group orange_brown">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <div class="scale-element-group sand_brown">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <div class="scale-element-group brown">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <div class="scale-element-group dark_brown">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
+                <div class="scale-group" id="depth">
+                    <form action="" method="get">
+                        <div class="scale-element-group yellow">
+                            <button class="rectangle opacity075" value="0"></button>
+                            <button class="rectangle opacity05" value="1"></button>
+                            <button class="rectangle opacity025" value="2"></button>
+                            <button class="rectangle opacity015" value="3"></button>
+                            <button class="rectangle opacity0" value="4"></button>
+                        </div>
+                        <div class="scale-element-group orange_brown">
+                            <div class="rectangle opacity075"></div>
+                            <div class="rectangle opacity05"></div>
+                            <div class="rectangle opacity025"></div>
+                            <div class="rectangle opacity015"></div>
+                            <div class="rectangle opacity0"></div>
+                        </div>
+                        <div class="scale-element-group sand_brown">
+                            <div class="rectangle opacity075"></div>
+                            <div class="rectangle opacity05"></div>
+                            <div class="rectangle opacity025"></div>
+                            <div class="rectangle opacity015"></div>
+                            <div class="rectangle opacity0"></div>
+                        </div>
+                        <div class="scale-element-group brown">
+                            <div class="rectangle opacity075"></div>
+                            <div class="rectangle opacity05"></div>
+                            <div class="rectangle opacity025"></div>
+                            <div class="rectangle opacity015"></div>
+                            <div class="rectangle opacity0"></div>
+                        </div>
+                        <div class="scale-element-group dark_brown">
+                            <div class="rectangle opacity075"></div>
+                            <div class="rectangle opacity05"></div>
+                            <div class="rectangle opacity025"></div>
+                            <div class="rectangle opacity015"></div>
+                            <div class="rectangle opacity0"></div>
+                        </div>
+                    </form>
                 </div>
                 <div class="scale-group-text">
                     <span class="default-text-small">0 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240</span>

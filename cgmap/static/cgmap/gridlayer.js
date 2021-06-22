@@ -4,76 +4,139 @@ $(window).on('map:init', function (e) {
                  e.originalEvent.detail : e.detail;
 
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
-   console.log('grid features: ', data.features, 'data type: ', typeof data.features, 'data length: ', data.features.length);
-    var myStyle = {
-        "color": "#ff7800",
-        "weight": 5,
-        "opacity": 0.65
-    };
+    var cg = JSON.parse(document.getElementById('context').textContent);
+    console.log('cg json data: ', cg);
+    /**console.log('grid features: ', data.features, 'data type: ', typeof data.features, 'data length: ', data.features.length);
+
+    var CanvasLayer = L.GridLayer.extend({
+        for (var i = 0; i < data.features.length; i++){
+            createTile: function(coords, done){
+
+d
+            }
+        };
+    })**/
+
+    /**sql = 'SELECT * FROM cgmap_cryogriddata where grid = '**/
+    var geojson;
+    var boundArray = [];
+    var polygonArray = [];
+
+    var geoJsonArray = [];
+
     for (var i = 0; i < data.features.length; i++){
-        var polygon = L.polygon([
+        /*var polygon = L.polygon([
             [data.features[i].properties.top, data.features[i].properties.left],
             [data.features[i].properties.top, data.features[i].properties.right],
             [data.features[i].properties.bottom, data.features[i].properties.right],
             [data.features[i].properties.bottom, data.features[i].properties.left]
         ]).addTo(detail.map);
+        polygonArray.push(polygon);*/
+        geoJsonArray.push({"type": "Feature", "properties": {"id": data.features[i].properties.id, "popupContent": " This is a Cell number: " + data.features[i].properties.id},
+            "geometry": {"type": "Polygon", "coordinates": [
+                [[data.features[i].properties.left, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.bottom],
+                [data.features[i].properties.left, data.features[i].properties.bottom]]
+                ]}
+            })
+        /**var bounds = L.latLngBounds([data.features[i].properties.top, data.features[i].properties.left],
+                                    [data.features[i].properties.bottom, data.features[i].properties.right]);
+        polygon.on('click', function(){
+            detail.map.fitBounds(this.getBounds())
+        })
+        boundArray.push(bounds);
+        var lat = (data.features[i].properties.top - data.features[i].properties.bottom)/2 + data.features[i].properties.bottom;
+        var long = (data.features[i].properties.right - data.features[i].properties.left)/2 + data.features[i].properties.left;
+        var center = L.marker([lat, long]).addTo(detail.map);**/
     };
 
-    var marker2 = L.marker([52.25, 12.75]).addTo(detail.map);
+    function style(feature) {
+        return {
+            fillColor: '#ff7800',
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.4
+        };
+    }
 
-    /**var h = 0.5;
-    var w = 0.5;
-    var deltay = h/4;
-    var deltax = w/2;
-    var topLeftCorner = [52.25 + deltay, 12.75 - deltax];
-    var topRightCorner = [52.25 + deltay, 12.75 + deltax];
-    var bottomRightCorner = [52.25 - deltay, 12.75 + deltax];
-    var bottomLeftCorner = [52.25 - deltay, 12.75 - deltax];
-
-    var polygon1 = L.polygon([
-        topLeftCorner, topRightCorner, bottomRightCorner, bottomLeftCorner
-    ]).addTo(detail.map);
-    content = "<h3 class=header3>Polygon1</h3><div><hr> You clicked inside a polygon</div>";
-    polygon1.bindPopup(content);
-
-    var topRightCorner2 = [52.25 + deltay, 12.75 + deltax*3];
-    var bottomRightCorner2 = [52.25 - deltay, 12.75 + deltax*3];
-    var polygon2 = L.polygon([
-        topRightCorner, topRightCorner2 , bottomRightCorner2, bottomRightCorner
-    ]).addTo(detail.map);
-
-    L.TileLayer.Gird = L.TileLayer.extend({
-        var latlng = L.latLng(52.25, 12.75)
-        var h = 20.0;
-        var w = 20.0;
-        var deltay = h/2;
-        var deltax = w/2;
-        var topLeftCorner = L.latLng(52.25 - deltay - deltax);
-        var bottomRightCorner = L.latLng(12.75 + deltay + deltax);
-    });
-
-    L.tileLayer.grid = function(){
-        return new L.TileLayer.Grid();
+    var geojsonMarkerOptions = {
+        radius: 8,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.65
     };
 
-    detail.map.addLayer(L.titleLayer.grid());
+
+    console.log('geojson first entry: ', geoJsonArray[0])
+    console.log('boundary array first entry: ', boundArray[0])
+    console.log('first data entry: ', data.features[0]);
+    var marker = {};
+    var popup = L.popup();
+
+    function whenClicked(e) {
+
+        lat = e.latlng.lat;
+        long = e.latlng.lng;
+        console.log('target feature id ', e.target.feature.properties.id);
+        content = "<h3 class=header3>This is cell number " +e.target.feature.properties.id+"</h3><div><hr>In the cell was clicked on map at Lat: "+ lat+" and Long: "+long  +" </div>";
+
+    // delete existing marker
+        if(marker != undefined){
+            detail.map.removeLayer(marker);
+        };
+        // add a new marker with a popup
+        marker = L.marker([lat, long]).addTo(detail.map)
+                    .bindPopup(content)
+                    .openPopup();
+        detail.map.fitBounds(e.target.getBounds());
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: whenClicked,
+        });
+    }
+
+    //mouseover event
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+    }
+
+    //mouseout event
+    function resetHighlight(e) {
+        geojson.resetStyle(e.target);
+    }
+
+    //zooms to the cell
+    function zoomToFeature(e) {
+        detail.map.fitBounds(e.target.getBounds());
+    }
 
 
-    L.GridLayer.GridDebug = L.GridLayer.extend({
-        createTitle: function (coords) {
-            const title = document.createElement('div');
-            title.style.outline = '1px solid green';
-            title.style.fontWeight = 'bold';
-            title.style.fontSize = '14pt';
-            title.innerHTML = [coords.z, coords.x, coords.y].join('/');
-            return title;
-        },
-    });
+    geojson = L.geoJSON(geoJsonArray, {
+        style: style,
+        onEachFeature: onEachFeature,
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, geojsonMarkerOptions)
+        }
+    }).addTo(detail.map);
 
-    L.gridLayer.gridDebug = function (opts) {
-        return new L.GridLayer.GridDebug(opts);
-    };
-
-    map.addLayer(L.gridLayer.gridDebug());
-**/
 });

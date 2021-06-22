@@ -1,26 +1,48 @@
+import datetime
+
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-from django.contrib.gis.db import models # -> throws error: GDAL lib is missing
+from django.contrib.gis.db import models  # -> throws error: GDAL lib is missing
 
 
 # Create your models here.
+class MapGrid(models.Model):
+    auto_id = models.AutoField(primary_key=True)
+    id = models.FloatField()
+    left = models.FloatField()
+    top = models.FloatField()
+    right = models.FloatField()
+    bottom = models.FloatField()
+    geom = models.MultiPolygonField(srid=4326)
+
+    def __str__(self):
+        return str(self.id)
+
+
 class ForcingData(models.Model):
     db_table = 'forcing_data'
     name = models.CharField(max_length=50)
-    description = models.TextField()
-    start_date = models.DateTimeField()
     precipitation = ArrayField(
         ArrayField(
             models.BigIntegerField(),
-        )
+        ), null=True, blank=True
     )
     tair = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=6, decimal_places=3, default=None)
-        )
+        ), default=None
     )
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
+    created_at = models.DateTimeField(default=datetime.datetime.now)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    grid = models.ForeignKey(
+        MapGrid,
+        on_delete=models.CASCADE,
+        verbose_name="related grid cell",
+        blank=False,
+        null=False,
+        default=None,
+    )
 
     def __str__(self):
         return self.name
@@ -57,46 +79,33 @@ class SoilCharacteristics(models.Model):
 
 class CryoGridData(models.Model):
     db_table = 'cryo_grid_data'
-    name = models.CharField(max_length=50)
-    lat = models.DecimalField(max_digits=9, decimal_places=6, default=None)
-    long = models.DecimalField(max_digits=9, decimal_places=6, default=None)
-    alt = models.DecimalField(max_digits=9, decimal_places=6, default=None)
-    z_level = ArrayField(models.BigIntegerField())
+    name = models.CharField(max_length=50, default=None)
+    lat = models.DecimalField(max_digits=6, decimal_places=3, default=None)
+    long = models.DecimalField(max_digits=6, decimal_places=3, default=None)
+    alt = models.DecimalField(max_digits=6, decimal_places=3, default=None, blank=True, null=True)
+    z_level = ArrayField(models.BigIntegerField(), default=None, blank=True, null=True)
     tsoil = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=6, decimal_places=3, default=None)
-        )
+        ), default=None
     )
-    time = ArrayField(models.DateTimeField())
-    start_date = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True, editable=False)
-    modified_at = models.DateTimeField(auto_now=True, editable=False)
-    forcing_data = models.ForeignKey(
-        ForcingData,
-        on_delete=models.CASCADE,
-        verbose_name="related forcing data",
-        blank=False,
-        null=False,
-        default=None,
-    )
+    time = ArrayField(models.DateTimeField(), default=None)
+    created_at = models.DateTimeField(default=datetime.datetime.now)
+    modified_at = models.DateTimeField(auto_now=True)
     soil_characteristics = models.ForeignKey(
         SoilCharacteristics,
         on_delete=models.CASCADE,
         verbose_name="related soil characteristics",
+        blank=True,
+        null=True,
+        default=None,
+    )
+    grid = models.ForeignKey(
+        MapGrid,
+        on_delete=models.CASCADE,
+        verbose_name="related grid cell",
         blank=False,
         null=False,
         default=None,
     )
 
-
-class MapGrid(models.Model):
-    auto_id = models.AutoField(primary_key=True)
-    id = models.FloatField()
-    left = models.FloatField()
-    top = models.FloatField()
-    right = models.FloatField()
-    bottom = models.FloatField()
-    geom = models.MultiPolygonField(srid=4326)
-
-    def __str__(self):
-        return str(self.id)

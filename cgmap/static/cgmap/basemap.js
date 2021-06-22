@@ -2,9 +2,11 @@
 javascript file for the basemap related javascript code
 **/
 
-window.addEventListener("map:init", function (e) {
+/**window.addEventListener("map:init", function (e) {
         var detail = e.originalEvent ?
                      e.originalEvent.detail : e.detail;
+        var data = JSON.parse(JSON.parse(document.getElementById('fd_data').textContent));
+        console.log('cg json data: ', data)
         var marker = {};
         var popup = L.popup();
         detail.map.on('click', function(pos){
@@ -23,4 +25,20 @@ window.addEventListener("map:init", function (e) {
                         .bindPopup(content)
                         .openPopup();
         });
-    }, false);
+    }, false);**/
+
+
+console.log('hello world')
+
+let current_depth = 0 /** init depth is surface **/
+
+$.ajax({
+    type: 'GET',
+    url: '/cgmap/', /** url: `/cgmap/${depth}`,**/
+    success: function(grid_data){
+        console.log('grid_data')
+    },
+    error: function(error){
+        console.log(error)
+    },
+})
