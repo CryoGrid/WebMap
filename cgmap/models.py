@@ -77,6 +77,12 @@ class SoilCharacteristics(models.Model):
         return self.name
 
 
+class Date(models.Model):
+    time = models.DateTimeField(blank=False,
+                                null=False,
+                                default=None, )
+
+
 class CryoGridData(models.Model):
     db_table = 'cryo_grid_data'
     name = models.CharField(max_length=50, default=None)
@@ -89,7 +95,6 @@ class CryoGridData(models.Model):
             models.DecimalField(max_digits=6, decimal_places=3, default=None)
         ), default=None
     )
-    time = ArrayField(models.DateTimeField(), default=None)
     created_at = models.DateTimeField(default=datetime.datetime.now)
     modified_at = models.DateTimeField(auto_now=True)
     soil_characteristics = models.ForeignKey(
@@ -108,4 +113,3 @@ class CryoGridData(models.Model):
         null=False,
         default=None,
     )
-

@@ -241,7 +241,7 @@ hr {
 *************/
 #nav-menu {
     position: absolute;
-    right: 10px;
+    left: 50px;
     top: 10px;
     opacity: 0.8;
     z-index: 1;

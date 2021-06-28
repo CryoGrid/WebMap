@@ -5,7 +5,7 @@ from .models import CryoGridData, SoilCharacteristics, SoilType, ForcingData, Ma
 
 
 class CryoGridAdmin(admin.ModelAdmin):
-    list_display = ('name', 'lat', 'long', 'alt', 'z_level', 'tsoil', 'time', 'grid',
+    list_display = ('name', 'lat', 'long', 'alt', 'z_level', 'tsoil', 'grid',
                     'soil_characteristics', 'created_at', 'modified_at')
 
 
