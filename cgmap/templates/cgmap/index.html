@@ -24,7 +24,6 @@
     {{context|json_script:"context"}}
     {{cg_data|json_script:"cg_data"}}
     {{fc_data|json_script:"fc_data"}}
-    <script src="{% static 'cgmap/gridlayer.js' %}"></script>
     <script src="{% static 'cgmap/basemap.js' %}"></script>
     <script type="text/Javascript">
         function isSelected(){
@@ -92,14 +91,15 @@
                 </button>
             </div>
             <div class="depth-container scale-container">
-                <div class="scale-group" id="depth">
-                    <form action="" method="get">
-                        <div class="scale-element-group yellow">
-                            <button class="rectangle opacity075" value="0"></button>
-                            <button class="rectangle opacity05" value="1"></button>
-                            <button class="rectangle opacity025" value="2"></button>
-                            <button class="rectangle opacity015" value="3"></button>
-                            <button class="rectangle opacity0" value="4"></button>
+                <div class="slide-container" id="depth">
+                    <form action="" method="get" id="load_data_form" style="margin-bottom: 4px; text-align: right;">
+                        {% csrf_token %}
+                        <input type="range" min="-240" max="0" step="10" value="0" class="slider" id="myRange">
+                        <!--<div class="scale-element-group yellow">
+                            <div class="rectangle opacity05" value="1" ></div>
+                            <div class="rectangle opacity025" value="2"></div>
+                            <div class="rectangle opacity015" value="3"></div>
+                            <div class="rectangle opacity0" value="4"></div>
                         </div>
                         <div class="scale-element-group orange_brown">
                             <div class="rectangle opacity075"></div>
@@ -128,11 +128,13 @@
                             <div class="rectangle opacity025"></div>
                             <div class="rectangle opacity015"></div>
                             <div class="rectangle opacity0"></div>
-                        </div>
+                        </div>-->
                     </form>
-                </div>
-                <div class="scale-group-text">
-                    <span class="default-text-small">0 10 20 30 40 50 60 70 80 90 100 110 120 130 140 150 160 170 180 190 200 210 220 230 240</span>
+                    <div id="number">
+                        <span class="default-text-small">
+                            0<br> 10<br> 20<br> 30<br> 40<br> 50<br> 60<br> 70<br> 80<br> 90<br> 100<br> 110<br>
+                            120<br> 130<br> 140<br> 150<br> 160<br> 170<br> 180<br> 190<br> 200<br> 210<br> 220<br> 230<br> 240</span>
+                    </div>
                 </div>
             </div>
         </div>

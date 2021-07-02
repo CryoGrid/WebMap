@@ -31,13 +31,13 @@ $(window).on('map:init', function (e) {
                  e.originalEvent.detail : e.detail;
 
     var layerGroup = new L.layerGroup();
-    var geojson;
+    var gridLayer;
 
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
     var fc = JSON.parse(document.getElementById('fc_data').textContent);
-    console.log('cg json data: ', cg, ' fc json data: ', fc, ' depth_level: ', depth_level);
+    //console.log('cg json data: ', cg, ' fc json data: ', fc, ' depth_level: ', depth_level);
 
     /**sql = 'SELECT * FROM cgmap_cryogriddata where grid = '**/
     var geojson;
@@ -57,17 +57,31 @@ $(window).on('map:init', function (e) {
                 [data.features[i].properties.left, data.features[i].properties.bottom]]
                 ]}
             });
-        if(data.features[i].properties.id == cg.grid_id){
-            geoJsonArray[i].properties["soil_temp"] = cg.soil_temp;
-            geoJsonArray[i].properties["air_temp"] = fc.air_temp;
-            geoJsonArray[i].properties["date"] = cg.date;
+        if(fc[data.features[i].properties.id] != null){
+            geoJsonArray[i].properties["soil_temp"] = cg[data.features[i].properties.id].soil_temp;
+            geoJsonArray[i].properties["air_temp"] = fc[data.features[i].properties.id].air_temp;
+            geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
 
     };
 
+    function getColor(t) {
+        return t > 30  ? '#EB5757' :
+               t > 20  ? '#F2994A' :
+               t > 10   ? '#F2C94C' :
+               t > 0   ? '#6FCF97' :
+               t > -10  ? '#E31A1C' :
+               t > -20   ? '#9B51E0' :
+                          '#FFEDA0';
+    }
+
     function style(feature) {
+        cellColor = '#FFEDA0';
+        if(feature.properties.soil_temp != null){
+            cellColor = getColor(feature.properties.soil_temp)
+        }
         return {
-            fillColor: '#ff7800',
+            fillColor: cellColor,
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -140,7 +154,7 @@ $(window).on('map:init', function (e) {
 
     //mouseout event
     function resetHighlight(e) {
-        geojson.resetStyle(e.target);
+        gridLayer.resetStyle(e.target);
     }
 
     //zooms to the cell
@@ -148,31 +162,24 @@ $(window).on('map:init', function (e) {
         detail.map.fitBounds(e.target.getBounds());
     }
 
-    geojson = L.geoJSON(geoJsonArray, {
+    gridLayer = L.geoJSON(geoJsonArray, {
         style: style,
         onEachFeature: onEachFeature,
         pointToLayer: function (feature, latlng) {
             return L.circleMarker(latlng, geojsonMarkerOptions)
         }
-     }).addTo(layerGroup);
+    }).addTo(layerGroup);
+
 
 
     layerControl = new L.Control.Layers(null, {
-        'Grid Layer': geojson,
+        'Grid Layer': gridLayer,
     }).addTo(detail.map);
 });
 
-console.log('hello world')
-
 let current_depth = 0 /** init depth is surface **/
 
-$.ajax({
-    type: 'GET',
-    url: '/cgmap/', /** url: `/cgmap/${depth}`,**/
-    success: function(grid_data){
-        console.log('grid_data')
-    },
-    error: function(error){
-        console.log(error)
-    },
-})
+var slider = document.getElementById("myRange");
+slider.oninput=function(){
+    console.log(slider.value)
+}

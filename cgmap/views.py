@@ -8,6 +8,7 @@ from django.template import RequestContext
 from django.views import View
 from django.views.generic import TemplateView
 import json
+import pickle
 
 from .models import CryoGridData, ForcingData, MapGrid, Date
 
@@ -17,25 +18,47 @@ class MapView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         today = datetime.date.today()
-        print('today: ', today)
 
         context = super().get_context_data(**kwargs)
-        print('init context: ', context)
         if context.get('depth_level') is None:
             context['depth_level'] = 0
         else:
             context['depth_level'] = 'new_depth_level'
 
         date_idx = Date.objects.get(time=today)
-
+        context['cg_data'] = {}
         print('selected date: ', date_idx.time, ' with id: ', date_idx.id)
 
-        cg = CryoGridData.objects.all().filter(grid_id=1415)
+        for fc in ForcingData.objects.defer("tair"):
+            print('forcing data: ', fc)
+            f = ForcingData.objects.values_list("tair").get(id=fc.id)
+            tair = f[0][date_idx.id]
+            json_data = {
+                'grid_id': fc.grid_id,
+                'file_name': fc.name,
+                'air_temp': tair,
+            }
+            if context.get('fc_data') is None:
+                context['fc_data'] = json_data
+            else:
+                context['fc_data'].update({fc.grid_id: json_data})
+
+        for cg in CryoGridData.objects.defer("tsoil"):
+            t = CryoGridData.objects.values_list("tsoil").get(id=cg.id)
+            tsoil = t[0][context['depth_level']][date_idx.id]
+            json_data = {
+                'grid_id': cg.grid_id,
+                'file_name': cg.name,
+                'soil_temp': tsoil,
+                'date': today
+            }
+            context['cg_data'].update({cg.grid_id: json_data})
+        '''cg = CryoGridData.objects.all().filter(grid_id=1415)
         for data in cg:
             json_data = {
                 'grid_id': data.grid_id,
                 'file_name': data.name,
-                'soil_temp': data.tsoil[context['depth_level']][date_idx.id],
+                'soil_temp': data.tsoil[context['depth_level']+1][date_idx.id],
                 'date': today
             }
             if context.get('cg_data') is None:
@@ -56,7 +79,7 @@ class MapView(TemplateView):
                 context['fc_data'] = json_data
             else:
                 context['fc_data'].update(json_data)
-            print('fc_data length: ', len(context['fc_data']))
+            print('fc_data length: ', len(context['fc_data']))'''
         # context['depth'] = list(MapGrid.objects.values())
         # print('context data depth: ', context['depth'])
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')

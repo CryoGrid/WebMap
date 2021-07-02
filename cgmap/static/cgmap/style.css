@@ -467,7 +467,7 @@ hr {
     height: 500px;
     left: 8px;
     top: 10px;
-    z-index: 2;
+    z-index: 1;
 
     /* Accent */
     border: 1px solid var(--accent);
@@ -800,6 +800,75 @@ hr {
     align-self: stretch;
     flex-grow: 0;
     margin: 10px 0px;
+}
+
+/**********************
+* Custom depth slider *
+**********************/
+
+#number{
+  height: 16px;
+  width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(90deg);
+}
+
+.slide-container {
+  position: relative;
+  height: 16px; /* height of the outside container */
+  width: 500px;
+  transform: rotate(-90deg);
+  left: 0px;
+  justify-content: top;
+  /* Accent */
+  border: 1px solid var(--accent);
+  box-sizing: border-box;
+  border-radius: 8px;
+  margin-bottom: 8px;
+
+  /* Inside Auto Layout */
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+}
+
+/* The slider itself */
+.slider {
+   width: 100%;
+  -webkit-appearance: none;  /* Override default CSS styles */
+  height: 100%;
+  position: relative;
+  background-color: #d3d3d3;
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  border-radius: 5px;
+  outline: none; /* Remove outline */
+}
+
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+/* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  width: 15px; /* Set a specific slider handle width */
+  height: 100%; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 50%;
+}
+
+.slider::-moz-range-thumb {
+  width: 15px; /* Set a specific slider handle width */
+  height: 15px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
 }
 
 /*****************************
