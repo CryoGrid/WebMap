@@ -72,13 +72,13 @@
                     {% endfor %}
                 </div>
                 <div class="dialog-content-text default-text-small">
-                    {% for data in cg_data%}
+                    {% for data in cg_data %}
                        at the location with latitude {{ data.lat }} and longitude {{ data.long }}. </br>
                     {% endfor %}
                     With forcing data:
                     {% for forcing in fd_data%}
                         {{ forcing.name }}
-                    {% endfor%}
+                    {% endfor %}
 
                 </div>
             </div>
@@ -92,9 +92,9 @@
             </div>
             <div class="depth-container scale-container">
                 <div class="slide-container" id="depth">
-                    <form action="" method="get" id="load_data_form" style="margin-bottom: 4px; text-align: right;">
+                    <form action="" method="get" id="load_data_form" style="margin-bottom: 8px;">
                         {% csrf_token %}
-                        <input type="range" min="-240" max="0" step="10" value="0" class="slider" id="myRange">
+                        <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
                         <!--<div class="scale-element-group yellow">
                             <div class="rectangle opacity05" value="1" ></div>
                             <div class="rectangle opacity025" value="2"></div>
@@ -132,8 +132,8 @@
                     </form>
                     <div id="number">
                         <span class="default-text-small">
-                            0<br> 10<br> 20<br> 30<br> 40<br> 50<br> 60<br> 70<br> 80<br> 90<br> 100<br> 110<br>
-                            120<br> 130<br> 140<br> 150<br> 160<br> 170<br> 180<br> 190<br> 200<br> 210<br> 220<br> 230<br> 240</span>
+                            0<br> 5<br> 10<br> 20<br> 25<br> 30<br> 40<br> 50<br> 65<br> 80<br> 100<br> 120<br>
+                            150<br> 170<br> 200 </span>
                     </div>
                 </div>
             </div>

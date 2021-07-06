@@ -812,6 +812,7 @@ hr {
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 4px;
   transform: rotate(90deg);
 }
 
@@ -820,7 +821,7 @@ hr {
   height: 16px; /* height of the outside container */
   width: 500px;
   transform: rotate(-90deg);
-  left: 0px;
+  left: -10px;
   justify-content: top;
   /* Accent */
   border: 1px solid var(--accent);

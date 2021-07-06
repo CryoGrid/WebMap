@@ -3,5 +3,5 @@ from .views import MapView
 
 urlpatterns = [
     path('', MapView.as_view(), name='index'),
-    path('<int:get_depth_map>/', MapView.as_view(), name='get_depth_map'),
+    path('get_depth_level_data/', MapView.get_depth_level_data, name='index'),
 ]

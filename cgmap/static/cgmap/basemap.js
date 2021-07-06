@@ -179,7 +179,31 @@ $(window).on('map:init', function (e) {
 
 let current_depth = 0 /** init depth is surface **/
 
-var slider = document.getElementById("myRange");
-slider.oninput=function(){
+/**var slider = document.getElementById("myRange");
+slider.oninput = function() {
     console.log(slider.value)
-}
+}**/
+
+$(document).ready(function(){
+    var slider = document.getElementById("myRange");
+    var depth_level;
+    slider.onchange = function(event) {
+        event.preventDefault();
+        depth_level = slider.value
+        depth_level  = Math.abs(depth_level)
+        console.log(depth_level)
+        $.ajax({
+            url: 'get_depth_level_data/',
+            type: 'POST',
+            data: {url_data:depth_level},
+            dataType: "json"
+        })
+        .done(function(response){
+            console.log(response);
+            console.log('has to be displayed on grid map: ', response[0], ' and depth level: ', response[1])
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    }
+});
