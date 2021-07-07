@@ -43,7 +43,6 @@ $(window).on('map:init', function (e) {
     var geojson;
     var boundArray = [];
     var polygonArray = [];
-
     var geoJsonArray = [];
 
     for (var i = 0; i < data.features.length; i++){
@@ -67,12 +66,17 @@ $(window).on('map:init', function (e) {
 
     function getColor(t) {
         return t > 30  ? '#EB5757' :
+               t > 25  ? '#F2AF74' :
                t > 20  ? '#F2994A' :
-               t > 10   ? '#F2C94C' :
+               t > 15  ? '#F2D374' :
+               t > 10  ? '#F2C94C' :
+               t > 5   ? '#86CFA4' :
                t > 0   ? '#6FCF97' :
-               t > -10  ? '#E31A1C' :
-               t > -20   ? '#9B51E0' :
-                          '#FFEDA0';
+               t > -5  ? '#5AACDB' :
+               t > -10 ? '#2D9CDB' :
+               t > -15 ? '#AC75E0' :
+               t > -20 ? '#9B51E0' :
+                         '#FFEDA0';
     }
 
     function style(feature) {
@@ -99,14 +103,11 @@ $(window).on('map:init', function (e) {
         fillOpacity: 0.65
     };
 
-
-    console.log('geojson first entry: ', geoJsonArray[0])
-    //console.log('boundary array first entry: ', boundArray[0])
-    console.log('first data entry: ', data.features[0]);
     var marker = {};
     var popup = L.popup();
 
     function whenClicked(e) {
+        console.log('event data: ', e.target.feature.properties)
 
         lat = e.latlng.lat;
         long = e.latlng.lng;
@@ -170,40 +171,36 @@ $(window).on('map:init', function (e) {
         }
     }).addTo(layerGroup);
 
-
-
     layerControl = new L.Control.Layers(null, {
         'Grid Layer': gridLayer,
     }).addTo(detail.map);
-});
 
-let current_depth = 0 /** init depth is surface **/
-
-/**var slider = document.getElementById("myRange");
-slider.oninput = function() {
-    console.log(slider.value)
-}**/
-
-$(document).ready(function(){
-    var slider = document.getElementById("myRange");
-    var depth_level;
-    slider.onchange = function(event) {
-        event.preventDefault();
-        depth_level = slider.value
-        depth_level  = Math.abs(depth_level)
-        console.log(depth_level)
-        $.ajax({
-            url: 'get_depth_level_data/',
-            type: 'POST',
-            data: {url_data:depth_level},
-            dataType: "json"
-        })
-        .done(function(response){
-            console.log(response);
-            console.log('has to be displayed on grid map: ', response[0], ' and depth level: ', response[1])
-        })
-        .fail(function(){
-            console.log('Failed!')
+/**
+    jquery for dynamically updating the temperature data of the selected level for all grid cells
+**/
+    $(document).ready(function(){
+        var slider = document.getElementById("myRange");
+        var depth_level;
+        $('#myRange').change(function(event) {
+            event.preventDefault();
+            depth_level = slider.value
+            depth_level  = Math.abs(depth_level)
+            console.log(depth_level)
+            console.log('event data in slider function: ', event)
+            $.ajax({
+                url: 'get_depth_level_data/',
+                type: 'POST',
+                data: {url_data:depth_level},
+                dataType: "json"
+            })
+            .done(function(response){
+                $("#context").html(response[1].depth_level);
+                /*TODO: replace hard coded id with a flexible one*/
+                geoJsonArray[729].properties["soil_temp"] = response[0][1415].soil_temp;
+            })
+            .fail(function(){
+                console.log('Failed!')
+            });
         });
-    }
+    });
 });

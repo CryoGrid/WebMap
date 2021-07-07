@@ -91,13 +91,13 @@ class MapView(TemplateView):
             cg = CryoGridData.objects.all().filter(grid_id=1415)
             for data in cg:
                 json_data = {
-                    'grid_id': data.grid_id,
+                    'id': data.grid_id,
                     'file_name': data.name,
                     'soil_temp': data.tsoil[int(depth_level)][date_idx.id],
                     'date': today
                 }
             print('created json data: ', json_data, 'with date index: ', date_idx.id)
-            return JsonResponse([{1415: json_data}, {depth_level: depth_level}], safe=False)
+            return JsonResponse([{1415: json_data}, {'depth_level': depth_level}], safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
