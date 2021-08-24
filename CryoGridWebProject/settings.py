@@ -110,7 +110,7 @@ DATABASES = {
         'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': str(os.getenv('LOCAL_DB_KEY')),
-        'HOST': 'localhost',
+        'HOST': 'localhost',  # this works only for docker, old host 'localhost'; host for docker 'db'
         'PORT': '5432',
     }
 }
@@ -132,7 +132,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

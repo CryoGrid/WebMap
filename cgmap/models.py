@@ -1,5 +1,6 @@
 import datetime
 
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.gis.db import models  # -> throws error: GDAL lib is missing
@@ -113,3 +114,32 @@ class CryoGridData(models.Model):
         null=False,
         default=None,
     )
+
+
+class TemperatureDepthLevel(models.Model):
+    name = models.CharField(max_length=50, default=None)
+    grid_id = models.PositiveIntegerField()
+    depth_level1 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level2 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level3 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level4 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level5 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level6 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level7 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level8 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level9 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level10 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level11 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level12 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level13 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level14 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level15 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    tair = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+
+    class Meta:
+        managed = False
+        db_table = 'temperature_depth_level'
+        indexes = [GinIndex(fields=['depth_level1', 'depth_level2', 'depth_level3', 'depth_level4', 'depth_level5',
+                                    'depth_level6', 'depth_level7', 'depth_level8', 'depth_level9', 'depth_level10',
+                                    'depth_level11', 'depth_level12', 'depth_level13', 'depth_level14', 'depth_level15',
+                                    'tair'])]
