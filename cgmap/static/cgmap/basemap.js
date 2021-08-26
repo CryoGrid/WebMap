@@ -37,14 +37,13 @@ $(window).on('map:init', function (e) {
         };
 
     };
-    console.log('geo json array: ', geoJsonArray)
 
     function getColor(t) {
         return t > 30  ? '#EB5757' :
-               t > 25  ? '#F2AF74' :
-               t > 20  ? '#F2994A' :
-               t > 15  ? '#F2D374' :
-               t > 10  ? '#F2C94C' :
+               t > 25  ? '#F2994A' :
+               t > 20  ? '#F2AF74' :
+               t > 15  ? '#F2C94C' :
+               t > 10  ? '#F2D374' :
                t > 5   ? '#86CFA4' :
                t > 0   ? '#6FCF97' :
                t > -5  ? '#5AACDB' :
@@ -84,10 +83,11 @@ $(window).on('map:init', function (e) {
     function whenClicked(e) {
         lat = e.latlng.lat;
         long = e.latlng.lng;
-        content = "<h3 class=header3>Cell " +e.target.feature.properties.id+"</h3><div><hr>In the cell was clicked on map at Lat: "+ lat+" and Long: "+long  +" </div>";
+        content = "<h3 class=header3>Cell " +e.target.feature.properties.id+"</h3><div><hr>The cell was clicked at LatLong: ("+ lat.toFixed(2)+" | "+long.toFixed(2)  +"), </div>";
         if(e.target.feature.properties.soil_temp != null){
-        content +="<div>With a calculated soil temperature of: "+e.target.feature.properties.soil_temp+ "°C and air temperature of: "+ e.target.feature.properties.air_temp+"°C "+"</div>"
-        content +="<div>For the date: "+e.target.feature.properties.date+"</div>"
+        content +="<div>with a calculated soil temperature of: "+parseFloat(e.target.feature.properties.soil_temp).toFixed(2)+ "°C at a depth of "+depth_level+".</div>"
+        content +="<div>Assumed air temperature of: "+ parseFloat(e.target.feature.properties.air_temp).toFixed(2)+"°C for the date: "+e.target.feature.properties.date+".</div>"
+        content +="<div>For up-to-date temperatures visit the DWD website <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html'>here</a> and for soil temperatures <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html'>here</a>."
         }
 
     // delete existing marker
@@ -164,13 +164,10 @@ $(window).on('map:init', function (e) {
                 dataType: "json"
             })
             .done(function(response){
-                console.log('data: '+ response[0].cg_data[1415].soil_temp + ' at depth_leve: ' + response[1].depth_level);
                 $("#context").html(response[1].depth_level);
-                /*TODO: replace hard coded id with a flexible one*/
                 for (var i = 0; i < geoJsonArray.length; i++){
                     id = geoJsonArray[i].properties["id"];
                     if(geoJsonArray[i].properties["soil_temp"] != null){
-                        console.log('geo json id ', i, ' soil propertie: ', geoJsonArray[i].properties["soil_temp"], ' grid_id: ', id, ' and soil temp: ', response[0].cg_data[id].soil_temp);
                         geoJsonArray[i].properties["soil_temp"] = response[0].cg_data[id].soil_temp;
                     }
                 };
