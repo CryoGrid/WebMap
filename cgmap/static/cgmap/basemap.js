@@ -83,7 +83,8 @@ $(window).on('map:init', function (e) {
     function whenClicked(e) {
         lat = e.latlng.lat;
         long = e.latlng.lng;
-        content = "<h3 class=header3>Cell " +e.target.feature.properties.id+"</h3><div><hr>The cell was clicked at LatLong: ("+ lat.toFixed(2)+" | "+long.toFixed(2)  +"), </div>";
+        content = "<h3 class=header3>Cell " +e.target.feature.properties.id+"<button type='button' class='btn btn-primary btn-sm' style='position: absolute; right: 20px; id='graph_btn'><span class='material-icons md-18 right' id='show_chart'>show_chart</span></button></h3>"
+        content += "<div><hr>The cell was clicked at LatLong: ("+ lat.toFixed(2)+" | "+long.toFixed(2)  +"), </div>";
         if(e.target.feature.properties.soil_temp != null){
         content +="<div>with a calculated soil temperature of: "+parseFloat(e.target.feature.properties.soil_temp).toFixed(2)+ "°C at a depth of "+depth_level+".</div>"
         content +="<div>Assumed air temperature of: "+ parseFloat(e.target.feature.properties.air_temp).toFixed(2)+"°C for the date: "+e.target.feature.properties.date+".</div>"
