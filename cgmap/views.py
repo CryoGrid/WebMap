@@ -37,6 +37,7 @@ class MapView(TemplateView):
                     'file_name': cg_data[1],
                     'soil_temp': cg_data[2],
                     'air_temp': cg_data[3],
+                    'depth_level': '0',
                     'date': self.today
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
@@ -59,6 +60,7 @@ class MapView(TemplateView):
                     json_data = {
                         'id': data[0],
                         'soil_temp': data[1],
+                        'depth_level': str(depth_level),
                     }
                     temp['cg_data'].update({data[0]: json_data})
                 print('filter query: ', temp['cg_data'][1415])
@@ -68,4 +70,20 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    @csrf_exempt
+    def get_cell_data(self, **kwargs):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            depth_level = int(self.POST.get('url_data'))+1
+            idx = self.POST.get('idx')
+            print('depth_level: ', depth_level, ' idx: ', idx)
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT depth_level%s FROM temperature_depth_level WHERE grid_id = %s" % (depth_level, idx))
+                cg = cursor.fetchall()
+                print('data type of selected data: ', type(cg[0][0][0]))
+
+            return JsonResponse([{'cell_data': cg[0][0][0]}, {'depth_level': depth_level}], safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
 

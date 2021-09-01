@@ -19,11 +19,14 @@
 
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
     {# to get access from view in external js files #}
     {{grid_data|json_script:"grid_data"}}
     {{context|json_script:"context"}}
     {{cg_data|json_script:"cg_data"}}
+    {{cell_data|json_script:"cell_data"}}
     <script src="{% static 'cgmap/basemap.js' %}"></script>
+    <script src="{% static 'cgmap/datacharts.js' %}"></script>
     <script type="text/Javascript">
         function isSelected(){
             results = document.querySelector
@@ -54,6 +57,21 @@
                 icon.text('chevron_left');
             }
         });
+
+        $('#close-btn').on('click', function(){
+            console.log("container has been closed");
+            document.getElementById('chart-container').style.display = "none";
+        });
+
+        function open_graph(){
+            console.log("container has been opened");
+            var div = document.getElementById('chart-container');
+            if (div.style.display === "none") {
+                div.style.display = "flex";
+            } else {
+                div.style.display = "none";
+            }
+        };
     </script>
 {% endblock footer_javascript_page %}
 
@@ -136,6 +154,12 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="chart-container" id="chart-container" style="display: none;">
+            <canvas id="tempChart" width="600" height="400"></canvas>
+            <button class="btn btn-primary btn-sm" type="button" id="close-btn" style="width: 18px;height: 18px;">
+                <span class="material-icons md-18 close">close</span>
+            </button>
         </div>
         <div class="temperature-container right-transition" id="right-slider">
             <div class="temperature-title-wrapper">

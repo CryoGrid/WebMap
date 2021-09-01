@@ -12,7 +12,6 @@ $(window).on('map:init', function (e) {
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
-    /**var fc = JSON.parse(document.getElementById('fc_data').textContent);**/
 
     var geojson;
     var boundArray = [];
@@ -33,9 +32,9 @@ $(window).on('map:init', function (e) {
         if(cg[data.features[i].properties.id] != null){
             geoJsonArray[i].properties["soil_temp"] = cg[data.features[i].properties.id].soil_temp;
             geoJsonArray[i].properties["air_temp"] = cg[data.features[i].properties.id].air_temp;
+            geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
-
     };
 
     function getColor(t) {
@@ -81,15 +80,25 @@ $(window).on('map:init', function (e) {
     var popup = L.popup();
 
     function whenClicked(e) {
+
         lat = e.latlng.lat;
         long = e.latlng.lng;
-        content = "<h3 class=header3>Cell " +e.target.feature.properties.id+"<button type='button' class='btn btn-primary btn-sm' style='position: absolute; right: 20px; id='graph_btn'><span class='material-icons md-18 right' id='show_chart'>show_chart</span></button></h3>"
-        content += "<div><hr>The cell was clicked at LatLong: ("+ lat.toFixed(2)+" | "+long.toFixed(2)  +"), </div>";
-        if(e.target.feature.properties.soil_temp != null){
-        content +="<div>with a calculated soil temperature of: "+parseFloat(e.target.feature.properties.soil_temp).toFixed(2)+ "°C at a depth of "+depth_level+".</div>"
-        content +="<div>Assumed air temperature of: "+ parseFloat(e.target.feature.properties.air_temp).toFixed(2)+"°C for the date: "+e.target.feature.properties.date+".</div>"
-        content +="<div>For up-to-date temperatures visit the DWD website <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html'>here</a> and for soil temperatures <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html'>here</a>."
-        }
+        const content = `
+            <h3 class=header3>Cell ${ e.target.feature.properties.id }
+                <button type='button' onclick=open_graph() class='btn btn-primary btn-sm' style='position: absolute; right: 20px;' id='graph_btn'>
+                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                </button>
+            </h3>
+            <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div>with a calculated soil temperature of: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C at a depth of ${e.target.feature.properties.depth_level}.</div>
+            <div>Assumed air temperature of:  ${parseFloat(e.target.feature.properties.air_temp).toFixed(2)}°C for the date: ${e.target.feature.properties.date}.</div>
+            <div>For up-to-date temperatures visit the DWD website
+                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
+                and for soil temperatures
+                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>here</a>.
+            </div>
+
+        `;
 
     // delete existing marker
         if(marker != undefined){
@@ -100,6 +109,8 @@ $(window).on('map:init', function (e) {
                     .bindPopup(content)
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
+        cell_data = getCellData(e.target.feature.properties.depth_level, e.target.feature.properties.id);
+
     }
 
     function onEachFeature(feature, layer) {
@@ -169,6 +180,7 @@ $(window).on('map:init', function (e) {
                 for (var i = 0; i < geoJsonArray.length; i++){
                     id = geoJsonArray[i].properties["id"];
                     if(geoJsonArray[i].properties["soil_temp"] != null){
+                        geoJsonArray[i].properties["depth_level"] = response[0].cg_data[id].depth_level;
                         geoJsonArray[i].properties["soil_temp"] = response[0].cg_data[id].soil_temp;
                     }
                 };
@@ -178,4 +190,22 @@ $(window).on('map:init', function (e) {
             });
         });
     });
+
+    function getCellData(depth_level, cell_id){
+        $.ajax({
+                url: 'get_cell_data/',
+                type: 'POST',
+                data: {url_data:depth_level, idx:cell_id},
+                dataType: "json"
+        })
+        .done(function(response){
+            query_data = response[0].cell_data;
+            console.log('query_data: ', query_data);
+            document.getElementById("cell_data").textContent = query_data;
+            return query_data
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
 });

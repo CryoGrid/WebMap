@@ -300,6 +300,7 @@ hr {
     justify-content: center;
     align-items: center;
     padding: 8px;
+    z-index: 2;
 
     position: absolute;
     width: 136px;
@@ -490,6 +491,7 @@ hr {
     justify-content: center;
     align-items: center;
     padding: 8px;
+    z-level: 2;
 
     position: absolute;
     width: 136px;
@@ -801,6 +803,44 @@ hr {
     flex-grow: 0;
     margin: 10px 0px;
 }
+
+/**********************
+*   Custom Charts UI  *
+**********************/
+
+.chart-container{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-right;
+    padding: 0px;
+
+    width: 600px;
+    height: 400px;
+    top: 30px;
+    right: -600px;
+    z-index: 1;
+}
+
+#tempChart{
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+
+    position: static;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
 
 /**********************
 * Custom depth slider *
