@@ -85,7 +85,7 @@ $(window).on('map:init', function (e) {
         long = e.latlng.lng;
         const content = `
             <h3 class=header3>Cell ${ e.target.feature.properties.id }
-                <button type='button' onclick=open_graph() class='btn btn-primary btn-sm' style='position: absolute; right: 20px;' id='graph_btn'>
+                <button type='button' onclick="open_graph();" class='btn btn-primary btn-sm' style='position: absolute; right: 20px;' id='graph_btn'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
@@ -169,6 +169,7 @@ $(window).on('map:init', function (e) {
             event.preventDefault();
             depth_level = slider.value;
             depth_level  = Math.abs(depth_level);
+            console.log('selected depth value: ', depth_level);
             $.ajax({
                 url: 'get_depth_level_data/',
                 type: 'POST',

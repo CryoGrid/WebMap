@@ -103,54 +103,57 @@
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
                 <div class="description default-text-small">Depth in cm</div>
-                <button class="btn btn-primary btn-sm" id="depth-slider">
+                <button class="btn btn-primary btn-sm" id="depth-slider" >
                     <span class="material-icons md-18 right" id="depth_chevron">chevron_right</span>
                 </button>
             </div>
-            <div class="depth-container scale-container">
-                <div class="slide-container" id="depth">
-                    <form action="" method="get" id="load_data_form" style="margin-bottom: 8px;">
-                        {% csrf_token %}
-                        <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
-                        <!--<div class="scale-element-group yellow">
-                            <div class="rectangle opacity075" value="1" ></div>
-                            <div class="rectangle opacity025" value="2"></div>
-                            <div class="rectangle opacity015" value="3"></div>
-                            <div class="rectangle opacity0" value="4"></div>
-                        </div>
-                        <div class="scale-element-group orange_brown">
-                            <div class="rectangle opacity075"></div>
-                            <div class="rectangle opacity05"></div>
-                            <div class="rectangle opacity025"></div>
-                            <div class="rectangle opacity015"></div>
-                            <div class="rectangle opacity0"></div>
-                        </div>
-                        <div class="scale-element-group sand_brown">
-                            <div class="rectangle opacity075"></div>
-                            <div class="rectangle opacity05"></div>
-                            <div class="rectangle opacity025"></div>
-                            <div class="rectangle opacity015"></div>
-                            <div class="rectangle opacity0"></div>
-                        </div>
-                        <div class="scale-element-group brown">
-                            <div class="rectangle opacity075"></div>
-                            <div class="rectangle opacity05"></div>
-                            <div class="rectangle opacity025"></div>
-                            <div class="rectangle opacity015"></div>
-                            <div class="rectangle opacity0"></div>
-                        </div>
-                        <div class="scale-element-group dark_brown">
-                            <div class="rectangle opacity075"></div>
-                            <div class="rectangle opacity05"></div>
-                            <div class="rectangle opacity025"></div>
-                            <div class="rectangle opacity015"></div>
-                            <div class="rectangle opacity0"></div>
-                        </div>-->
-                    </form>
-                    <div id="number">
+            <div class="scale-container">
+                <div class="slider-container" id="depth">
+                    <div class="scale-group-depth">
+                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;" onchange="changeData();">
+                            {% csrf_token %}
+                            <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
+                            <!--<div class="scale-element-group yellow">
+                                <div class="rectangle opacity075" value="1" ></div>
+                                <div class="rectangle opacity025" value="2"></div>
+                                <div class="rectangle opacity015" value="3"></div>
+                                <div class="rectangle opacity0" value="4"></div>
+                            </div>
+                            <div class="scale-element-group orange_brown">
+                                <div class="rectangle opacity075"></div>
+                                <div class="rectangle opacity05"></div>
+                                <div class="rectangle opacity025"></div>
+                                <div class="rectangle opacity015"></div>
+                                <div class="rectangle opacity0"></div>
+                            </div>
+                            <div class="scale-element-group sand_brown">
+                                <div class="rectangle opacity075"></div>
+                                <div class="rectangle opacity05"></div>
+                                <div class="rectangle opacity025"></div>
+                                <div class="rectangle opacity015"></div>
+                                <div class="rectangle opacity0"></div>
+                            </div>
+                            <div class="scale-element-group brown">
+                                <div class="rectangle opacity075"></div>
+                                <div class="rectangle opacity05"></div>
+                                <div class="rectangle opacity025"></div>
+                                <div class="rectangle opacity015"></div>
+                                <div class="rectangle opacity0"></div>
+                            </div>
+                            <div class="scale-element-group dark_brown">
+                                <div class="rectangle opacity075"></div>
+                                <div class="rectangle opacity05"></div>
+                                <div class="rectangle opacity025"></div>
+                                <div class="rectangle opacity015"></div>
+                                <div class="rectangle opacity0"></div>
+                            </div>-->
+                        </form>
+                    </div>
+
+                    <div class="scale-group-depth-text">
                         <span class="default-text-small">
-                            0<br> 5<br> 10<br> 20<br> 25<br> 30<br> 40<br> 50<br> 65<br> 80<br> 100<br> 120<br>
-                            150<br> 170<br> 200 </span>
+                            1<br> 5<br> 10<br> 20<br> 50<br> 100<br> 200<br> 300<br> 400<br> 500<br> 600<br> 700<br>
+                            800<br> 900<br> 1000 </span>
                     </div>
                 </div>
             </div>
@@ -168,7 +171,7 @@
                     <span class="material-icons md-18 left" id="temperature_chevron">chevron_left</span>
                 </button>
             </div>
-            <div class="temperature-container scale-container">
+            <div class="scale-container">
                 <div class="scale-group">
                     <div class="scale-element-group red">
                         <div class="rectangle opacity0"></div>
@@ -205,16 +208,16 @@
                         <div class="rectangle opacity015"></div>
                         <div class="rectangle opacity0"></div>
                     </div>
-                    <div class="scale-element-group purple">
+                    <!--<div class="scale-element-group purple">
                         <div class="rectangle opacity075"></div>
                         <div class="rectangle opacity05"></div>
                         <div class="rectangle opacity025"></div>
                         <div class="rectangle opacity015"></div>
                         <div class="rectangle opacity0"></div>
-                    </div>
+                    </div>-->
                 </div>
                 <div class="scale-group-text">
-                    <span class="default-text-small">38 36 34 32 30 28 26 24 22 20 18 16 14 12 10 8 6 4 2 0 -2 -4 -6 -8 -10 -12 -14 -16 -18 -20</span>
+                    <span class="default-text-small" style="transform: rotate(90deg);">38<br> 36<br> 34<br> 32<br> 30<br> 28<br> 26<br> 24<br> 22<br> 20<br> 18<br> 16<br> 14<br> 12<br> 10<br> 8<br> 6<br> 4<br> 2<br> 0<br> -2<br> -4<br> -6<br> -8<br> -10 </span>
                 </div>
             </div>
         </div>

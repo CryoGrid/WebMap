@@ -43,6 +43,21 @@ $(window).on('map:init', function (e) {
             }
         }
     });
+
+    const changeData = () => {
+        tempChart.data.datasets[0].data = randomArray(7);
+        tempChart.update();
+    }
+
+    const randomArray = (size) => {
+        const randomArray = [];
+        for (let i=0; i<size; i++) {
+            randomArray.push(Math.random() * 45);
+        }
+        return randomArray;
+    };
 })
+
+
 
 

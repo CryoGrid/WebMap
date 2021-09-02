@@ -277,7 +277,7 @@ hr {
     /* Auto Layout */
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     padding: 0px;
 
     position: static;
@@ -304,7 +304,9 @@ hr {
 
     position: absolute;
     width: 136px;
-    height: 600px;
+    /* height: 600px; */
+    height: moz-fit-content;
+    height: fit-content;
     left: -110px;
     top: 25%;
 
@@ -354,7 +356,6 @@ hr {
 }
 
 .depth-container .scale-container {
-    /* Auto Layout */
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -368,14 +369,11 @@ hr {
     top: 36px;
 
     background: #FFFFFF;
-
-    /* Turquoise */
     border: 1px solid var(--primary);
     box-sizing: border-box;
     box-shadow: 0px 0px 0px 4px rgba(43, 179, 192, 0.2);
     border-radius: 8px;
 
-    /* Inside Auto Layout */
     flex: none;
     order: 1;
     flex-grow: 0;
@@ -419,13 +417,20 @@ hr {
     background: var(--dark_brown);
 }
 
+.scale-group-depth {
+    position: static;
+    width: 500px;
+    height: 16px;
+    left: 8px;
+    top: 10px;
+}
+
 .scale-group {
     position: static;
     width: 16px;
     height: 500px;
     left: 8px;
     top: 10px;
-    z-index: 2;
 
     /* Accent */
     border: 1px solid var(--accent);
@@ -464,11 +469,14 @@ hr {
 
 .scale-group-text {
     position: static;
-    width: 16px;
-    height: 500px;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 500px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 8px;
     top: 10px;
-    z-index: 1;
 
     /* Accent */
     border: 1px solid var(--accent);
@@ -491,11 +499,14 @@ hr {
     justify-content: center;
     align-items: center;
     padding: 8px;
-    z-level: 2;
+    z-index: 2;
 
     position: absolute;
     width: 136px;
-    height: 676px;
+    height: auto;
+    /* height: 676px; */
+    height: -moz-fit-content;
+    height: fit-content;
     top: 20%;
     right: -110px;
 
@@ -542,16 +553,20 @@ hr {
     margin: 4px 0px;
 }
 
-.temperature-container .scale-container {
+.scale-container {
     /* Auto Layout */
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
-    padding: 8px 12px;
+    align-items: center;
+    padding: 8px 8px;
 
     position: static;
-    width: 72px;
-    height: 616px;
+    /* width: 72px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 616px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 32px;
     top: 52px;
 
@@ -853,21 +868,24 @@ hr {
   align-items: center;
   justify-content: center;
   margin: 4px;
-  transform: rotate(90deg);
 }
 
-.slide-container {
+.slider-container {
   position: relative;
   height: 16px; /* height of the outside container */
-  width: 500px;
-  transform: rotate(-90deg);
+  /* width: 500px; */
+  width: -moz-fit-content;
+  width: fit-content;
+  /*transform: rotate(-90deg);*/
   left: -10px;
   justify-content: top;
   /* Accent */
   border: 1px solid var(--accent);
   box-sizing: border-box;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+
+  transform: rotate(270deg);
 
   /* Inside Auto Layout */
   flex: none;
@@ -910,6 +928,31 @@ hr {
   height: 15px; /* Slider handle height */
   background: #04AA6D; /* Green background */
   cursor: pointer; /* Cursor on hover */
+}
+
+.scale-group-depth-text {
+    position: relative;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 500px; */
+    height: -moz-fit-content;
+    height: fit-content;
+    transform:rotate(90deg);
+    top: -135px;
+    left: 200px;
+
+    /* Accent */
+    border: 1px solid var(--accent);
+    box-sizing: border-box;
+    border-radius: 8px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+    margin: 0px 8px;
+
 }
 
 /*****************************
