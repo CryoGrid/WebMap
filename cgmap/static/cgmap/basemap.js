@@ -201,7 +201,6 @@ $(window).on('map:init', function (e) {
         })
         .done(function(response){
             query_data = response[0].cell_data;
-            console.log('query_data: ', query_data);
             document.getElementById("cell_data").textContent = query_data;
             return query_data
         })

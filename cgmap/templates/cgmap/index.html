@@ -110,7 +110,7 @@
             <div class="scale-container">
                 <div class="slider-container" id="depth">
                     <div class="scale-group-depth">
-                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;" onchange="changeData();">
+                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;" onchange="changeData;" >
                             {% csrf_token %}
                             <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
                             <!--<div class="scale-element-group yellow">

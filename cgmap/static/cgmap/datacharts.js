@@ -3,6 +3,7 @@ $(window).on('map:init', function (e) {
                  e.originalEvent.detail : e.detail;
     var ctx = document.getElementById('tempChart').getContext('2d');
     var chartData = [];
+    console.log('datacharts event data: ', e)
     console.log('ui element cell_data: ', document.getElementById('cell_data'))
     document.getElementById('cell_data').addEventListener("change", function(){
         console.log('cell data has changed');
@@ -44,7 +45,7 @@ $(window).on('map:init', function (e) {
         }
     });
 
-    const changeData = () => {
+    function changeData(){
         tempChart.data.datasets[0].data = randomArray(7);
         tempChart.update();
     }
