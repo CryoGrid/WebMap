@@ -79,9 +79,20 @@ class SoilCharacteristics(models.Model):
 
 
 class Date(models.Model):
-    time = models.DateTimeField(blank=False,
-                                null=False,
-                                default=None, )
+    time = models.DateTimeField(
+        blank=False,
+        null=False,
+        default=None,
+    )
+
+
+class DepthLevel(models.Model):
+    z_level = ArrayField(
+        models.BigIntegerField(),
+        default=None,
+        blank=True,
+        null=True,
+    )
 
 
 class CryoGridData(models.Model):
@@ -90,7 +101,6 @@ class CryoGridData(models.Model):
     lat = models.DecimalField(max_digits=6, decimal_places=3, default=None)
     long = models.DecimalField(max_digits=6, decimal_places=3, default=None)
     alt = models.DecimalField(max_digits=6, decimal_places=3, default=None, blank=True, null=True)
-    z_level = ArrayField(models.BigIntegerField(), default=None, blank=True, null=True)
     tsoil = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=6, decimal_places=3, default=None)
