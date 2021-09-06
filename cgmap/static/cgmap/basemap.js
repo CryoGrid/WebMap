@@ -110,7 +110,6 @@ $(window).on('map:init', function (e) {
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
         cell_data = getCellData(e.target.feature.properties.depth_level, e.target.feature.properties.id);
-
     }
 
     function onEachFeature(feature, layer) {
@@ -202,6 +201,7 @@ $(window).on('map:init', function (e) {
         .done(function(response){
             query_data = response[0].cell_data;
             document.getElementById("cell_data").textContent = query_data;
+            console.log('data charts event data: ', sessionStorage.getItem("cell_data"));
             return query_data
         })
         .fail(function(){
