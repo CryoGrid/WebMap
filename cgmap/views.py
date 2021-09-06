@@ -10,7 +10,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-from .models import MapGrid, Date
+from .models import MapGrid, Date, DepthLevel
 
 
 class MapView(TemplateView):
@@ -36,7 +36,10 @@ class MapView(TemplateView):
 
         context['cg_data'] = {}
         date_id = int(self.date_idx.id)+1
+        depth_id = int(context['depth_level'])+1
         with connection.cursor() as cursor:
+            cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
+            depth = cursor.fetchone()
             cursor.execute("SELECT grid_id, name, depth_level1[1][%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
             cg = cursor.fetchall()
             for cg_data in cg:
@@ -46,7 +49,8 @@ class MapView(TemplateView):
                     'file_name': cg_data[1],
                     'soil_temp': cg_data[2],
                     'air_temp': cg_data[3],
-                    'depth_level': '1',
+                    'depth_idx': depth_id,
+                    'depth_level': depth,
                     'date': self.today
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
@@ -63,20 +67,23 @@ class MapView(TemplateView):
             today = datetime.date.today()
             self.session['depth_level'] = self.POST.get('url_data')
             date_idx = Date.objects.get(time=today).id+1
-            depth_level = int(self.POST.get('url_data'))+1
+            depth_id = int(self.POST.get('url_data'))+1
             with connection.cursor() as cursor:
-                cursor.execute("SELECT grid_id, depth_level%s[1][%s] FROM temperature_depth_level" % (depth_level, date_idx))
+                cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
+                depth = cursor.fetchone()
+                cursor.execute("SELECT grid_id, depth_level%s[1][%s] FROM temperature_depth_level" % (depth_id, date_idx))
                 cg = cursor.fetchall()
                 for data in cg:
                     json_data = {
                         'id': data[0],
                         'soil_temp': data[1],
-                        'depth_level': str(depth_level),
+                        'depth_level': depth,
+                        'depth_idx': str(depth_id),
                     }
                     temp['cg_data'].update({data[0]: json_data})
                 print('filter query: ', temp['cg_data'][1415])
             print('______________________session data, stored depth_level: ', self.session['depth_level'], '__________________________')
-            return JsonResponse([{'cg_data': temp['cg_data']}, {'depth_level': depth_level}], safe=False)
+            return JsonResponse([{'cg_data': temp['cg_data']}, {'depth_level': depth_id}], safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)

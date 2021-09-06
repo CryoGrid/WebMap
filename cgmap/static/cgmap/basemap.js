@@ -33,6 +33,7 @@ $(window).on('map:init', function (e) {
             geoJsonArray[i].properties["soil_temp"] = cg[data.features[i].properties.id].soil_temp;
             geoJsonArray[i].properties["air_temp"] = cg[data.features[i].properties.id].air_temp;
             geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
+            geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
     };
@@ -90,7 +91,7 @@ $(window).on('map:init', function (e) {
                 </button>
             </h3>
             <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>with a calculated soil temperature of: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C at a depth of ${e.target.feature.properties.depth_level}.</div>
+            <div>with a calculated soil temperature of: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(e.target.feature.properties.depth_level).toFixed(2)} m.</div>
             <div>Assumed air temperature of:  ${parseFloat(e.target.feature.properties.air_temp).toFixed(2)}°C for the date: ${e.target.feature.properties.date}.</div>
             <div>For up-to-date temperatures visit the DWD website
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
@@ -109,7 +110,7 @@ $(window).on('map:init', function (e) {
                     .bindPopup(content)
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
-        cell_data = getCellData(e.target.feature.properties.depth_level, e.target.feature.properties.id);
+        cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id);
     }
 
     function onEachFeature(feature, layer) {

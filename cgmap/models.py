@@ -87,8 +87,9 @@ class Date(models.Model):
 
 
 class DepthLevel(models.Model):
-    z_level = ArrayField(
-        models.BigIntegerField(),
+    z_level = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
         default=None,
         blank=True,
         null=True,
