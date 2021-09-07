@@ -29,12 +29,13 @@ class MapView(TemplateView):
             context['depth_level'] = 'new_depth_level'
 
         context['cg_data'] = {}
-        date_id = int(self.date_idx.id)+1
-        depth_id = int(context['depth_level'])+1
+        date_id = int(self.date_idx.id)
+        depth_id = int(context['depth_level']) + 1
         with connection.cursor() as cursor:
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
-            cursor.execute("SELECT grid_id, name, depth_level1[1][%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
+            cursor.execute(
+                "SELECT grid_id, name, depth_level1[1][%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
             cg = cursor.fetchall()
             for cg_data in cg:
                 # entry = depth.values_list('depth_level1', 'tair').filter(grid_id__exact=cg.grid_id)
@@ -58,12 +59,13 @@ class MapView(TemplateView):
             print('___________Request: ', self.method, ' with type ', type(self), '___________')
             temp = {'cg_data': {}}
             today = datetime.date.today()
-            date_idx = Date.objects.get(time=today).id+1
-            depth_id = int(self.POST.get('url_data'))+1
+            date_idx = Date.objects.get(time=today).id
+            depth_id = int(self.POST.get('url_data')) + 1
             with connection.cursor() as cursor:
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
                 depth = cursor.fetchone()
-                cursor.execute("SELECT grid_id, depth_level%s[1][%s] FROM temperature_depth_level" % (depth_id, date_idx))
+                cursor.execute(
+                    "SELECT grid_id, depth_level%s[1][%s] FROM temperature_depth_level" % (depth_id, date_idx))
                 cg = cursor.fetchall()
                 for data in cg:
                     json_data = {
@@ -83,15 +85,28 @@ class MapView(TemplateView):
     def get_cell_data(self, **kwargs):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            today = datetime.date.today()
+            date_idx = Date.objects.get(time=today).id
+            end_interval = date_idx + 6
+            print('date interval index: ', date_idx, end_interval)
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             print('depth_level: ', depth_level, ' idx: ', idx)
             with connection.cursor() as cursor:
-                cursor.execute("SELECT depth_level%s[1][1:7], tair[1:7] FROM temperature_depth_level WHERE grid_id = %s" % (depth_level, idx))
+                cursor.execute(
+                    "SELECT depth_level%s[1][%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                        depth_level, date_idx, end_interval, date_idx, end_interval, idx
+                    )
+                )
                 cg = cursor.fetchall()
                 print('data type of selected data: ', cg)
-            return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}], safe=False)
+                cursor.execute(
+                    "SELECT time FROM cgmap_date WHERE id >= %s and id <= %s;" % (
+                        date_idx, end_interval
+                    )
+                )
+                interval = cursor.fetchall()
+            return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}], safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
-
