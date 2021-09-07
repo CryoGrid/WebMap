@@ -20,17 +20,18 @@
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src="{% static 'cgmap/basemap.js' %}"></script>
     {# to get access from view in external js files #}
     {{grid_data|json_script:"grid_data"}}
     {{context|json_script:"context"}}
     {{cg_data|json_script:"cg_data"}}
-    {{cell_data|json_script:"cell_data"}}
-    <script src="{% static 'cgmap/basemap.js' %}"></script>
-    <script src="{% static 'cgmap/datacharts.js' %}"></script>
+
     <script type="text/Javascript">
         function isSelected(){
-            results = document.querySelector
-        }
+            results = document.querySelector;
+            console.log('is selected func:', results);
+        };
+
     </script>
 {# jquery for scale animation #}
     <script>
@@ -102,7 +103,7 @@
         </div>-->
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
-                <div class="description default-text-small">Depth in cm</div>
+                <div class="description default-text-small">Depth in m</div>
                 <button class="btn btn-primary btn-sm" id="depth-slider" >
                     <span class="material-icons md-18 right" id="depth_chevron">chevron_right</span>
                 </button>
@@ -113,47 +114,13 @@
                         <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;" onchange="changeData;" >
                             {% csrf_token %}
                             <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
-                            <!--<div class="scale-element-group yellow">
-                                <div class="rectangle opacity075" value="1" ></div>
-                                <div class="rectangle opacity025" value="2"></div>
-                                <div class="rectangle opacity015" value="3"></div>
-                                <div class="rectangle opacity0" value="4"></div>
-                            </div>
-                            <div class="scale-element-group orange_brown">
-                                <div class="rectangle opacity075"></div>
-                                <div class="rectangle opacity05"></div>
-                                <div class="rectangle opacity025"></div>
-                                <div class="rectangle opacity015"></div>
-                                <div class="rectangle opacity0"></div>
-                            </div>
-                            <div class="scale-element-group sand_brown">
-                                <div class="rectangle opacity075"></div>
-                                <div class="rectangle opacity05"></div>
-                                <div class="rectangle opacity025"></div>
-                                <div class="rectangle opacity015"></div>
-                                <div class="rectangle opacity0"></div>
-                            </div>
-                            <div class="scale-element-group brown">
-                                <div class="rectangle opacity075"></div>
-                                <div class="rectangle opacity05"></div>
-                                <div class="rectangle opacity025"></div>
-                                <div class="rectangle opacity015"></div>
-                                <div class="rectangle opacity0"></div>
-                            </div>
-                            <div class="scale-element-group dark_brown">
-                                <div class="rectangle opacity075"></div>
-                                <div class="rectangle opacity05"></div>
-                                <div class="rectangle opacity025"></div>
-                                <div class="rectangle opacity015"></div>
-                                <div class="rectangle opacity0"></div>
-                            </div>-->
                         </form>
                     </div>
 
                     <div class="scale-group-depth-text">
                         <span class="default-text-small">
-                            1<br> 5<br> 10<br> 20<br> 50<br> 100<br> 200<br> 300<br> 400<br> 500<br> 600<br> 700<br>
-                            800<br> 900<br> 1000 </span>
+                            0.01<br> 0.05<br> 0.1<br> 0.2<br> 0.5<br> 1.0<br> 2.0<br> 3.0<br> 4.0<br> 5.0<br> 6.0<br> 7.0<br>
+                            8.0<br> 9.0<br> 10.0 </span>
                     </div>
                 </div>
             </div>

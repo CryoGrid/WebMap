@@ -9,6 +9,9 @@ $(window).on('map:init', function (e) {
     var layerGroup = new L.layerGroup();
     var gridLayer;
 
+    var ctx = document.getElementById('tempChart').getContext('2d');
+    var tempChart;
+    createChart();
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
@@ -86,7 +89,7 @@ $(window).on('map:init', function (e) {
         long = e.latlng.lng;
         const content = `
             <h3 class=header3>Cell ${ e.target.feature.properties.id }
-                <button type='button' onclick="open_graph();" class='btn btn-primary btn-sm' style='position: absolute; right: 20px;' id='graph_btn'>
+                <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
@@ -110,7 +113,7 @@ $(window).on('map:init', function (e) {
                     .bindPopup(content)
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
-        cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id);
+        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
     }
 
     function onEachFeature(feature, layer) {
@@ -192,7 +195,7 @@ $(window).on('map:init', function (e) {
         });
     });
 
-    function getCellData(depth_level, cell_id){
+    function getCellData(depth_level, cell_id, e){
         $.ajax({
                 url: 'get_cell_data/',
                 type: 'POST',
@@ -201,12 +204,55 @@ $(window).on('map:init', function (e) {
         })
         .done(function(response){
             query_data = response[0].cell_data;
-            document.getElementById("cell_data").textContent = query_data;
-            console.log('data charts event data: ', sessionStorage.getItem("cell_data"));
-            return query_data
+            changeData(query_data, e);
         })
         .fail(function(){
             console.log('Failed!')
         });
     };
+
+    function createChart(){
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'depth in m',
+                data: [0, 1],
+                fill: false,
+                borderColor: '#EB8702',
+                tension: 0.1
+            },
+            {
+                label: 'air temperature',
+                data: [0, 1],
+                fill: false,
+                borderColor: '#BA700B',
+                tension: 0.1
+            }],
+        };
+        tempChart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                legend: {
+                    position: "right",
+                    align: "middle"
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        stacked: true
+                    }
+                }
+            }
+        });
+    };
+
+    function changeData(q_data, e){
+        tempChart.data.datasets[0].data = q_data[0][0][0];
+        tempChart.data.datasets[0].label = e.target.feature.properties.depth_level + ' m';
+        tempChart.data.datasets[1].data = q_data[0][1];
+        tempChart.update();
+    }
 });
