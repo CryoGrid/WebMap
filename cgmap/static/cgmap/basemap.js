@@ -185,6 +185,7 @@ $(window).on('map:init', function (e) {
                     id = geoJsonArray[i].properties["id"];
                     if(geoJsonArray[i].properties["soil_temp"] != null){
                         geoJsonArray[i].properties["depth_level"] = response[0].cg_data[id].depth_level;
+                        geoJsonArray[i].properties["depth_idx"] = response[0].cg_data[id].depth_idx;
                         geoJsonArray[i].properties["soil_temp"] = response[0].cg_data[id].soil_temp;
                     }
                 };
