@@ -87,22 +87,23 @@ class MapView(TemplateView):
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
-            end_interval = date_idx + 6
-            print('date interval index: ', date_idx, end_interval)
+            start_interval = date_idx - 258
+            end_interval = date_idx + 106
+            print('date interval index: ', start_interval, end_interval)
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             print('depth_level: ', depth_level, ' idx: ', idx)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT depth_level%s[1][%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                        depth_level, date_idx, end_interval, date_idx, end_interval, idx
+                    "SELECT depth_level%s[1][%s:%s], depth_level6[1][%s:%s], depth_level7[1][%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                        depth_level, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, idx
                     )
                 )
                 cg = cursor.fetchall()
                 print('data type of selected data: ', cg)
                 cursor.execute(
                     "SELECT time FROM cgmap_date WHERE id >= %s and id <= %s;" % (
-                        date_idx, end_interval
+                        start_interval, end_interval
                     )
                 )
                 interval = cursor.fetchall()

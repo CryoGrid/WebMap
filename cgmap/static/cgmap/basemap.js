@@ -218,6 +218,20 @@ $(window).on('map:init', function (e) {
         const data = {
             labels: labels,
             datasets: [{
+                label: '1 m',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#F2C94C',
+                tension: 0.1
+            },
+            {
+                label: '2 m',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#BA700B',
+                tension: 0.1
+            },
+            {
                 label: 'depth in m',
                 data: [0, 0.1],
                 fill: false,
@@ -253,9 +267,11 @@ $(window).on('map:init', function (e) {
 
     function changeData(q_data, interval, e){
         tempChart.data.labels = [].concat.apply([], interval);
-        tempChart.data.datasets[0].data = q_data[0][0][0];
-        tempChart.data.datasets[0].label = e.target.feature.properties.depth_level + ' m';
-        tempChart.data.datasets[1].data = q_data[0][1];
+        tempChart.data.datasets[0].data = q_data[0][1][0];
+        tempChart.data.datasets[1].data = q_data[0][2][0];
+        tempChart.data.datasets[2].data = q_data[0][0][0];
+        tempChart.data.datasets[2].label = e.target.feature.properties.depth_level + ' m';
+        tempChart.data.datasets[3].data = q_data[0][3];
         tempChart.update();
     }
 });
