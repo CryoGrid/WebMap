@@ -228,7 +228,7 @@ $(window).on('map:init', function (e) {
                 label: 'air temperature',
                 data: [0, 0.1],
                 fill: false,
-                borderColor: '#BA700B',
+                borderColor: '#2D9CDB',
                 tension: 0.1
             }],
         };
