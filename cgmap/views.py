@@ -35,7 +35,7 @@ class MapView(TemplateView):
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
             cursor.execute(
-                "SELECT grid_id, name, depth_level1[1][%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
+                "SELECT grid_id, name, depth_level1[%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
             cg = cursor.fetchall()
             for cg_data in cg:
                 # entry = depth.values_list('depth_level1', 'tair').filter(grid_id__exact=cg.grid_id)
@@ -65,7 +65,7 @@ class MapView(TemplateView):
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
                 depth = cursor.fetchone()
                 cursor.execute(
-                    "SELECT grid_id, depth_level%s[1][%s] FROM temperature_depth_level" % (depth_id, date_idx))
+                    "SELECT grid_id, depth_level%s[%s] FROM temperature_depth_level" % (depth_id, date_idx))
                 cg = cursor.fetchall()
                 for data in cg:
                     json_data = {
@@ -87,20 +87,17 @@ class MapView(TemplateView):
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
-            start_interval = date_idx - 258
-            end_interval = date_idx + 106
-            print('date interval index: ', start_interval, end_interval)
+            start_interval = date_idx - 259
+            end_interval = date_idx + 105
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
-            print('depth_level: ', depth_level, ' idx: ', idx)
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT depth_level%s[1][%s:%s], depth_level6[1][%s:%s], depth_level7[1][%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                    "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
                         depth_level, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, idx
                     )
                 )
                 cg = cursor.fetchall()
-                print('data type of selected data: ', cg)
                 cursor.execute(
                     "SELECT time FROM cgmap_date WHERE id >= %s and id <= %s;" % (
                         start_interval, end_interval

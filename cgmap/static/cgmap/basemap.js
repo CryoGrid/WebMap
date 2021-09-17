@@ -267,9 +267,9 @@ $(window).on('map:init', function (e) {
 
     function changeData(q_data, interval, e){
         tempChart.data.labels = [].concat.apply([], interval);
-        tempChart.data.datasets[0].data = q_data[0][1][0];
-        tempChart.data.datasets[1].data = q_data[0][2][0];
-        tempChart.data.datasets[2].data = q_data[0][0][0];
+        tempChart.data.datasets[0].data = q_data[0][1];
+        tempChart.data.datasets[1].data = q_data[0][2];
+        tempChart.data.datasets[2].data = q_data[0][0];
         tempChart.data.datasets[2].label = e.target.feature.properties.depth_level + ' m';
         tempChart.data.datasets[3].data = q_data[0][3];
         tempChart.update();
