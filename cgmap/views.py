@@ -87,8 +87,8 @@ class MapView(TemplateView):
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
-            start_interval = date_idx - 259
-            end_interval = date_idx + 105
+            start_interval = date_idx - 261
+            end_interval = date_idx + 103
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             with connection.cursor() as cursor:
