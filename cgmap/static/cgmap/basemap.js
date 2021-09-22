@@ -93,12 +93,12 @@ $(window).on('map:init', function (e) {
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
-            <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>with a calculated soil temperature of: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(e.target.feature.properties.depth_level).toFixed(2)} m.</div>
-            <div>Assumed air temperature of:  ${parseFloat(e.target.feature.properties.air_temp).toFixed(2)}°C for the date: ${e.target.feature.properties.date}.</div>
-            <div>For up-to-date temperatures visit the DWD website
+            <div><hr>Die Zelle wurde ausgewählt an den Breitengraden: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div>mit einer berechneten Bodentemperatur von: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C in einer Tiefe von ${parseFloat(e.target.feature.properties.depth_level).toFixed(2)} m.</div>
+            <div>Die angenommene Lufttemperatur:  ${parseFloat(e.target.feature.properties.air_temp).toFixed(2)}°C für das Datum: ${e.target.feature.properties.date}.</div>
+            <div>Aktuelle Temperaturen finden sie auf der DWD Webseite
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
-                and for soil temperatures
+                und für Bodentemperaturen
                 <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>here</a>.
             </div>
 
