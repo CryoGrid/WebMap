@@ -218,14 +218,14 @@ $(window).on('map:init', function (e) {
         const data = {
             labels: labels,
             datasets: [{
-                label: '1 m',
+                label: '50 cm',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#F2C94C',
                 tension: 0.1
             },
             {
-                label: '2 m',
+                label: '3 m',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#BA700B',

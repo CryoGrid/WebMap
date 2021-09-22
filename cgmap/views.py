@@ -87,13 +87,13 @@ class MapView(TemplateView):
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
-            start_interval = date_idx - 261
-            end_interval = date_idx + 103
+            start_interval = 14611  # id for 2020-01-01
+            end_interval = start_interval + 365 # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                    "SELECT depth_level%s[%s:%s], depth_level5[%s:%s], depth_level8[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
                         depth_level, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, idx
                     )
                 )
