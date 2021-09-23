@@ -364,7 +364,7 @@ hr {
 
     position: static;
     width: 66px;
-    height: 520px;
+    height: 325px;
     left: 32.5px;
     top: 36px;
 
@@ -419,7 +419,7 @@ hr {
 
 .scale-group-depth {
     position: static;
-    width: 500px;
+    width: 300px;
     height: 16px;
     left: 8px;
     top: 10px;
@@ -940,7 +940,7 @@ hr {
     height: fit-content;
     transform:rotate(90deg);
     top: -135px;
-    left: 200px;
+    left: 125px;
 
     /* Accent */
     border: 1px solid var(--accent);
