@@ -88,13 +88,14 @@ class MapView(TemplateView):
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
             start_interval = 14611  # id for 2020-01-01
-            end_interval = start_interval + 365 # id for 2020-12-31
+            end_interval = start_interval + 365  # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT depth_level%s[%s:%s], depth_level5[%s:%s], depth_level8[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                        depth_level, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, start_interval, end_interval, idx
+                        depth_level, start_interval, end_interval, start_interval, end_interval, start_interval,
+                        end_interval, start_interval, end_interval, idx
                     )
                 )
                 cg = cursor.fetchall()
@@ -104,7 +105,29 @@ class MapView(TemplateView):
                     )
                 )
                 interval = cursor.fetchall()
-            return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}], safe=False)
+            return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}],
+                                safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
+
+
+class AboutView(TemplateView):
+    template_name = 'cgmap/about.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class ContactView(TemplateView):
+    template_name = 'cgmap/contact.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+
+
+class LegalView(TemplateView):
+    template_name = 'cgmap/legal.html'
+
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
