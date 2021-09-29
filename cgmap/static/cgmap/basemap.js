@@ -156,7 +156,7 @@ $(window).on('map:init', function (e) {
         pointToLayer: function (feature, latlng) {
             return L.circleMarker(latlng, geojsonMarkerOptions)
         }
-    }).addTo(layerGroup);
+    }).addTo(layerGroup).addTo(detail.map);
 
     layerControl = new L.Control.Layers(null, {
         'Grid Layer': gridLayer,

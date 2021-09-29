@@ -30,9 +30,10 @@
                 <span class="material-icons" aria-hidden="true">&#xe5d2;</span>
             </button>
             <div class="dropdown-menu dropdown-menu-lg-left" aria-labelledby="dropdownMenu">
-                <button class="dropdown-item" type="button">First Item</button>
-                <button class="dropdown-item" type="button">Second Item</button>
-                <button class="dropdown-item" type="button">Third Item</button>
+                <button class="dropdown-item" type="button"><a href="{% url 'index' %}">Map</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'about' %}">Impressum</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'legal' %}">Datenschutz</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'contact' %}">Kontakt</a></button>
             </div>
         </div>
         <div class="dropdown">
