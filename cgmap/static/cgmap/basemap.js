@@ -10,8 +10,10 @@ $(window).on('map:init', function (e) {
     var gridLayer;
 
     var ctx = document.getElementById('tempChart').getContext('2d');
+    var ctx2 = document.getElementById('trumpetChart').getContext('2d');
     var tempChart;
     createChart();
+    createTrumpetChart();
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
@@ -114,6 +116,7 @@ $(window).on('map:init', function (e) {
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
+        var data = getMaxMin(e.target.feature.properties.id);
     }
 
     function onEachFeature(feature, layer) {
@@ -198,10 +201,10 @@ $(window).on('map:init', function (e) {
 
     function getCellData(depth_level, cell_id, e){
         $.ajax({
-                url: 'get_cell_data/',
-                type: 'POST',
-                data: {url_data:depth_level, idx:cell_id},
-                dataType: "json"
+            url: 'get_cell_data/',
+            type: 'POST',
+            data: {url_data:depth_level, idx:cell_id},
+            dataType: "json"
         })
         .done(function(response){
             query_data = response[0].cell_data;
@@ -212,6 +215,150 @@ $(window).on('map:init', function (e) {
             console.log('Failed!')
         });
     };
+
+    function getMaxMin(cell_id){
+        $.ajax({
+            url: 'get_max_min/',
+            data: {idx:cell_id},
+            type: 'POST',
+        })
+        .done(function(response){
+            data = response[0]['depth_list'];
+            updateData(data);
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
+
+    function createTrumpetChart(){
+        const labels = [0.01, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 ];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Min',
+                data: [],
+                fill: false,
+                borderColor: '#F2C94C',
+                tension: 0.1
+            },
+            {
+                label: 'Max',
+                data: [],
+                fill: false,
+                borderColor: '#F2C94C',
+                tension: 0.1
+            },
+            {
+                label: 'Mean',
+                data: [],
+                fill: false,
+                borderColor: '#EB8702',
+                tension: 0.1
+            },
+            {
+                label: 'Median',
+                data: [],
+                fill: false,
+                borderColor: '#2D9CDB',
+                borderDash: [5, 5],
+                tension: 0.1
+            },
+            {
+                label: 'Max. Quantile',
+                data: [],
+                fill: false,
+                borderColor: '#693D00',
+                borderDash: [5, 5],
+                tension: 0.1
+            },
+            {
+                label: 'Min. Quantile',
+                data: [],
+                fill: false,
+                borderColor: '#693D00',
+                borderDash: [5, 5],
+                tension: 0.1
+            }],
+        };
+        trumpetChart = new Chart(ctx2, {
+            type: 'line',
+            data: data,
+            options: {
+                indexAxis: 'y',
+                response: true,
+                title: {
+                    display: true,
+                    text: 'Soil Temperature over the year 2020'
+                },
+                tooltips: {
+                    mode: 'index',
+                    axis: 'x',
+                    intersect: false,
+                },
+                legend: {
+                    position: 'right',
+                    align: 'middle'
+                },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        title:{
+                            display: true,
+                            text: 'Temperature'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(value, index, values) {
+                                // Hide the label of every 2nd dataset
+                                return value + ' m';
+                            },
+                        },
+                    }],
+                    yAxes: [{
+                        beginAtZero: true,
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Depth'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(value, index, values) {
+                                // Hide the label of every 2nd dataset
+                                return value + '°';
+                            },
+                        },
+                    }]
+                }
+            }
+        });
+    }
+
+    function updateData(newData){
+        min = [];
+        max = [];
+        mean = [];
+        median = [];
+        max_quantile = [];
+        min_quantile = [];
+        for (var i = 1; i < 16; i++){
+            min.push(newData[i]['min']);
+            max.push(newData[i]['max']);
+            mean.push(newData[i]['mean']);
+            median.push(newData[i]['median']);
+            max_quantile.push(newData[i]['max_quantile']);
+            min_quantile.push(newData[i]['min_quantile'])
+        }
+        trumpetChart.data.datasets[0].data = min;
+        trumpetChart.data.datasets[1].data = max;
+        trumpetChart.data.datasets[2].data = mean;
+        trumpetChart.data.datasets[3].data = median;
+        trumpetChart.data.datasets[4].data = max_quantile;
+        trumpetChart.data.datasets[5].data = min_quantile;
+        trumpetChart.update();
+        console.log('trumpet chart dataset: ', trumpetChart.data);
+    }
 
     function createChart(){
         const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
@@ -251,15 +398,27 @@ $(window).on('map:init', function (e) {
             data: data,
             options: {
                 responsive: true,
+                tooltips: {
+                    mode: 'index',
+                    axis: 'x',
+                    intersect: false,
+                },
                 legend: {
                     position: "right",
                     align: "middle"
                 },
                 scales: {
-                    y: {
+                    yAxes: [{
                         beginAtZero: true,
-                        stacked: true
-                    }
+                        display: true,
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(value, index, values) {
+                                // Hide the label of every 2nd dataset
+                                return value + '°';
+                            },
+                        },
+                    }]
                 }
             }
         });

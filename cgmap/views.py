@@ -1,6 +1,8 @@
 # Create your views here.
 import datetime
 import json
+import numpy
+import numpy as np
 
 from django.contrib import messages
 from django.core.serializers import serialize
@@ -106,6 +108,40 @@ class MapView(TemplateView):
                 )
                 interval = cursor.fetchall()
             return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}],
+                                safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
+
+    @csrf_exempt
+    def get_max_min(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            idx = self.POST.get('idx')
+            start_interval = 14611  # id for 2020-01-01
+            end_interval = start_interval + 365  # id for 2020-12-31
+            depth_list = {}
+            with connection.cursor() as cursor:
+                for x in range(1, 16):
+                    cursor.execute(
+                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                            x, start_interval, end_interval, idx
+                        )
+                    )
+                    cg = cursor.fetchall()
+                    depth_list[x] = [float(i) for i in cg[0][0]]
+            for idx in depth_list:
+                arr = np.array(depth_list[idx])
+                json_data = {
+                    'min': np.round(np.min(arr), 2),
+                    'max': np.round(np.max(arr), 2),
+                    'mean': np.round(np.mean(arr), 2),
+                    'median': np.round(np.median(arr), 2),
+                    'max_quantile': np.round(np.quantile(arr, 0.9), 2),
+                    'min_quantile': np.round(np.quantile(arr, 0.1), 2),
+                }
+                depth_list[idx] = json_data
+            return JsonResponse([{'depth_list': depth_list}],
                                 safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
