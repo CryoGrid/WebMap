@@ -237,6 +237,8 @@ $(window).on('map:init', function (e) {
             labels: labels,
             datasets: [{
                 label: 'Min',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
@@ -244,6 +246,8 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Max',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
@@ -251,6 +255,8 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Mean',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#EB8702',
@@ -258,6 +264,8 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Median',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#2D9CDB',
@@ -266,6 +274,8 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Max. Quantile',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#693D00',
@@ -274,6 +284,8 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Min. Quantile',
+                xAxesID: 'y',
+                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#693D00',
@@ -285,7 +297,6 @@ $(window).on('map:init', function (e) {
             type: 'line',
             data: data,
             options: {
-                indexAxis: 'y',
                 response: true,
                 title: {
                     display: true,

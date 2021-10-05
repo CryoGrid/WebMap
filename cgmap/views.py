@@ -15,6 +15,7 @@ from django.views.generic import TemplateView
 from .models import MapGrid, Date, DepthLevel
 
 
+# This class contains to logic for the main page where the map is initiated
 class MapView(TemplateView):
     template_name = 'cgmap/index.html'
     today = datetime.date.today()
@@ -22,16 +23,16 @@ class MapView(TemplateView):
     if Date.objects.filter(time=today).exists():
         date_idx = Date.objects.get(time=today)
 
+    # get request is called at initial load of the page, it sets up the grid layer and loads the data for the grid cells
     def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if context.get('depth_level') is None:
-            context['depth_level'] = 0
-        else:
-            context['depth_level'] = 'new_depth_level'
-
+        # depth level is set to 0, because the ui slider starts at the index of 0
+        context['depth_level'] = 0
         context['cg_data'] = {}
         date_id = int(self.date_idx.id)
+
+        # postgreSQL DB index starts at 1
         depth_id = int(context['depth_level']) + 1
         with connection.cursor() as cursor:
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
@@ -39,8 +40,8 @@ class MapView(TemplateView):
             cursor.execute(
                 "SELECT grid_id, name, depth_level1[%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
             cg = cursor.fetchall()
+            # turn query data into json data
             for cg_data in cg:
-                # entry = depth.values_list('depth_level1', 'tair').filter(grid_id__exact=cg.grid_id)
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
@@ -51,10 +52,12 @@ class MapView(TemplateView):
                     'date': self.today
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
+        # query to get shape data for grid map
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')
         return render(request, self.template_name,
                       {'grid_data': geojson, 'context': context['depth_level'], 'cg_data': context['cg_data']})
 
+    # request function to get data for selected depth level
     @csrf_exempt
     def get_depth_level_data(self, **kwargs):
         if self.method == 'POST':
@@ -62,6 +65,7 @@ class MapView(TemplateView):
             temp = {'cg_data': {}}
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
+            # postgreSQL DB index starts at 1
             depth_id = int(self.POST.get('url_data')) + 1
             with connection.cursor() as cursor:
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
@@ -83,12 +87,14 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    # request function to get data for selected cell for the chart
     @csrf_exempt
     def get_cell_data(self, **kwargs):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
-            date_idx = Date.objects.get(time=today).id
+            # date_idx = Date.objects.get(time=today).id
+            # definition of interval
             start_interval = 14611  # id for 2020-01-01
             end_interval = start_interval + 365  # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
@@ -113,6 +119,7 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    # request function to get data for trumpet curve
     @csrf_exempt
     def get_max_min(self):
         if self.method == 'POST':
