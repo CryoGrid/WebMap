@@ -237,8 +237,6 @@ $(window).on('map:init', function (e) {
             labels: labels,
             datasets: [{
                 label: 'Min',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
@@ -246,8 +244,6 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Max',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
@@ -255,8 +251,6 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Mean',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#EB8702',
@@ -264,8 +258,6 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Median',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#2D9CDB',
@@ -274,8 +266,6 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Max. Quantile',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#693D00',
@@ -284,8 +274,6 @@ $(window).on('map:init', function (e) {
             },
             {
                 label: 'Min. Quantile',
-                xAxesID: 'y',
-                yAxesID: 'x',
                 data: [],
                 fill: false,
                 borderColor: '#693D00',
@@ -298,21 +286,25 @@ $(window).on('map:init', function (e) {
             data: data,
             options: {
                 response: true,
+                indexAxis: 'y',
                 title: {
                     display: true,
                     text: 'Soil Temperature over the year 2020'
                 },
-                tooltips: {
+                interaction: {
                     mode: 'index',
-                    axis: 'x',
+                    axis: 'y',
                     intersect: false,
                 },
-                legend: {
-                    position: 'right',
-                    align: 'middle'
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'middle'
+                    },
                 },
                 scales: {
-                    xAxes: [{
+                    x: {
                         display: true,
                         title:{
                             display: true,
@@ -320,14 +312,12 @@ $(window).on('map:init', function (e) {
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-                            callback: function(value, index, values) {
-                                // Hide the label of every 2nd dataset
-                                return value + ' m';
+                            callback: function(val, index) {
+                                return val + '°';
                             },
                         },
-                    }],
-                    yAxes: [{
-                        beginAtZero: true,
+                    },
+                    y: {
                         display: true,
                         title: {
                             display: true,
@@ -335,12 +325,12 @@ $(window).on('map:init', function (e) {
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-                            callback: function(value, index, values) {
-                                // Hide the label of every 2nd dataset
-                                return value + '°';
+
+                            callback: function(val, index) {
+                                return this.getLabelForValue(index) + ' m';
                             },
                         },
-                    }]
+                    }
                 }
             }
         });
@@ -409,27 +399,34 @@ $(window).on('map:init', function (e) {
             data: data,
             options: {
                 responsive: true,
-                tooltips: {
+                interaction: {
                     mode: 'index',
                     axis: 'x',
                     intersect: false,
                 },
-                legend: {
-                    position: "right",
-                    align: "middle"
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'middle'
+                    },
                 },
                 scales: {
-                    yAxes: [{
+                    y: {
                         beginAtZero: true,
                         display: true,
+                        title:{
+                            display: true,
+                            text: 'Temperature'
+                        },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-                            callback: function(value, index, values) {
+                            callback: function(val, index) {
                                 // Hide the label of every 2nd dataset
-                                return value + '°';
+                                return val + '°';
                             },
                         },
-                    }]
+                    }
                 }
             }
         });
