@@ -253,14 +253,14 @@ $(window).on('map:init', function (e) {
                 label: 'Mean',
                 data: [],
                 fill: false,
-                borderColor: '#EB8702',
+                borderColor: '#693D00',
                 tension: 0.1
             },
             {
                 label: 'Median',
                 data: [],
                 fill: false,
-                borderColor: '#2D9CDB',
+                borderColor: '#BA700B',
                 borderDash: [5, 5],
                 tension: 0.1
             },
@@ -268,7 +268,7 @@ $(window).on('map:init', function (e) {
                 label: 'Max. Quantile',
                 data: [],
                 fill: false,
-                borderColor: '#693D00',
+                borderColor: '#EB8702',
                 borderDash: [5, 5],
                 tension: 0.1
             },
@@ -276,7 +276,7 @@ $(window).on('map:init', function (e) {
                 label: 'Min. Quantile',
                 data: [],
                 fill: false,
-                borderColor: '#693D00',
+                borderColor: '#EB8702',
                 borderDash: [5, 5],
                 tension: 0.1
             }],
