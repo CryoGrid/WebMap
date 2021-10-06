@@ -830,11 +830,32 @@ hr {
     align-items: flex-right;
     padding: 0px;
 
-    width: 600px;
-    height: 400px;
+    width: -moz-fit-content;
+    width: fit-content;
+
+    height: -moz-fit-content;
+    height: fit-content;
     top: 1em;
     right: 4em;
     z-index: 1;
+}
+
+#tab-nav{
+    align-items: center;
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
+#tab-content{
+    align-items: center;
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
 }
 
 #tempChart{

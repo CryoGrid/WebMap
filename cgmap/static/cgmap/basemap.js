@@ -12,8 +12,14 @@ $(window).on('map:init', function (e) {
     var ctx = document.getElementById('tempChart').getContext('2d');
     var ctx2 = document.getElementById('trumpetChart').getContext('2d');
     var tempChart;
+    var trumpetChart;
     createChart();
-    createTrumpetChart();
+    $('#bs-tab2').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab2').off(); //to remove the binded event after initial rendering
+    });
+
+
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);

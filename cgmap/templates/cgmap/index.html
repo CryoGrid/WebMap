@@ -66,7 +66,7 @@
 
         function open_graph(){
             console.log("container has been opened");
-            var div = document.getElementById('chart-container');
+            var div = document.getElementById('tab-nav');
             if (div.style.display === "none") {
                 div.style.display = "flex";
             } else {
@@ -125,15 +125,31 @@
                 </div>
             </div>
         </div>
-        <div class="chart-container" id="chart-container" style="display: none;">
-            <canvas id="tempChart" width="600" height="400"></canvas>
-            <button class="btn btn-primary btn-sm" type="button" id="close-btn" style="width: 18px;height: 18px;">
+        <div class="chart-container" id="tab-nav" style="display: none;">
+            <ul class="nav nav-pills nav-jt">
+               <li class="nav-item"><a class="nav-link active" href="#first" data-toggle="tab">Annual Soil Temperature Chart</a></li>
+               <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Trumpet Chart</a></li>
+            </ul>
+            <!--<button class="btn btn-primary btn-sm" type="button" id="close-btn" style="width: 18px;height: 18px;">
                 <span class="material-icons md-18 close">close</span>
-            </button>
+            </button>-->
+            <div class="tab-content" id="tab-content">
+                <div id="first" class="tab-pane fade active in">
+                    <div class="chart-container" id="chart-container">
+                        <canvas id="tempChart" width="600" height="400"></canvas>
+                    </div>
+                </div>
+                <div id="second" class="tab-pane">
+                    <div class="chart-container" id="chart2-container" style="top: 25em; right: 4em;">
+                        <canvas id="trumpetChart" width="600" height="400"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="chart-container" id="chart2-container" style="top: 25em; right: 4em;">
-            <canvas id="trumpetChart" width="600" height="400"></canvas>
-        </div>
+
+
+
+
         <div class="temperature-container right-transition" id="right-slider">
             <div class="temperature-title-wrapper">
                 <div class="description default-text-small">Temperature in °C</div>
