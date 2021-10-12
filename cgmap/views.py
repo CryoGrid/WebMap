@@ -154,6 +154,52 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    # request function to get data for trumpet curve
+    @csrf_exempt
+    def get_ground_profile(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            idx = self.POST.get('idx')
+            start_interval = 14611  # id for 2020-01-01
+            end_interval = start_interval + 365  # id for 2020-12-31
+            depth_list = {}
+            with connection.cursor() as cursor:
+                for x in range(1, 11):
+                    cursor.execute(
+                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                            x, start_interval, end_interval, idx
+                        )
+                    )
+                    cg = cursor.fetchall()
+                    depth_list[x] = [float(i) for i in cg[0][0]]
+                cursor.execute(
+                    "SELECT id, z_level FROM cgmap_depthlevel"
+                )
+                z_level = cursor.fetchall()
+                cursor.execute(
+                    "SELECT time FROM cgmap_date WHERE id >= %s and id <= %s;" % (
+                        start_interval, end_interval
+                    )
+                )
+                interval = cursor.fetchall()
+
+            for idx in depth_list:
+                z_level.sort()
+                temp = []
+                for i, val in enumerate(depth_list[idx]):
+                    temp.append({'x': interval[i][0], 'y': float(z_level[idx-1][1]), 'r': val})
+
+                json_data = {
+                    'data': temp,
+                }
+                depth_list[idx] = json_data
+
+            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}],
+                                safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
+
 
 class AboutView(TemplateView):
     template_name = 'cgmap/about.html'
