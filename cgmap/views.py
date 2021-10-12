@@ -182,13 +182,12 @@ class MapView(TemplateView):
                     )
                 )
                 interval = cursor.fetchall()
-
+            # convert query data to json data for easy is in chart js code
             for idx in depth_list:
                 z_level.sort()
                 temp = []
                 for i, val in enumerate(depth_list[idx]):
                     temp.append({'x': interval[i][0], 'y': float(z_level[idx-1][1]), 'r': val})
-
                 json_data = {
                     'data': temp,
                 }
