@@ -335,6 +335,10 @@ function for creating trumpet chart, contains config data for chart
                     intersect: false,
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Soil Temperature 2020'
+                    },
                     legend: {
                         display: true,
                         position: 'right',
@@ -430,7 +434,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             datasets: [
             {
                 label: '0.01 m',
-                data: [85, 40, 83, 13, 75, 43, 95, 23, 36, 3, 18, 34],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [],
                 borderColor: [],
@@ -442,7 +446,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '0.05 m',
-                data: [34, 85, 12, 59, 75, 62, 23, 36, 46, 82, 73, 52],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -463,7 +467,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '0.1 m',
-                data: [78, 92, 32, 45, 36, 46, 82, 85, 12, 59, 75, 43],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -484,7 +488,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '0.2 m',
-                data: [94, 3, 78, 68, 14, 58, 89, 92, 32, 45, 23, 12],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -505,7 +509,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '0.5 m',
-                data: [4, 13, 38, 28, 64, 48, 59, 78, 68, 14, 41, 32],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -526,7 +530,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '1 m',
-                data: [ 59, 78, 28, 41, 32, 64, 48, 4, 13, 38, 68, 14],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -547,7 +551,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '2 m',
-                data: [ 59, 38, 28, 45, 23, 12, 78, 4, 13, 3, 78, 68],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -568,7 +572,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '3 m',
-                data: [ 75, 43, 95, 23, 3, 78, 68, 14,  4, 13, 3, 78],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -589,7 +593,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '4 m',
-                data: [ 13, 75, 43, 95, 23, 3, 68, 4, 13, 27, 78, 14],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -610,7 +614,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 label: '5 m',
-                data: [ 14,  4, 13, 3, 78, 75, 43, 95, 23, 3, 78, 68],
+                data: [],
                 pointBackgroundColor: [],
                 backgroundColor: [function(context) {
                     const chart = context.chart;
@@ -639,14 +643,26 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Chart.js Line Chart - stacked=' + ctx.chart.options.scales.y.stacked
+                        text: (ctx) => 'Ground Profile for 2020'
                     },
                     tooltip: {
-                        mode: 'index'
+                        mode: 'index',
+                        callbacks: {
+                            title: function(context){
+                                for( var i = 0; i < context.length; i++){
+                                    return context[i].label = 'Week ' + context[i].label;
+                                }
+                            },
+                            label: function(context){
+                                var label = context.dataset.label;
+                                label += ' : ' + context.raw.r + '°';
+                                return label;
+                            }
+                        },
                     },
                     legend: {
-                        display: true,
-                        position: 'right',
+                        display: false,
+                        position: 'top',
                         align: 'middle'
                     },
                 },
@@ -659,8 +675,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     x: {
                         title: {
                             display: true,
-                            text: 'Month'
-                        }
+                            text: 'Weeks'
+                        },
                     },
                     y: {
                         reverse: true,
@@ -676,7 +692,12 @@ function to update trumpet chart with requested data -> is called in ajax functi
                             },
                         },
                     }
-                }
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    },
+                },
             }
         });
     }
@@ -754,7 +775,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
         for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
             var color = addColor(groundProfile.data.datasets[i].data, false);
-            groundProfile.data.datasets[i].backgroundColor = color;
+            var trans = addColor(groundProfile.data.datasets[i].data, true);
+            groundProfile.data.datasets[i].backgroundColor = trans;
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
         }
@@ -807,6 +829,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     intersect: false,
                 },
                 plugins: {
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Ground temperature for 2020'
+                    },
                     legend: {
                         display: true,
                         position: 'right',

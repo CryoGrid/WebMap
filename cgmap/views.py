@@ -160,8 +160,8 @@ class MapView(TemplateView):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             idx = self.POST.get('idx')
-            start_interval = 14611  # id for 2020-01-01
-            end_interval = start_interval + 365  # id for 2020-12-31
+            start_interval = 14609  # id for 2019-12-30 Monday
+            end_interval = start_interval + 365 + 5  # id for 2020-12-31 -> id for 2021-01-03
             depth_list = {}
             with connection.cursor() as cursor:
                 for x in range(1, 11):
@@ -182,8 +182,23 @@ class MapView(TemplateView):
                     )
                 )
                 interval = cursor.fetchall()
+            # calculating weekly mean values -> 5 days in first week and 4 days in last week; 357 days left -> 51 weeks
+            for i in depth_list:
+                z_level.sort()
+                temp = []
+                arr = np.array(depth_list[i])
+                week = 1
+                for x in range(0, len(arr), 7):
+                    mean = np.round(np.mean(arr[x:x+7]), 2)
+                    temp.append({'x': week, 'y': float(z_level[i-1][1]), 'r': mean})
+                    week += 1
+                json_data = {
+                    'data': temp,
+                }
+                depth_list[i] = json_data
+            interval = np.arange(1, 54, 1, dtype=int).tolist()
             # convert query data to json data for easy is in chart js code
-            for idx in depth_list:
+            '''for idx in depth_list:
                 z_level.sort()
                 temp = []
                 for i, val in enumerate(depth_list[idx]):
@@ -191,7 +206,7 @@ class MapView(TemplateView):
                 json_data = {
                     'data': temp,
                 }
-                depth_list[idx] = json_data
+                depth_list[idx] = json_data'''
 
             return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}],
                                 safe=False)
