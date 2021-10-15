@@ -896,6 +896,25 @@ hr {
     flex: none;
 }
 
+#groundProfile{
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    padding: 40px;
+
+    position: static;
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
 
 /**********************
 * Custom depth slider *

@@ -6,6 +6,7 @@ urlpatterns = [
     path('get_depth_level_data/', MapView.get_depth_level_data, name='depth_level_data'),
     path('get_cell_data/', MapView.get_cell_data, name='cell_data'),
     path('get_max_min/', MapView.get_max_min, name='max_min'),
+    path('get_ground_profile/', MapView.get_ground_profile, name='ground_profile'),
     path('about/', AboutView.as_view(), name='about'),
     path('contact/', ContactView.as_view(), name='contact'),
     path('legal/', LegalView.as_view(), name='legal')
