@@ -20,7 +20,7 @@ from django.urls import path, include
 
 
 urlpatterns = [
-    path('cgmap/', include('cgmap.urls')),
+    path('', include('cgmap.urls')),
     path('admin/', admin.site.urls),
 ]
 

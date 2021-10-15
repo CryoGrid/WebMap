@@ -53,7 +53,7 @@ $(window).on('map:init', function (e) {
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
     };
-
+    // color for grid cells
     function getColor(t) {
         return t > 30  ? '#EB5757' :
                t > 25  ? '#F2994A' :
@@ -68,7 +68,7 @@ $(window).on('map:init', function (e) {
                t > -20 ? '#9B51E0' :
                          '#FFEDA0';
     }
-
+    // style for grid cells
     function style(feature) {
         cellColor = '#FFEDA0';
         if(feature.properties.soil_temp != null){
@@ -101,6 +101,7 @@ $(window).on('map:init', function (e) {
 
         lat = e.latlng.lat;
         long = e.latlng.lng;
+        // content for popup window -> includes the button for activating the charts
         const content = `
             <h3 class=header3>Cell ${ e.target.feature.properties.id }
                 <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
@@ -404,7 +405,9 @@ function to update trumpet chart with requested data -> is called in ajax functi
         trumpetChart.data.datasets[5].data = min_quantile;
         trumpetChart.update();
     }
-
+    /**
+    function for creating a color gradient
+    **/
     function getGradient(ctx, chartArea){
         let width, height, gradient = null;
         const chartWidth = chartArea.right - chartArea.left;
@@ -427,6 +430,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
     function createGroundProfile(){
 
         const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        /* const up checks if the next point has a different color as the current -> in datasets the color will be changed accordingly */
         const up = (ctx, value) => ctx.p0.options.backgroundColor != ctx.p1.options.backgroundColor ? value : undefined;
         const down = (ctx, value) => ctx.p0.options.backgroundColor == ctx.p1.options.backgroundColor ? value : undefined;
         const data = {
@@ -701,6 +705,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             }
         });
     }
+    /* gets the size of an object*/
     Object.size = function(obj) {
         var size = 0,
         key;
@@ -729,40 +734,22 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         for( var i = 0; i < data.length; i++){
             if( data[i].r > 25){
-                color.push('rgba(255,87,87,1)'); /* hex: #EB5757 - rgb: (235,87,87) */
-                if( trans === true ){
-                    color.push('rgba(255,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
-                }
+                color.push('#EB5757'); /* hex: #EB5757 - rgb: (235,87,87) */
             }
             else if( data[i].r > 20){
-                color.push('rgba(242,153,74,1)'); /* hex: #F2994A - rgb: (242,153,74) */
-                if( trans === true ){
-                    color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
-                }
+                color.push('#F2994A'); /* hex: #F2994A - rgb: (242,153,74) */
             }
             else if( data[i].r > 15){
-                color.push('rgba(255,179,112,1)'); /* hex: #FFB370 - rgb: (255,179,112) */
-                if( trans === true ){
-                    color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
-                }
+                color.push('#FFB370'); /* hex: #FFB370 - rgb: (255,179,112) */
             }
             else if( data[i].r > 10){
-                color.push('rgba(242,201,76,1)'); /* hex: #F2C94C - rgb: (242,201,76) */
-                if( trans === true ){
-                    color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
-                }
+                color.push('#F2C94C'); /* hex: #F2C94C - rgb: (242,201,76) */
             }
             else if( data[i].r > 5){
-                color.push('rgba(111,207,151,1)'); /* hex: #6FCF97 - rgb: (111,207,151) */
-                if( trans === true ){
-                    color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
-                }
+                color.push('#6FCF97'); /* hex: #6FCF97 - rgb: (111,207,151) */
             }
             else{
-                color.push('rgba(45,156,219,1)'); /* hex: #2D9CDB - rgb: (45,156,219) */
-                if( trans === true ){
-                    color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
-                }
+                color.push('#2D9CDB'); /* hex: #2D9CDB - rgb: (45,156,219) */
             }
         }
         return color
