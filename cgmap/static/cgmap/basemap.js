@@ -9,24 +9,6 @@ $(window).on('map:init', function (e) {
     var layerGroup = new L.layerGroup();
     var gridLayer;
 
-<<<<<<< HEAD
-    var ctx = document.getElementById('tempChart').getContext('2d');
-    var ctx2 = document.getElementById('trumpetChart').getContext('2d');
-    var tempChart;
-    var trumpetChart;
-    createChart();
-    $('#bs-tab2').on("shown.bs.tab", function() {
-        createTrumpetChart();
-        $('#bs-tab2').off(); //to remove the binded event after initial rendering
-    });
-
-
-    var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
-    var depth_level = JSON.parse(document.getElementById('context').textContent);
-    var cg = JSON.parse(document.getElementById('cg_data').textContent);
-
-=======
->>>>>>> map
     var geojson;
     var boundArray = [];
     var polygonArray = [];
@@ -49,6 +31,15 @@ $(window).on('map:init', function (e) {
     createTrumpetChart();
     createGroundProfile();
 
+
+    $('#bs-tab2').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab2').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab3').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab3').off(); //to remove the bound event after initial rendering
+    });
     /**
     populating geojson array with db data
     **/
