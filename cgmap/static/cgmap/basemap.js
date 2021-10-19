@@ -31,7 +31,10 @@ $(window).on('map:init', function (e) {
     createTrumpetChart();
     createGroundProfile();
 
-
+    $('#bs-tab2').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab2').off(); //to remove the bound event after initial rendering
+    });
     $('#bs-tab2').on("shown.bs.tab", function() {
         createTrumpetChart();
         $('#bs-tab2').off(); //to remove the bound event after initial rendering
@@ -418,7 +421,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
     function for creating a color gradient
     **/
     function getGradient(ctx, chartArea){
-        let width, height, gradient = null;
+        var width, height, gradient = null;
         const chartWidth = chartArea.right - chartArea.left;
         const chartHeight = chartArea.bottom - chartArea.top;
         if(gradient === null || width !== chartWidth || height !== chartHeight){
@@ -431,6 +434,18 @@ function to update trumpet chart with requested data -> is called in ajax functi
             gradient.addColorStop(0.75, '#F2994A');
             gradient.addColorStop(1, '#EB5757');
         }
+        return gradient;
+    }
+
+    function getLineGradient(ctx, startPoint, endPoint){
+        var gradient = null;
+        console.log('ctx', ctx);
+        console.log('start point: ', startPoint);
+        console.log('end point: ', endPoint);
+        gradient = ctx.createLinearGradient(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+        gradient.addColorStop(0, startPoint.options.borderColor);
+        gradient.addColorStop(1, endPoint.options.borderColor);
+
         return gradient;
     }
     /**
@@ -453,8 +468,26 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getLineGradient(ctx, ctx.p0, ctx.p1);
+                    }) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getLineGradient(ctx, ctx.p0, ctx.p1);
+                    }) || down(ctx, ctx.p0.options.backgroundColor),
                 },
             },
             {
@@ -621,8 +654,28 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getGradient(ctx, chartArea);
+                    }) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        console.log('chart of 4m level: ', chart);
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getGradient(ctx, chartArea);
+                    }) || down(ctx, ctx.p0.options.backgroundColor),
                 },
             },
             {
@@ -642,8 +695,26 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: {value: 6},
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getGradient(ctx, chartArea);
+                    }) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => up(ctx, function(context) {
+                        const chart = context.chart;
+                        const {ctx, chartArea} = chart;
+
+                        if ( !chartArea ){
+                            // This case happens on initial chart load
+                            return null;
+                        }
+                        return getGradient(ctx, chartArea);
+                    }) || down(ctx, ctx.p0.options.backgroundColor),
                 },
             }]
         };

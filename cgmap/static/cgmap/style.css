@@ -830,12 +830,14 @@ hr {
     align-items: flex-right;
     padding: 0px;
 
+    left: 2.5em;
+    top: 3em;
+
     width: -moz-fit-content;
     width: fit-content;
     height: -moz-fit-content;
     height: fit-content;
 
-    z-index: 1;
 }
 
 .nav .chart-container{
