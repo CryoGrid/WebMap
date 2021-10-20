@@ -455,8 +455,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         /* const up checks if the next point has a different color as the current -> in datasets the color will be changed accordingly */
-        const up = (ctx, value) => ctx.p0.options.backgroundColor != ctx.p1.options.backgroundColor ? value : undefined;
-        const down = (ctx, value) => ctx.p0.options.backgroundColor == ctx.p1.options.backgroundColor ? value : undefined;
+        const up = (ctx, value) => ctx.p0.options.borderColor != ctx.p1.options.borderColor ? value : undefined;
+        const down = (ctx, value) => ctx.p0.options.borderColor == ctx.p1.options.borderColor ? value : undefined;
         const data = {
             labels: labels,
             datasets: [
@@ -468,26 +468,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getLineGradient(ctx, ctx.p0, ctx.p1);
-                    }) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getLineGradient(ctx, ctx.p0, ctx.p1);
-                    }) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
                 },
             },
             {
@@ -654,6 +636,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
+                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                },
+                /**segment: {
                     borderColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
@@ -662,7 +648,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                             // This case happens on initial chart load
                             return null;
                         }
-                        return getGradient(ctx, chartArea);
+                        return getLineGradient(ctx, ctx.p0, ctx.p1);
                     }) || down(ctx, ctx.p0.options.borderColor),
                     backgroundColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
@@ -674,9 +660,9 @@ function to update trumpet chart with requested data -> is called in ajax functi
                             // This case happens on initial chart load
                             return null;
                         }
-                        return getGradient(ctx, chartArea);
+                        return getLineGradient(ctx, ctx.p0, ctx.p1);
                     }) || down(ctx, ctx.p0.options.backgroundColor),
-                },
+                },**/
             },
             {
                 label: '5 m',
@@ -694,28 +680,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 }],
                 borderColor: [],
                 fill: {value: 6},
-                segment: {
-                    borderColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getGradient(ctx, chartArea);
-                    }) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getGradient(ctx, chartArea);
-                    }) || down(ctx, ctx.p0.options.backgroundColor),
-                },
             }]
         };
 
@@ -748,6 +712,22 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         display: false,
                         position: 'top',
                         align: 'middle'
+                    },
+                    afterLayout: chart => {
+                        var ctx = chart.chart.ctx;
+                        var xAxis = chart.scales['x-axis-0'];
+                        var gradientStroke = ctx.createLinearGradient(xAxis.left, 0, xAxis.right, 0);
+                        var dataset = chart.data.datasets[0];
+                        dataset.borderColor.forEach((c,i) => {
+                            var stop = 1/(dataset.borderColor.length - 1) * i;
+                            gradientStroke.addColorStop(stop, dataset.borderColor[i]);
+                        });
+                        dataset.borderColor = gradientStroke;
+                        dataset.pointBorderColor = gradientStroke;
+                        dataset.pointBackgroundColor = gradientStroke;
+                        dataset.pointHoverBorderColor = gradientStroke;
+                        dataset.pointHoverBackgroundColor = gradientStroke;
+                        console.log(dataset.colors);
                     },
                 },
                 interaction: {
@@ -809,27 +789,27 @@ function to update trumpet chart with requested data -> is called in ajax functi
 /**
     depending on temperature set color
 **/
-    function addColor(data, trans){
+    function addColor(data){
     color = [];
 
         for( var i = 0; i < data.length; i++){
             if( data[i].r > 25){
-                color.push('#EB5757'); /* hex: #EB5757 - rgb: (235,87,87) */
+                color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
             }
             else if( data[i].r > 20){
-                color.push('#F2994A'); /* hex: #F2994A - rgb: (242,153,74) */
+                color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
             }
             else if( data[i].r > 15){
-                color.push('#FFB370'); /* hex: #FFB370 - rgb: (255,179,112) */
+                color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
             }
             else if( data[i].r > 10){
-                color.push('#F2C94C'); /* hex: #F2C94C - rgb: (242,201,76) */
+                color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
             }
             else if( data[i].r > 5){
-                color.push('#6FCF97'); /* hex: #6FCF97 - rgb: (111,207,151) */
+                color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
             }
             else{
-                color.push('#2D9CDB'); /* hex: #2D9CDB - rgb: (45,156,219) */
+                color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
             }
         }
         return color
@@ -841,12 +821,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
         groundProfile.data.labels = [].concat.apply([], interval);
         for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
-            var color = addColor(groundProfile.data.datasets[i].data, false);
-            var trans = addColor(groundProfile.data.datasets[i].data, true);
-            groundProfile.data.datasets[i].backgroundColor = trans;
+            var color = addColor(groundProfile.data.datasets[i].data);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
         }
+        console.log('ground profile data: ', groundProfile);
+        console.log('segment of data points: ', groundProfile.data.datasets[8]);
+
         groundProfile.update();
     }
 /**
