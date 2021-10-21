@@ -183,21 +183,36 @@ class MapView(TemplateView):
                 )
                 interval = cursor.fetchall()
             # calculating weekly mean values -> 5 days in first week and 4 days in last week; 357 days left -> 51 weeks
+            temp25, temp20, temp15, temp10, temp5, temp0 = [], [], [], [], [], []
             for i in depth_list:
                 z_level.sort()
                 temp = []
                 arr = np.array(depth_list[i])
                 week = 1
                 for x in range(0, len(arr), 7):
-                    mean = np.round(np.mean(arr[x:x+7]), 2)
-                    temp.append({'x': week, 'y': float(z_level[i-1][1]), 'r': mean})
+                    mean = np.round(np.mean(arr[x:x + 7]), 2)
+                    value = {'x': week, 'y': float(z_level[i - 1][1]), 'r': mean}
+                    temp.append(value)
+                    if mean > 25:
+                        temp25.append(value)
+                    elif mean > 20:
+                        temp20.append(value)
+                    elif mean > 15:
+                        temp15.append(value)
+                    elif mean > 10:
+                        temp10.append(value)
+                    elif mean > 5:
+                        temp5.append(value)
+                    else:
+                        temp0.append(value)
                     week += 1
+
                 json_data = {
                     'data': temp,
                 }
                 depth_list[i] = json_data
             interval = np.arange(1, 54, 1, dtype=int).tolist()
-            # convert query data to json data for easy is in chart js code
+            temp_list = {'5': temp25, '4': temp20, '3': temp15, '2': temp10, '1': temp5, '0': temp0}
             '''for idx in depth_list:
                 z_level.sort()
                 temp = []
@@ -208,7 +223,7 @@ class MapView(TemplateView):
                 }
                 depth_list[idx] = json_data'''
 
-            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}],
+            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}, {'temp_list': temp_list}],
                                 safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \

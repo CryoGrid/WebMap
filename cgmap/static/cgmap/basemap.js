@@ -256,7 +256,8 @@ ajax function to get ground profile data for selected grid cell and updating cor
         .done(function(response){
             data = response[0]['depth_list'];
             interval = response[1]['date_interval'];
-            updateProfileData(data, interval);
+            cluster = response[2]['temp_list'];
+            updateProfileData(data, interval, cluster);
         })
         .fail(function(){
             console.log('Failed!')
@@ -467,6 +468,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
+                showLine: true,
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
                     backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
@@ -682,9 +684,61 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 fill: {value: 6},
             }]
         };
+        const data2 = {
+            labels: labels,
+            datasets: [
+            {
+                label: 'dataset1',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                showLine: true,
+            },
+            {
+                label: 'dataset2',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                showLine: true,
+            },
+            {
+                label: 'dataset3',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                showLine: true,
+            },
+            {
+                label: 'dataset4',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                showLine: true,
+            },
+            {
+                label: 'dataset5',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                showLine: true,
+            },
+            {
+                label: 'dataset6',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+            },
+            ]
+        };
 
         groundProfile = new Chart(ctx3, {
-            type: 'line',
+            type: 'scatter',
             data: data,
             options: {
                 responsive: true,
@@ -712,7 +766,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         display: false,
                         position: 'top',
                         align: 'middle'
-                    },
+                    },/**
                     afterLayout: chart => {
                         var ctx = chart.chart.ctx;
                         var xAxis = chart.scales['x-axis-0'];
@@ -728,7 +782,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         dataset.pointHoverBorderColor = gradientStroke;
                         dataset.pointHoverBackgroundColor = gradientStroke;
                         console.log(dataset.colors);
-                    },
+                    },**/
                 },
                 interaction: {
                     mode: 'nearest',
@@ -757,11 +811,11 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         },
                     }
                 },
-                elements: {
+                /**elements: {
                     point: {
                         radius: 0
                     },
-                },
+                },**/
             }
         });
     }
@@ -791,33 +845,45 @@ function to update trumpet chart with requested data -> is called in ajax functi
 **/
     function addColor(data){
     color = [];
-
+    temp25 = [];
+    temp20 = [];
+    temp15 = [];
+    temp10 = [];
+    temp5 = [];
+    temp0 = [];
         for( var i = 0; i < data.length; i++){
             if( data[i].r > 25){
                 color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
+                temp25.push(data[i]);
             }
             else if( data[i].r > 20){
                 color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
+                temp20.push(data[i]);
             }
             else if( data[i].r > 15){
                 color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
+                temp15.push(data[i]);
             }
             else if( data[i].r > 10){
                 color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
+                temp10.push(data[i]);
             }
             else if( data[i].r > 5){
                 color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
+                temp5.push(data[i]);
             }
             else{
                 color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
+                temp0.push(data[i]);
             }
         }
+        console.log('data for temp 15: ', temp15);
         return color
     }
 /**
     update ground profile data and set colors for graph
 **/
-    function updateProfileData(data, interval){
+    function updateProfileData(data, interval, cluster){
         groundProfile.data.labels = [].concat.apply([], interval);
         for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
@@ -825,9 +891,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
         }
-        console.log('ground profile data: ', groundProfile);
-        console.log('segment of data points: ', groundProfile.data.datasets[8]);
-
+        console.log('cluster', cluster[0]);
+        /**for( var i = 0; i < 7; i++){
+            groundProfile.data.datasets[i].data = cluster[i];
+            console.log('ground profile: ', groundProfile.data);
+            var color = addColor(groundProfile.data.datasets[i].data);
+            groundProfile.data.datasets[i].pointBackgroundColor = color;
+            groundProfile.data.datasets[i].borderColor = color;
+        }**/
         groundProfile.update();
     }
 /**
