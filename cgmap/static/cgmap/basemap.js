@@ -6,6 +6,37 @@ $(window).on('map:init', function (e) {
     var detail = e.originalEvent ?
                  e.originalEvent.detail : e.detail;
 
+    /**
+    console.log('get geo search async')
+    const form = document.querySelector('form');
+    const input = form.querySelector('input[type="text"]');
+    var query_promise = provider.search({
+        query: input.value
+    });
+    query_promise.then(value => {
+        console.log('queried value: ', value);
+        for( var i = 0; i < value.length; i++){
+            // success!
+            var x_coor = value[i].x;
+            var y_coor = value[i].y;
+            var label = value[i].label;
+            var marker = L.marker([y_coor, x_coor]).addTo(detail.map)
+            marker.bindPopup("<b>Found location</b><br>" + label).openPopup();
+        };
+    }, reason => {
+        console.log(reason); // Error!
+    });
+    var results = L.layerGroup().addTo(detail.map);
+    search.on('results', function(data) {
+        console.log('search results: ', data);
+        results.clearLayers();
+        for(var i = data.results.length - 1; i >= 0; i--){
+            results.addLayer(L.marker(data.results[i].latlng));
+        }
+    });**/
+
+
+
     var layerGroup = new L.layerGroup();
     var gridLayer;
 
@@ -13,6 +44,7 @@ $(window).on('map:init', function (e) {
     var boundArray = [];
     var polygonArray = [];
     var geoJsonArray = [];
+
 
     /**
     parsing data from backend
@@ -27,6 +59,11 @@ $(window).on('map:init', function (e) {
     var ctx = document.getElementById('tempChart').getContext('2d');
     var ctx2 = document.getElementById('trumpetChart').getContext('2d');
     var ctx3 = document.getElementById('groundProfile').getContext('2d');
+    // declaring charts
+    var tempChart;
+    var trumpetChart;
+    var groundProfile;
+    // creating charts
     createChart();
     createTrumpetChart();
     createGroundProfile();
@@ -82,7 +119,7 @@ $(window).on('map:init', function (e) {
     }
     // style for grid cells
     function style(feature) {
-        cellColor = '#FFEDA0';
+        var cellColor = '#FFEDA0';
         if(feature.properties.soil_temp != null){
             cellColor = getColor(feature.properties.soil_temp)
         }
@@ -108,11 +145,41 @@ $(window).on('map:init', function (e) {
     var marker = {};
     var popup = L.popup();
 
+    // get open street map geo search provider
+    const search = new GeoSearch.GeoSearchControl({
+        provider: new GeoSearch.OpenStreetMapProvider(),
+        style: 'button',
+        showMarker: false,
+        marker: marker,
+    });
+    detail.map.addControl(search);
+    detail.map.on('geosearch/showlocation', function(e) {
+        if(marker){
+            detail.map.removeLayer(marker);
+        }
+        var lat = Math.round((e.location.y + Number.EPSILON) * 100) / 100;
+        var long = Math.round((e.location.x + Number.EPSILON) * 100) / 100;
+        for (var i = 0; i < geoJsonArray.length; i++){
+            var lat_min = geoJsonArray[i].geometry.coordinates[0][2][1];
+            var lat_max = geoJsonArray[i].geometry.coordinates[0][0][1];
+            var lng_min = geoJsonArray[i].geometry.coordinates[0][0][0];
+            var lng_max = geoJsonArray[i].geometry.coordinates[0][1][0];
+            if((lat >= lat_min && lat <= lat_max) && (long >= lng_min && long <= lng_max)){
+                e.target["feature"] = {"properties": geoJsonArray[i].properties};
+            }
+        }
+        createGridMarker(lat, long, e);
+    });
+
     // grid cell click event: set marker and open popup window.
     function whenClicked(e) {
 
-        lat = e.latlng.lat;
-        long = e.latlng.lng;
+        var lat = e.latlng.lat;
+        var long = e.latlng.lng;
+        createGridMarker(lat, long, e);
+    }
+
+    function createGridMarker(lat, long, e){
         // content for popup window -> includes the button for activating the charts
         const content = `
             <h3 class=header3>Cell ${ e.target.feature.properties.id }
@@ -132,7 +199,7 @@ $(window).on('map:init', function (e) {
         `;
 
     // delete existing marker
-        if(marker != undefined){
+        if(marker){
             detail.map.removeLayer(marker);
         };
         // add a new marker with a popup
@@ -140,6 +207,8 @@ $(window).on('map:init', function (e) {
                     .bindPopup(content)
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
+
+        console.log('map marker: ', marker);
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
         var minMax = getMaxMin(e.target.feature.properties.id);
         var gP = getGroundProfile(e.target.feature.properties.id);
@@ -187,7 +256,7 @@ $(window).on('map:init', function (e) {
         }
     }).addTo(layerGroup).addTo(detail.map);
 
-    layerControl = new L.Control.Layers(null, {
+    const layerControl = new L.Control.Layers(null, {
         'Grid Layer': gridLayer,
     }).addTo(detail.map);
 
@@ -236,8 +305,8 @@ ajax function to get data for selected grid cell and updating corresponding char
             dataType: "json"
         })
         .done(function(response){
-            query_data = response[0].cell_data;
-            interval = response[2].date_interval;
+            var query_data = response[0].cell_data;
+            var interval = response[2].date_interval;
             changeData(query_data, interval, e);
         })
         .fail(function(){
@@ -254,8 +323,8 @@ ajax function to get ground profile data for selected grid cell and updating cor
             type: 'POST',
         })
         .done(function(response){
-            data = response[0]['depth_list'];
-            interval = response[1]['date_interval'];
+            var data = response[0]['depth_list'];
+            var interval = response[1]['date_interval'];
             updateProfileData(data, interval);
         })
         .fail(function(){
@@ -272,7 +341,7 @@ ajax function to get min, max and mean values for selected grid cell and updatin
             type: 'POST',
         })
         .done(function(response){
-            data = response[0]['depth_list'];
+            var data = response[0]['depth_list'];
             updateData(data);
         })
         .fail(function(){
@@ -395,12 +464,12 @@ function for creating trumpet chart, contains config data for chart
 function to update trumpet chart with requested data -> is called in ajax function
 **/
     function updateData(newData){
-        min = [];
-        max = [];
-        mean = [];
-        median = [];
-        max_quantile = [];
-        min_quantile = [];
+        var min = [];
+        var max = [];
+        var mean = [];
+        var median = [];
+        var max_quantile = [];
+        var min_quantile = [];
         for (var i = 1; i < 16; i++){
             min.push(newData[i]['min']);
             max.push(newData[i]['max']);
@@ -790,7 +859,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
     depending on temperature set color
 **/
     function addColor(data){
-    color = [];
+        var color = [];
 
         for( var i = 0; i < data.length; i++){
             if( data[i].r > 25){
