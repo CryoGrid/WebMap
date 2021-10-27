@@ -6,37 +6,6 @@ $(window).on('map:init', function (e) {
     var detail = e.originalEvent ?
                  e.originalEvent.detail : e.detail;
 
-    /**
-    console.log('get geo search async')
-    const form = document.querySelector('form');
-    const input = form.querySelector('input[type="text"]');
-    var query_promise = provider.search({
-        query: input.value
-    });
-    query_promise.then(value => {
-        console.log('queried value: ', value);
-        for( var i = 0; i < value.length; i++){
-            // success!
-            var x_coor = value[i].x;
-            var y_coor = value[i].y;
-            var label = value[i].label;
-            var marker = L.marker([y_coor, x_coor]).addTo(detail.map)
-            marker.bindPopup("<b>Found location</b><br>" + label).openPopup();
-        };
-    }, reason => {
-        console.log(reason); // Error!
-    });
-    var results = L.layerGroup().addTo(detail.map);
-    search.on('results', function(data) {
-        console.log('search results: ', data);
-        results.clearLayers();
-        for(var i = data.results.length - 1; i >= 0; i--){
-            results.addLayer(L.marker(data.results[i].latlng));
-        }
-    });**/
-
-
-
     var layerGroup = new L.layerGroup();
     var gridLayer;
 
@@ -44,7 +13,6 @@ $(window).on('map:init', function (e) {
     var boundArray = [];
     var polygonArray = [];
     var geoJsonArray = [];
-
 
     /**
     parsing data from backend
@@ -102,6 +70,7 @@ $(window).on('map:init', function (e) {
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
     };
+
     // color for grid cells
     function getColor(t) {
         return t > 30  ? '#EB5757' :
@@ -144,8 +113,10 @@ $(window).on('map:init', function (e) {
 
     var marker = {};
     var popup = L.popup();
-
-    // get open street map geo search provider
+    /**
+        get open street map geo search provider
+        Source: https://github.com/smeijer/leaflet-geosearch
+    **/
     const search = new GeoSearch.GeoSearchControl({
         provider: new GeoSearch.OpenStreetMapProvider(),
         style: 'button',
@@ -153,6 +124,7 @@ $(window).on('map:init', function (e) {
         marker: marker,
     });
     detail.map.addControl(search);
+    // set marker and populate the content with db data
     detail.map.on('geosearch/showlocation', function(e) {
         if(marker){
             detail.map.removeLayer(marker);
@@ -179,6 +151,7 @@ $(window).on('map:init', function (e) {
         createGridMarker(lat, long, e);
     }
 
+    // creates a grid marker for selected coordinates with db data
     function createGridMarker(lat, long, e){
         // content for popup window -> includes the button for activating the charts
         const content = `
@@ -280,7 +253,7 @@ $(window).on('map:init', function (e) {
             .done(function(response){
                 $("#context").html(response[1].depth_level);
                 for (var i = 0; i < geoJsonArray.length; i++){
-                    id = geoJsonArray[i].properties["id"];
+                    var id = geoJsonArray[i].properties['id'];
                     if(geoJsonArray[i].properties["soil_temp"] != null){
                         geoJsonArray[i].properties["depth_level"] = response[0].cg_data[id].depth_level;
                         geoJsonArray[i].properties["depth_idx"] = response[0].cg_data[id].depth_idx;
