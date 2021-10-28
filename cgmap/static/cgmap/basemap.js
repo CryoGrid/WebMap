@@ -260,6 +260,18 @@ $(window).on('map:init', function (e) {
                         geoJsonArray[i].properties["soil_temp"] = response[0].cg_data[id].soil_temp;
                     }
                 };
+                // remove old grid layer from map and layer control
+                gridLayer.remove();
+                layerControl.removeLayer(gridLayer);
+                // draw grid layer and add to map as well as to the layer control
+                gridLayer = L.geoJSON(geoJsonArray, {
+                    style: style,
+                    onEachFeature: onEachFeature,
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, geojsonMarkerOptions)
+                    }
+                }).addTo(layerGroup).addTo(detail.map);
+                layerControl.addOverlay(gridLayer, 'Grid Layer');
             })
             .fail(function(){
                 console.log('Failed!')
