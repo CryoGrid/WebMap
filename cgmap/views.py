@@ -81,7 +81,6 @@ class MapView(TemplateView):
                         'depth_idx': str(depth_id),
                     }
                     temp['cg_data'].update({data[0]: json_data})
-                print('filter query: ', temp['cg_data'][1415])
             return JsonResponse([{'cg_data': temp['cg_data']}, {'depth_level': depth_id}], safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \

@@ -281,8 +281,12 @@ hr {
     padding: 0px;
 
     position: static;
-    width: 120px;
-    height: 40px;
+    /* width: 120px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 40px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 8px;
     top: 8px;
 
@@ -383,8 +387,12 @@ hr {
 /* scale related ui */
 .scale-element-group {
     position: relative;
-    width: 16px;
-    height: 100px;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 100px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 0%;
     right: -525%;
     top: 0%;
@@ -427,8 +435,12 @@ hr {
 
 .scale-group {
     position: static;
-    width: 16px;
-    height: 500px;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 500px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 8px;
     top: 10px;
 
@@ -538,10 +550,12 @@ hr {
     flex-direction: row;
     align-items: center;
     padding: 0px;
+    width: -moz-fit-content;
+    width: fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
 
     position: static;
-    width: 120px;
-    height: 40px;
     left: 8px;
     top: 8px;
 
