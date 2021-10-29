@@ -151,18 +151,17 @@ $(window).on('map:init', function (e) {
         createGridMarker(lat, long, e);
     }
 
-    // creates a grid marker for selected coordinates with db data
-    function createGridMarker(lat, long, e){
+    function setMarkerContent(data, lat, long){
         // content for popup window -> includes the button for activating the charts
-        const content = `
-            <h3 class=header3>Cell ${ e.target.feature.properties.id }
+        var content = `
+            <h3 class=header3>Cell ${ data.id }
                 <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
             <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>with a calculated soil temperature of: ${parseFloat(e.target.feature.properties.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(e.target.feature.properties.depth_level).toFixed(2)} m.</div>
-            <div>Assumed air temperature of:  ${parseFloat(e.target.feature.properties.air_temp).toFixed(2)}°C for the date: ${e.target.feature.properties.date}.</div>
+            <div>with a calculated soil temperature of: ${parseFloat(data.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>Assumed air temperature of:  ${parseFloat(data.air_temp).toFixed(2)}°C for the date: ${data.date}.</div>
             <div>For up-to-date temperatures visit the DWD website
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
                 and for soil temperatures
@@ -170,6 +169,13 @@ $(window).on('map:init', function (e) {
             </div>
 
         `;
+
+        return content;
+    }
+
+    // creates a grid marker for selected coordinates with db data
+    function createGridMarker(lat, long, e){
+        const content = setMarkerContent(e.target.feature.properties, lat, long);
 
     // delete existing marker
         if(marker){
@@ -181,7 +187,6 @@ $(window).on('map:init', function (e) {
                     .openPopup();
         detail.map.fitBounds(e.target.getBounds());
 
-        console.log('map marker: ', marker);
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
         var minMax = getMaxMin(e.target.feature.properties.id);
         var gP = getGroundProfile(e.target.feature.properties.id);
@@ -237,27 +242,27 @@ $(window).on('map:init', function (e) {
     jquery for dynamically updating the temperature data of the selected level for all grid cells
 **/
     $(document).ready(function(){
-        var slider = document.getElementById("myRange");
+        var slider = document.getElementById('myRange');
         var depth_level;
         $('#myRange').change(function(event) {
             event.preventDefault();
             depth_level = slider.value;
             depth_level  = Math.abs(depth_level);
-            console.log('selected depth value: ', depth_level);
+
             $.ajax({
                 url: 'get_depth_level_data/',
                 type: 'POST',
                 data: {url_data:depth_level},
-                dataType: "json"
+                dataType: 'json'
             })
             .done(function(response){
-                $("#context").html(response[1].depth_level);
+                $('#context').html(response[1].depth_level);
                 for (var i = 0; i < geoJsonArray.length; i++){
                     var id = geoJsonArray[i].properties['id'];
-                    if(geoJsonArray[i].properties["soil_temp"] != null){
-                        geoJsonArray[i].properties["depth_level"] = response[0].cg_data[id].depth_level;
-                        geoJsonArray[i].properties["depth_idx"] = response[0].cg_data[id].depth_idx;
-                        geoJsonArray[i].properties["soil_temp"] = response[0].cg_data[id].soil_temp;
+                    if(geoJsonArray[i].properties['soil_temp'] != null){
+                        geoJsonArray[i].properties['depth_level'] = response[0].cg_data[id].depth_level;
+                        geoJsonArray[i].properties['depth_idx'] = response[0].cg_data[id].depth_idx;
+                        geoJsonArray[i].properties['soil_temp'] = response[0].cg_data[id].soil_temp;
                     }
                 };
                 // remove old grid layer from map and layer control
@@ -272,6 +277,14 @@ $(window).on('map:init', function (e) {
                     }
                 }).addTo(layerGroup).addTo(detail.map);
                 layerControl.addOverlay(gridLayer, 'Grid Layer');
+                // get new data for marker popup window
+                var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                var obj = geoJsonArray.find(o => o.properties.id === id);
+                var lat = marker.getLatLng().lat;
+                var lng = marker.getLatLng().lng;
+                // set content of popup and update popup
+                marker.getPopup().setContent(setMarkerContent(obj.properties, lat, lng));
+                marker.getPopup().update();
             })
             .fail(function(){
                 console.log('Failed!')
@@ -493,9 +506,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
     function getLineGradient(ctx, startPoint, endPoint){
         var gradient = null;
-        console.log('ctx', ctx);
-        console.log('start point: ', startPoint);
-        console.log('end point: ', endPoint);
         gradient = ctx.createLinearGradient(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
         gradient.addColorStop(0, startPoint.options.borderColor);
         gradient.addColorStop(1, endPoint.options.borderColor);
@@ -781,7 +791,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         dataset.pointBackgroundColor = gradientStroke;
                         dataset.pointHoverBorderColor = gradientStroke;
                         dataset.pointHoverBackgroundColor = gradientStroke;
-                        console.log(dataset.colors);
                     },
                 },
                 interaction: {
@@ -879,8 +888,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
         }
-        console.log('ground profile data: ', groundProfile);
-        console.log('segment of data points: ', groundProfile.data.datasets[8]);
 
         groundProfile.update();
     }
