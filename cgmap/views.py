@@ -28,7 +28,7 @@ class MapView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         # depth level is set to 0, because the ui slider starts at the index of 0
-        context['depth_level'] = 0
+        context['depth_level'] = 2
         context['cg_data'] = {}
         date_id = int(self.date_idx.id)
 
@@ -100,7 +100,7 @@ class MapView(TemplateView):
             idx = self.POST.get('idx')
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT depth_level%s[%s:%s], depth_level5[%s:%s], depth_level8[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                    "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
                         depth_level, start_interval, end_interval, start_interval, end_interval, start_interval,
                         end_interval, start_interval, end_interval, idx
                     )

@@ -119,7 +119,7 @@
                     <div class="scale-group-depth">
                         <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;">
                             {% csrf_token %}
-                            <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
+                            <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="myRange">
                         </form>
                     </div>
 
@@ -137,8 +137,8 @@
             </button>-->
             <ul class="nav nav-pills nav-jt">
                <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Annual Soil Temperature Chart</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Trumpet Chart</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Ground Profile Chart</a></li>
+               <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Depth Profile</a></li>
+               <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Depth Time Chart</a></li>
             </ul>
             <div class="tab-content" id="tab-content">
                 <div id="first" class="tab-pane fade in active show">

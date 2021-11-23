@@ -358,21 +358,18 @@ function for creating trumpet chart, contains config data for chart
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
-                tension: 0.1
             },
             {
                 label: 'Max',
                 data: [],
                 fill: false,
                 borderColor: '#F2C94C',
-                tension: 0.1
             },
             {
                 label: 'Mean',
                 data: [],
                 fill: false,
                 borderColor: '#693D00',
-                tension: 0.1
             },
             {
                 label: 'Median',
@@ -380,7 +377,6 @@ function for creating trumpet chart, contains config data for chart
                 fill: false,
                 borderColor: '#BA700B',
                 borderDash: [5, 5],
-                tension: 0.1
             },
             {
                 label: 'Max. Quantile',
@@ -388,7 +384,6 @@ function for creating trumpet chart, contains config data for chart
                 fill: false,
                 borderColor: '#EB8702',
                 borderDash: [5, 5],
-                tension: 0.1
             },
             {
                 label: 'Min. Quantile',
@@ -396,7 +391,6 @@ function for creating trumpet chart, contains config data for chart
                 fill: false,
                 borderColor: '#EB8702',
                 borderDash: [5, 5],
-                tension: 0.1
             }],
         };
         trumpetChart = new Chart(ctx2, {
@@ -404,6 +398,7 @@ function for creating trumpet chart, contains config data for chart
             data: data,
             options: {
                 response: true,
+                tension: 0.2,
                 indexAxis: 'y',
                 title: {
                     display: true,
@@ -417,12 +412,35 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Soil Temperature 2020'
+                        text: (ctx) => 'Soil Temperature Depth Profile for 2020'
                     },
                     legend: {
                         display: true,
                         position: 'right',
-                        align: 'middle'
+                        align: 'middle',
+                        labels: {
+                            boxHeight: 2,
+                        },
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            title: function(context){
+                                for( var i = 0; i < context.length; i++){
+                                    var lbl = context[i].label;
+                                    if (lbl.includes('.')){
+                                        lbl = parseFloat(lbl)/0.01;
+                                        return context[i].label = ' in ' + lbl + ' cm';
+                                    }
+                                    return context[i].label = ' in ' + lbl + ' m';
+                                }
+                            },
+                            label: function(context){
+                                var label = context.dataset.label;
+                                label += ' : ' + context.raw + '°';
+                                return label;
+                            }
+                        },
                     },
                 },
                 scales: {
@@ -755,7 +773,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Ground Profile for 2020'
+                        text: (ctx) => 'Depth Time Chart for 2020'
                     },
                     tooltip: {
                         mode: 'index',
@@ -899,14 +917,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         const data = {
             labels: labels,
             datasets: [{
-                label: '50 cm',
+                label: '1 m',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#F2C94C',
                 tension: 0.1
             },
             {
-                label: '3 m',
+                label: '2 m',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#BA700B',
@@ -920,7 +938,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 tension: 0.1
             },
             {
-                label: 'air temperature',
+                label: '2 m air temperature',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#2D9CDB',
@@ -946,6 +964,19 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         display: true,
                         position: 'right',
                         align: 'middle'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            label: function(context){
+                                var label = context.dataset.label;
+                                if (label.includes('.')){
+                                    label = parseFloat(label)/0.01 + ' cm';
+                                }
+                                label += ' : ' + context.raw + '°';
+                                return label;
+                            }
+                        },
                     },
                 },
                 scales: {
@@ -976,7 +1007,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         tempChart.data.datasets[0].data = q_data[0][1];
         tempChart.data.datasets[1].data = q_data[0][2];
         tempChart.data.datasets[2].data = q_data[0][0];
-        tempChart.data.datasets[2].label = e.target.feature.properties.depth_level + ' m';
+        var lbl = e.target.feature.properties.depth_level[0];
+        if (lbl.includes('.')) {
+            lbl = parseFloat(lbl)/0.01 + ' cm';
+        }
+        else{
+            lbl = lbl + ' m';
+        }
+        tempChart.data.datasets[2].label = lbl;
         tempChart.data.datasets[3].data = q_data[0][3];
         tempChart.update();
     }
