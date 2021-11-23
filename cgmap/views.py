@@ -1,7 +1,5 @@
 # Create your views here.
 import datetime
-import json
-import numpy
 import numpy as np
 
 from django.contrib import messages
@@ -182,7 +180,7 @@ class MapView(TemplateView):
                 )
                 interval = cursor.fetchall()
             # calculating weekly mean values -> 5 days in first week and 4 days in last week; 357 days left -> 51 weeks
-            temp25, temp20, temp15, temp10, temp5, temp0 = [], [], [], [], [], []
+            temp20, temp16, temp14, temp12, temp10, temp8, temp6, temp4, temp0 = [], [], [], [], [], [], [], [], []
             for i in depth_list:
                 z_level.sort()
                 temp = []
@@ -192,16 +190,22 @@ class MapView(TemplateView):
                     mean = np.round(np.mean(arr[x:x + 7]), 2)
                     value = {'x': week, 'y': float(z_level[i - 1][1]), 'r': mean}
                     temp.append(value)
-                    if mean > 25:
-                        temp25.append(value)
-                    elif mean > 20:
+                    if mean > 20:
                         temp20.append(value)
-                    elif mean > 15:
-                        temp15.append(value)
+                    elif mean > 16:
+                        temp16.append(value)
+                    elif mean > 14:
+                        temp14.append(value)
+                    elif mean > 12:
+                        temp12.append(value)
                     elif mean > 10:
                         temp10.append(value)
-                    elif mean > 5:
-                        temp5.append(value)
+                    elif mean > 8:
+                        temp8.append(value)
+                    elif mean > 6:
+                        temp6.append(value)
+                    elif mean > 4:
+                        temp4.append(value)
                     else:
                         temp0.append(value)
                     week += 1
@@ -211,7 +215,7 @@ class MapView(TemplateView):
                 }
                 depth_list[i] = json_data
             interval = np.arange(1, 54, 1, dtype=int).tolist()
-            temp_list = {'5': temp25, '4': temp20, '3': temp15, '2': temp10, '1': temp5, '0': temp0}
+            temp_list = {'0': temp20, '1': temp16, '2': temp14, '3': temp12, '8': temp10, '7': temp8, '6': temp6, '5': temp4, '4': temp0}
             '''for idx in depth_list:
                 z_level.sort()
                 temp = []
