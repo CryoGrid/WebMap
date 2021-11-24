@@ -149,9 +149,13 @@ $(window).on('map:init', function (e) {
         var lat = e.latlng.lat;
         var long = e.latlng.lng;
         createGridMarker(lat, long, e);
+        var div = document.getElementById('tab-nav');
+        if (div.style.display === "none") {
+            div.style.display = "flex";
+        }
     }
 
-    function setMarkerContent(data, lat, long){
+    function setPopupContent(data, lat, long){
         // content for popup window -> includes the button for activating the charts
         var content = `
             <h3 class=header3>Cell ${ data.id }
@@ -175,7 +179,7 @@ $(window).on('map:init', function (e) {
 
     // creates a grid marker for selected coordinates with db data
     function createGridMarker(lat, long, e){
-        const content = setMarkerContent(e.target.feature.properties, lat, long);
+        const content = setPopupContent(e.target.feature.properties, lat, long);
 
     // delete existing marker
         if(marker){
@@ -185,7 +189,7 @@ $(window).on('map:init', function (e) {
         marker = L.marker([lat, long]).addTo(detail.map)
                     .bindPopup(content)
                     .openPopup();
-        detail.map.fitBounds(e.target.getBounds());
+        // detail.map.fitBounds(e.target.getBounds());
 
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
         var minMax = getMaxMin(e.target.feature.properties.id);
@@ -221,7 +225,7 @@ $(window).on('map:init', function (e) {
         gridLayer.resetStyle(e.target);
     }
 
-    //zooms to the cell
+    //zooms to the cell -> not used
     function zoomToFeature(e) {
         detail.map.fitBounds(e.target.getBounds());
     }
@@ -421,6 +425,10 @@ function for creating trumpet chart, contains config data for chart
                         labels: {
                             boxHeight: 2,
                         },
+                        generateLabels: function(chart){
+                            var data = chart.data;
+                            console.log('legend data: ', data);
+                        }
                     },
                     tooltip: {
                         mode: 'index',

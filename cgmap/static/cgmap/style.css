@@ -311,7 +311,7 @@ hr {
     /* height: 600px; */
     height: moz-fit-content;
     height: fit-content;
-    left: -110px;
+    left: 6px;
     top: 25%;
 
     /* Accent */
@@ -336,6 +336,10 @@ hr {
 
 .depth-container-open {
     left: 6px !important;
+}
+
+.depth-container-close {
+    left: -110px !important;
 }
 
 .depth-container .description {
@@ -520,7 +524,7 @@ hr {
     height: -moz-fit-content;
     height: fit-content;
     top: 20%;
-    right: -110px;
+    right: 6px;
 
     /* Accent */
     background: var(--accent);
@@ -542,6 +546,10 @@ hr {
 
 .temperature-container-open {
     right: 6px !important;
+}
+
+.temperature-container-close {
+    right: -110px !important;
 }
 
 .temperature-title-wrapper {

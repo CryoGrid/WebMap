@@ -43,7 +43,7 @@
     <script>
         $('#depth-slider').on('click', function(){
             console.log( "Button depth-slider was clicked!" );
-            $('#left-slider').toggleClass('depth-container-open');
+            $('#left-slider').toggleClass('depth-container-close');
             var icon = $('#depth_chevron');
             icon.toggleClass('left');
             if( icon.hasClass('left')){
@@ -55,7 +55,7 @@
 
         $('#temperature-slider').on('click', function(){
             console.log( "Button temperature-slider was clicked!" );
-            $('#right-slider').toggleClass('temperature-container-open');
+            $('#right-slider').toggleClass('temperature-container-close');
             var icon = $('#temperature_chevron');
             icon.toggleClass('right');
             if( icon.hasClass('right')){
@@ -111,7 +111,7 @@
             <div class="depth-title-wrapper">
                 <div class="description default-text-small">Depth in m</div>
                 <button class="btn btn-primary btn-sm" id="depth-slider" >
-                    <span class="material-icons md-18 right" id="depth_chevron">chevron_right</span>
+                    <span class="material-icons md-18 left" id="depth_chevron">chevron_left</span>
                 </button>
             </div>
             <div class="scale-container">
@@ -132,13 +132,12 @@
             </div>
         </div>
         <div class="nav chart-container" id="tab-nav" style="display: none;">
-            <!--<button class="btn btn-primary btn-sm" type="button" id="close-btn" style="width: 18px;height: 18px;">
-                <span class="material-icons md-18 close">close</span>
-            </button>-->
+
             <ul class="nav nav-pills nav-jt">
-               <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Annual Soil Temperature Chart</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Depth Profile</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Depth Time Chart</a></li>
+                <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Annual Soil Temperature Chart</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Depth Profile</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Depth Time Chart</a></li>
+                <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
             </ul>
             <div class="tab-content" id="tab-content">
                 <div id="first" class="tab-pane fade in active show">
@@ -162,7 +161,7 @@
             <div class="temperature-title-wrapper">
                 <div class="description default-text-small">Temperature in °C</div>
                 <button class="btn btn-primary btn-sm" id="temperature-slider">
-                    <span class="material-icons md-18 left" id="temperature_chevron">chevron_left</span>
+                    <span class="material-icons md-18 right" id="temperature_chevron">chevron_right</span>
                 </button>
             </div>
             <div class="scale-container">
