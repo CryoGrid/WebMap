@@ -24,6 +24,7 @@
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script type="module" src="{% static 'cgmap/basemap.js' %}"></script>
     <!-- Make sure you put this AFtER leaflet.js, when using with leaflet -->
     <script src="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.umd.js"></script>
@@ -142,18 +143,48 @@
             <div class="tab-content" id="tab-content">
                 <div id="first" class="tab-pane fade in active show">
                     <div class="canvas-container" id="chart-container">
-                        <canvas id="tempChart" width="800" height="600"></canvas>
+                        <canvas id="tempChart" height="190"></canvas>
                     </div>
                 </div>
                 <div id="second" class="tab-pane fade">
                     <div class="canvas-container" id="chart2-container" >
-                        <canvas id="trumpetChart" width="800" height="600"></canvas>
+                        <canvas id="trumpetChart" height="190"></canvas>
+                        <hr>
+                        <div id="year_selector">
+                            <input class="btn btn-secondary" type="button" name="year" id="year0" value="1990 - 2010">
+                            <input class="btn btn-secondary" type="button" name="year" id="year1" value="2000 - 2020">
+                            <input class="btn btn-secondary" type="button" name="year" id="year2" value="2010 - 2030">
+                            <input class="btn btn-secondary" type="button" name="year" id="year3" value="2020 - 2040">
+                            <input class="btn btn-secondary" type="button" name="year" id="year4" value="2030 - 2050">
+                        </div>
                     </div>
                 </div>
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
-                        <canvas id="groundProfile" width="800" height="600"></canvas>
-                    </div>
+                        <canvas id="groundProfile" height="190"></canvas>
+                    </div><!--
+                    <div class="scale-container">
+                        <div class="scale-group">
+                            <div class="scale-element-group red">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group orange">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group yellow">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group green">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group blue">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                        </div>
+                        <div class="scale-group-text">
+                            <span class="default-text-small" style="transform: rotate(90deg);">25<br> 20<br> 15<br> 10<br> 5<br></span>
+                        </div>
+                    </div>-->
                 </div>
             </div>
         </div>

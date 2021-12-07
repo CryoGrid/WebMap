@@ -26,7 +26,9 @@ class MapView(TemplateView):
     # get request is called at initial load of the page, it sets up the grid layer and loads the data for the grid cells
     def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        start_date = int(Date.objects.get(time='2000-01-01').id)
+        end_date = int(Date.objects.get(time='2020-12-31').id)
+        print('first_date ', start_date, ' end_date ', end_date)
         # depth level is set to 0, because the ui slider starts at the index of 0
         context['depth_level'] = 2
         context['cg_data'] = {}
@@ -38,18 +40,20 @@ class MapView(TemplateView):
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
             cursor.execute(
-                "SELECT grid_id, name, depth_level1[%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
+                "SELECT grid_id, name, depth_level%s[%s:%s], tair[%s:%s] FROM temperature_depth_level" % (depth_id, start_date, end_date, start_date, end_date))
             cg = cursor.fetchall()
             # turn query data into json data
             for cg_data in cg:
+                soil_arr = [float(i) for i in cg_data[2]]
+                air_arr = [float(i) for i in cg_data[3]]
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
-                    'soil_temp': cg_data[2],
-                    'air_temp': cg_data[3],
+                    'soil_temp': np.round(np.mean(np.array(soil_arr)), 2),
+                    'air_temp': np.round(np.mean(np.array(air_arr)), 2),
                     'depth_idx': depth_id,
                     'depth_level': depth,
-                    'date': self.today
+                    'date': start_date
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
         # query to get shape data for grid map
@@ -65,18 +69,21 @@ class MapView(TemplateView):
             temp = {'cg_data': {}}
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
+            start_date = int(Date.objects.get(time='2000-01-01').id)
+            end_date = int(Date.objects.get(time='2020-01-01').id)
             # postgreSQL DB index starts at 1
             depth_id = int(self.POST.get('url_data')) + 1
             with connection.cursor() as cursor:
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
                 depth = cursor.fetchone()
                 cursor.execute(
-                    "SELECT grid_id, depth_level%s[%s] FROM temperature_depth_level" % (depth_id, date_idx))
+                    "SELECT grid_id, depth_level%s[%s:%s] FROM temperature_depth_level" % (depth_id, start_date, end_date))
                 cg = cursor.fetchall()
                 for data in cg:
+                    soil_arr = [float(i) for i in data[1]]
                     json_data = {
                         'id': data[0],
-                        'soil_temp': data[1],
+                        'soil_temp': np.round(np.mean(np.array(soil_arr)), 2),
                         'depth_level': depth,
                         'depth_idx': str(depth_id),
                     }
@@ -118,20 +125,59 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    # request function to get decadal trumpet data
+    @csrf_exempt
+    def get_year_range(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            idx = self.POST.get('idx')
+            yID = self.POST.get('yearID')
+            # determined by the send id for the year
+            years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+            start_date = int(Date.objects.get(time=years[yID]+'-01-01'))
+            end_date = int(Date.objects.get(time=years[yID+2]+'-01-01'))
+            depth_list = {}
+            with connection.cursor() as cursor:
+                for x in range(1, 16):
+                    cursor.execute(
+                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                            x, start_date, end_date, idx
+                        )
+                    )
+                    cg = cursor.fetchall()
+                    depth_list[x] = [float(i) for i in cg[0][0]]
+            for idx in depth_list:
+                arr = np.array(depth_list[idx])
+                json_data = {
+                    'min': np.round(np.min(arr), 2),
+                    'max': np.round(np.max(arr), 2),
+                    'mean': np.round(np.mean(arr), 2),
+                    'median': np.round(np.median(arr), 2),
+                    'max_quantile': np.round(np.quantile(arr, 0.9), 2),
+                    'min_quantile': np.round(np.quantile(arr, 0.1), 2),
+                }
+                depth_list[idx] = json_data
+                print('selected year', years[yID+1], ' depth data: ', depth_list)
+
     # request function to get data for trumpet curve
     @csrf_exempt
     def get_max_min(self):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             idx = self.POST.get('idx')
-            start_interval = 14611  # id for 2020-01-01
-            end_interval = start_interval + 365  # id for 2020-12-31
+            yID = int(self.POST.get('yID'))
+            # start_date = 14611  # id for 2020-01-01
+            # end_date = start_interval + 365  # id for 2020-12-31
+            # determined by the send id for the year
+            years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+            start_date = Date.objects.get(time=str(years[yID]+'-01-01')).id
+            end_date = Date.objects.get(time=str(years[yID+2]+'-01-01')).id
             depth_list = {}
             with connection.cursor() as cursor:
                 for x in range(1, 16):
                     cursor.execute(
                         "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                            x, start_interval, end_interval, idx
+                            x, start_date, end_date, idx
                         )
                     )
                     cg = cursor.fetchall()

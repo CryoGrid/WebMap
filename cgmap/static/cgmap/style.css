@@ -864,9 +864,11 @@ hr {
 
 .nav .chart-container{
     display: flex;
+    width: -moz-fit-content;
+    width: fit-content;
 
-    height: 420px;
-    width: 685px;
+    height: -moz-fit-content;
+    height: fit-content;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
