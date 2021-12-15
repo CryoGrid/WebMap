@@ -40,19 +40,19 @@ class MapView(TemplateView):
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
             cursor.execute(
-                "SELECT grid_id, name, depth_level%s[%s:%s], tair[%s:%s] FROM temperature_depth_level" % (
+                "SELECT grid_id, name, (select avg(cg) from unnest(depth_level%s[%s:%s]) as cg), (select avg(tair) from unnest(tair[%s:%s]) as tair) FROM temperature_depth_level" % (
                     depth_id, start_date, end_date, start_date, end_date))
             # "SELECT tdl.grid_id, tdl.name, tmp.cg, tmp.tair FROM temperature_depth_level tdl LEFT JOIN LATERAL( select avg((select avg(val) from unnest(depth_level%s[%s:%s]) as val)) as cg, avg((select avg(val) from unnest(tair[%s:%s]) as val)) as tair FROM temperature_depth_level) as tmp" % (depth_id, start_date, end_date, start_date, end_date))
             cg = cursor.fetchall()
             # turn query data into json data
             for cg_data in cg:
-                soil_arr = [float(i) for i in cg_data[2]]
-                air_arr = [float(i) for i in cg_data[3]]
+                # soil_arr = [float(i) for i in cg_data[2]]
+                # air_arr = [float(i) for i in cg_data[3]]
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
-                    'soil_temp': np.round(np.mean(np.array(soil_arr)), 2),
-                    'air_temp': np.round(np.mean(np.array(air_arr)), 2),
+                    'soil_temp': cg_data[2],  # np.round(np.mean(np.array(soil_arr)), 2),
+                    'air_temp': cg_data[3],  # np.round(np.mean(np.array(air_arr)), 2),
                     'depth_idx': depth_id,
                     'depth_level': depth,
                     'date': start_date
@@ -79,14 +79,14 @@ class MapView(TemplateView):
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
                 depth = cursor.fetchone()
                 cursor.execute(
-                    "SELECT grid_id, depth_level%s[%s:%s] FROM temperature_depth_level" % (
+                    "SELECT grid_id, (select avg(cg) from unnest(depth_level%s[%s:%s]) as cg) FROM temperature_depth_level" % (
                     depth_id, start_date, end_date))
                 cg = cursor.fetchall()
                 for data in cg:
-                    soil_arr = [float(i) for i in data[1]]
+                    # soil_arr = [float(i) for i in data[1]]
                     json_data = {
                         'id': data[0],
-                        'soil_temp': np.round(np.mean(np.array(soil_arr)), 2),
+                        'soil_temp': data[1],  # np.round(np.mean(np.array(soil_arr)), 2),
                         'depth_level': depth,
                         'depth_idx': str(depth_id),
                     }
