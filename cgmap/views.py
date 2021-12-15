@@ -40,7 +40,9 @@ class MapView(TemplateView):
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
             cursor.execute(
-                "SELECT grid_id, name, depth_level%s[%s:%s], tair[%s:%s] FROM temperature_depth_level" % (depth_id, start_date, end_date, start_date, end_date))
+                "SELECT grid_id, name, depth_level%s[%s:%s], tair[%s:%s] FROM temperature_depth_level" % (
+                    depth_id, start_date, end_date, start_date, end_date))
+            # "SELECT tdl.grid_id, tdl.name, tmp.cg, tmp.tair FROM temperature_depth_level tdl LEFT JOIN LATERAL( select avg((select avg(val) from unnest(depth_level%s[%s:%s]) as val)) as cg, avg((select avg(val) from unnest(tair[%s:%s]) as val)) as tair FROM temperature_depth_level) as tmp" % (depth_id, start_date, end_date, start_date, end_date))
             cg = cursor.fetchall()
             # turn query data into json data
             for cg_data in cg:
@@ -77,7 +79,8 @@ class MapView(TemplateView):
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
                 depth = cursor.fetchone()
                 cursor.execute(
-                    "SELECT grid_id, depth_level%s[%s:%s] FROM temperature_depth_level" % (depth_id, start_date, end_date))
+                    "SELECT grid_id, depth_level%s[%s:%s] FROM temperature_depth_level" % (
+                    depth_id, start_date, end_date))
                 cg = cursor.fetchall()
                 for data in cg:
                     soil_arr = [float(i) for i in data[1]]
@@ -125,40 +128,6 @@ class MapView(TemplateView):
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
-    # request function to get decadal trumpet data
-    @csrf_exempt
-    def get_year_range(self):
-        if self.method == 'POST':
-            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
-            idx = self.POST.get('idx')
-            yID = self.POST.get('yearID')
-            # determined by the send id for the year
-            years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
-            start_date = int(Date.objects.get(time=years[yID]+'-01-01'))
-            end_date = int(Date.objects.get(time=years[yID+2]+'-01-01'))
-            depth_list = {}
-            with connection.cursor() as cursor:
-                for x in range(1, 16):
-                    cursor.execute(
-                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                            x, start_date, end_date, idx
-                        )
-                    )
-                    cg = cursor.fetchall()
-                    depth_list[x] = [float(i) for i in cg[0][0]]
-            for idx in depth_list:
-                arr = np.array(depth_list[idx])
-                json_data = {
-                    'min': np.round(np.min(arr), 2),
-                    'max': np.round(np.max(arr), 2),
-                    'mean': np.round(np.mean(arr), 2),
-                    'median': np.round(np.median(arr), 2),
-                    'max_quantile': np.round(np.quantile(arr, 0.9), 2),
-                    'min_quantile': np.round(np.quantile(arr, 0.1), 2),
-                }
-                depth_list[idx] = json_data
-                print('selected year', years[yID+1], ' depth data: ', depth_list)
-
     # request function to get data for trumpet curve
     @csrf_exempt
     def get_max_min(self):
@@ -170,8 +139,8 @@ class MapView(TemplateView):
             # end_date = start_interval + 365  # id for 2020-12-31
             # determined by the send id for the year
             years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
-            start_date = Date.objects.get(time=str(years[yID]+'-01-01')).id
-            end_date = Date.objects.get(time=str(years[yID+2]+'-01-01')).id
+            start_date = Date.objects.get(time=str(years[yID] + '-01-01')).id
+            end_date = Date.objects.get(time=str(years[yID + 2] + '-01-01')).id
             depth_list = {}
             with connection.cursor() as cursor:
                 for x in range(1, 16):
@@ -234,8 +203,8 @@ class MapView(TemplateView):
                 arr = np.array(depth_list[i])
                 week = 1
                 for x in range(0, len(arr), 7):
-                    mean = np.round(np.mean(arr[x:x+7]), 2)
-                    temp.append({'x': week, 'y': float(z_level[i-1][1]), 'r': mean})
+                    mean = np.round(np.mean(arr[x:x + 7]), 2)
+                    temp.append({'x': week, 'y': float(z_level[i - 1][1]), 'r': mean})
                     week += 1
                 json_data = {
                     'data': temp,
