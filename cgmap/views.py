@@ -80,7 +80,7 @@ class MapView(TemplateView):
                 depth = cursor.fetchone()
                 cursor.execute(
                     "SELECT grid_id, (select avg(cg) from unnest(depth_level%s[%s:%s]) as cg) FROM temperature_depth_level" % (
-                    depth_id, start_date, end_date))
+                        depth_id, start_date, end_date))
                 cg = cursor.fetchall()
                 for data in cg:
                     # soil_arr = [float(i) for i in data[1]]

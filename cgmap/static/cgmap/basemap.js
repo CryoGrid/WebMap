@@ -480,18 +480,34 @@ function for creating trumpet chart, contains config data for chart
                             },
                             label: function(context){
                                 var label = context.dataset.label;
-                                label += ' : ' + context.raw + '°';
+                                var data = context.dataset.data;
+                                // update tooltip temperature data with lower and upper limits
+                                if (context.raw.length == undefined){
+                                    if (label.includes('Min/Max')){
+                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
+                                        let newData = data.map(function(e, i){
+                                            return [e, nextData[i]];
+                                        });
+                                        context.dataset.data = newData;
+                                    }
+                                    if (label.includes('10%/90%')){
+                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
+                                        let newData = nextData.map(function(e, i){
+                                            return [e, data[i]];
+                                        });
+                                        context.dataset.data = newData;
+                                    }
+                                    label += ' : ' + context.raw + '°';
+                                } else {
+                                    label += ' : ' + context.raw[0] + '°/'+ context.raw[1] + '°';
+                                }
                                 return label;
                             },
-                            afterBody: function(t, d){
-                                console.log('t: ', t, ' d: ', d);
-                            }
                         },
                         filter: function(context) {
-                            console.log('context of filter: ', );
                             var label = context.dataset.label;
                             var data = context.dataset.data;
-                            console.log('data: ', data);
+
                             return !label.includes('_');
                         }
                     },
