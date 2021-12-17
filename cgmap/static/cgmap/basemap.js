@@ -175,8 +175,8 @@ $(window).on('map:init', function (e) {
     detail.map.addControl(search);
     // set marker and populate the content with db data
     detail.map.on('geosearch/showlocation', function(e) {
-        if(marker){
-            detail.map.removeLayer(marker);
+        if(popup){
+            detail.map.removeLayer(popup);
         }
         var lat = Math.round((e.location.y + Number.EPSILON) * 100) / 100;
         var long = Math.round((e.location.x + Number.EPSILON) * 100) / 100;
@@ -230,13 +230,17 @@ $(window).on('map:init', function (e) {
         const content = setPopupContent(e.target.feature.properties, lat, long);
 
     // delete existing marker
-        if(marker){
-            detail.map.removeLayer(marker);
+        if(popup){
+            detail.map.removeLayer(popup);
         };
-        // add a new marker with a popup
+        /** add a new marker with a popup
         marker = L.marker([lat, long]).addTo(detail.map)
                     .bindPopup(content)
-                    .openPopup();
+                    .openPopup();**/
+        popup
+            .setLatLng(e.latlng)
+            .setContent(content)
+            .openOn(detail.map);
         // detail.map.fitBounds(e.target.getBounds());
 
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
@@ -336,13 +340,16 @@ $(window).on('map:init', function (e) {
                 }).addTo(layerGroup).addTo(detail.map);
                 layerControl.addOverlay(gridLayer, 'Grid Layer');
                 // get new data for marker popup window
-                var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                // var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                var id =  parseInt(popup.getContent().split(/[\s]+/)[3]);
                 var obj = geoJsonArray.find(o => o.properties.id === id);
-                var lat = marker.getLatLng().lat;
-                var lng = marker.getLatLng().lng;
-                // set content of popup and update popup
+                var lat = popup.getLatLng().lat;
+                var lng = popup.getLatLng().lng;
+                /** set content of popup and update popup
                 marker.getPopup().setContent(setPopupContent(obj.properties, lat, lng));
-                marker.getPopup().update();
+                marker.getPopup().update();**/
+                popup.setContent(setPopupContent(obj.properties, lat, lng));
+                popup.update();
             })
             .fail(function(){
                 console.log('Failed!')
