@@ -80,6 +80,25 @@
                 div.style.display = "none";
             }
         };
+
+        $(document).ready(function() {
+            var slider = document.getElementById('temp_scale');
+            var tooltip = document.getElementById('tooltip');
+
+            setValue = () => {
+                const val = slider.value;
+                const min = slider.min ? slider.min : 0;
+                const max = slider. max ? slider.max: 100;
+                const newValue = Number((val - min) * 100 / (max - min));
+                const newPosition = 18 - (newValue * 0.17);
+                console.log('new value in %: ', newValue);
+                tooltip.innerHTML = `<span>${val}</span>`;
+                tooltip.style.left = `calc(${newValue}% - (${newPosition}rem))`;
+                tooltip.style.background = slider.style.background;
+            };
+            document.addEventListener("DOMContentLoaded", setValue);
+            slider.addEventListener('input', setValue);
+        });
     </script>
 {% endblock footer_javascript_page %}
 
@@ -89,28 +108,9 @@
         <div id="map">
             {% leaflet_map "main" %}
         </div>
- <!--       <div class="dialog-container">
-            <div class="dialog-content">
-                <div class="dialog-content-title header3">
-                    {% for data in cg_data %}
-                        {{ data.name }}
-                    {% endfor %}
-                </div>
-                <div class="dialog-content-text default-text-small">
-                    {% for data in cg_data %}
-                       at the location with latitude {{ data.lat }} and longitude {{ data.long }}. </br>
-                    {% endfor %}
-                    With forcing data:
-                    {% for forcing in fd_data%}
-                        {{ forcing.name }}
-                    {% endfor %}
-
-                </div>
-            </div>
-        </div>-->
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
-                <div class="description default-text-small">Depth in m</div>
+                <div class="description default-text-small">Depth in cm/m</div>
                 <button class="btn btn-primary btn-sm" id="depth-slider" >
                     <span class="material-icons md-18 left" id="depth_chevron">chevron_left</span>
                 </button>
@@ -120,14 +120,14 @@
                     <div class="scale-group-depth">
                         <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;">
                             {% csrf_token %}
-                            <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="myRange">
+                            <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="depth_range">
                         </form>
                     </div>
 
                     <div class="scale-group-depth-text">
                         <span class="default-text-small">
-                            0.01<br> 0.05<br> 0.1<br> 0.2<br> 0.5<br> 1.0<br> 2.0<br> 3.0<br> 4.0<br> 5.0<br> 6.0<br> 7.0<br>
-                            8.0<br> 9.0<br> 10.0 </span>
+                            1 cm<br> 5 cm<br> 10 cm<br> 20 cm<br> 50 cm<br> 1 m<br> 2 m<br> 3 m<br> 4 m<br> 5 m<br> 6 m<br> 7 m<br>
+                            8 m<br> 9 m<br> 10 m </span>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
                 <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Depth Time Chart</a></li>
                 <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
             </ul>
-            <div class="tab-content" id="tab-content">
+            <div class="tab-content" id="tab-content">-
                 <div id="first" class="tab-pane fade in active show">
                     <div class="canvas-container" id="chart-container">
                         <canvas id="tempChart" height="190"></canvas>
@@ -196,52 +196,11 @@
                 </button>
             </div>
             <div class="scale-container">
-                <div class="scale-group">
-                    <div class="scale-element-group red">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
+                <div class="slider-container" id="temperature">
+                    <div class="scale-group-temperature">
+                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true">
+                        <div id="tooltip"></div>
                     </div>
-                    <div class="scale-element-group orange">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group yellow">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group green">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group blue">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <!--<div class="scale-element-group purple">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>-->
-                </div>
-                <div class="scale-group-text">
-                    <span class="default-text-small" style="transform: rotate(90deg);">38<br> 36<br> 34<br> 32<br> 30<br> 28<br> 26<br> 24<br> 22<br> 20<br> 18<br> 16<br> 14<br> 12<br> 10<br> 8<br> 6<br> 4<br> 2<br> 0<br> -2<br> -4<br> -6<br> -8<br> -10 </span>
                 </div>
             </div>
         </div>

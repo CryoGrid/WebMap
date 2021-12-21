@@ -9,6 +9,7 @@ $(window).on('map:init', function (e) {
     var layerGroup = new L.layerGroup();
     var gridLayer;
     var gridID;
+    var prevSelectedLayer = null;
 
     var geojson;
     var boundArray = [];
@@ -22,7 +23,23 @@ $(window).on('map:init', function (e) {
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
+    temperatureScale(cg);
+    /**
+    testing
+    **/
 
+    function temperatureScale(cgData){
+        let cg_arr = Object.values(cgData);
+        let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
+        let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
+        let maxCol = getColor(maxObj);
+        let minCol = getColor(minObj);
+        document.getElementById('temp_scale').min = minObj;
+        document.getElementById('temp_scale').max = maxObj;
+        document.getElementById('temp_scale').value = maxObj;
+        document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
+        var temp_slider = document.getElementById('temp_scale').style;
+    }
     /**
     button setup with related function for setting responding id
     **/
@@ -304,9 +321,9 @@ $(window).on('map:init', function (e) {
     jquery for dynamically updating the temperature data of the selected level for all grid cells
 **/
     $(document).ready(function(){
-        var slider = document.getElementById('myRange');
+        var slider = document.getElementById('depth_range');
         var depth_level;
-        $('#myRange').change(function(event) {
+        $('#depth_range').change(function(event) {
             event.preventDefault();
             depth_level = slider.value;
             depth_level  = Math.abs(depth_level);
@@ -341,7 +358,7 @@ $(window).on('map:init', function (e) {
                 layerControl.addOverlay(gridLayer, 'Grid Layer');
                 // get new data for marker popup window
                 // var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
-                var id =  parseInt(popup.getContent().split(/[\s]+/)[3]);
+                var id =  parseInt(popup.getContent().split(/[\s]+/)[3]); // --> has to be changed for later updates, when id is not displayed anymore
                 var obj = geoJsonArray.find(o => o.properties.id === id);
                 var lat = popup.getLatLng().lat;
                 var lng = popup.getLatLng().lng;
@@ -350,6 +367,8 @@ $(window).on('map:init', function (e) {
                 marker.getPopup().update();**/
                 popup.setContent(setPopupContent(obj.properties, lat, lng));
                 popup.update();
+                // update temperature scale after depth selection
+                temperatureScale(response[0].cg_data);
             })
             .fail(function(){
                 console.log('Failed!')
@@ -969,7 +988,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-
                             callback: function(val, index) {
                                 return val + ' m';
                             },
