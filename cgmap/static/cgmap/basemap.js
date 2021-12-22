@@ -223,18 +223,18 @@ $(window).on('map:init', function (e) {
     function setPopupContent(data, lat, long){
         // content for popup window -> includes the button for activating the charts
         var content = `
-            <h3 class=header3>Cell ${ data.id }
+            <h3 class=header3>Zelle ${ data.id }
                 <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
-            <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>with a calculated soil temperature of: ${parseFloat(data.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(data.depth_level).toFixed(2)} m.</div>
-            <div>Assumed air temperature of:  ${parseFloat(data.air_temp).toFixed(2)}°C for the date: ${data.date}.</div>
-            <div>For up-to-date temperatures visit the DWD website
-                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
-                and for soil temperatures
-                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>here</a>.
+            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(2)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(2)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+            <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
+                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
+                und Bodentemperaturen
+                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>hier</a>.
             </div>
 
         `;
@@ -451,7 +451,7 @@ function for creating trumpet chart, contains config data for chart
                 indexAxis: 'y',
                 title: {
                     display: true,
-                    text: 'Soil Temperature over the year 2020'
+                    text: 'Bodentemperatur über das Jahr 2020'
                 },
                 interaction: {
                     mode: 'index',
@@ -461,7 +461,7 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Soil Temperature Depth Profile between 2000 and 2020'
+                        text: (ctx) => 'Bodentermperaturprofiel zwischen 2000 und 2020'
                     },
                     legend: {
                         display: true,
@@ -543,7 +543,7 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title:{
                             display: true,
-                            text: 'Temperature'
+                            text: 'Temperatur'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -556,7 +556,7 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title: {
                             display: true,
-                            text: 'Depth'
+                            text: 'Tiefe'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -930,14 +930,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Depth Time Chart for 2020'
+                        text: (ctx) => 'Tiefen-Zeit Diagramm für 2020'
                     },
                     tooltip: {
                         mode: 'index',
                         callbacks: {
                             title: function(context){
                                 for( var i = 0; i < context.length; i++){
-                                    return context[i].label = 'Week ' + context[i].label;
+                                    return context[i].label = 'Woche ' + context[i].label;
                                 }
                             },
                             label: function(context){
@@ -977,14 +977,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     x: {
                         title: {
                             display: true,
-                            text: 'Weeks'
+                            text: 'Wochen'
                         },
                     },
                     y: {
                         reverse: true,
                         title: {
                             display: true,
-                            text: 'Depth'
+                            text: 'Tiefe'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -1094,7 +1094,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 tension: 0.1
             },
             {
-                label: '2 m air temperature',
+                label: '2 m Lufttemperatur',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#2D9CDB',
@@ -1114,7 +1114,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Ground temperature for 2020'
+                        text: (ctx) => 'Bodentemperatur für 2020'
                     },
                     legend: {
                         display: true,
@@ -1138,7 +1138,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         display: true,
                         title:{
                             display: true,
-                            text: 'Temperature'
+                            text: 'Temperatur'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
