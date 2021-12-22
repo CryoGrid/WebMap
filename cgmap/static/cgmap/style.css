@@ -247,6 +247,19 @@ hr {
     z-index: 1;
 }
 
+/* adjust colors for subpage navbars */
+#navbar {
+    background: var(--accent);
+}
+
+#navbar .navbar-toggler {
+    color: var(--accent);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--primary);
+}
+
 /* footer location on map */
 #footer {
     position:absolute;
