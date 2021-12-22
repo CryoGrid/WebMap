@@ -1,6 +1,7 @@
 # Create your views here.
 import datetime
 import json
+import numpy as np
 
 from django.contrib import messages
 from django.core.serializers import serialize
@@ -13,6 +14,7 @@ from django.views.generic import TemplateView
 from .models import MapGrid, Date, DepthLevel
 
 
+# This class contains to logic for the main page where the map is initiated
 class MapView(TemplateView):
     template_name = 'cgmap/index.html'
     today = datetime.date.today()
@@ -20,16 +22,16 @@ class MapView(TemplateView):
     if Date.objects.filter(time=today).exists():
         date_idx = Date.objects.get(time=today)
 
+    # get request is called at initial load of the page, it sets up the grid layer and loads the data for the grid cells
     def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        if context.get('depth_level') is None:
-            context['depth_level'] = 0
-        else:
-            context['depth_level'] = 'new_depth_level'
-
+        # depth level is set to 0, because the ui slider starts at the index of 0
+        context['depth_level'] = 0
         context['cg_data'] = {}
         date_id = int(self.date_idx.id)
+
+        # postgreSQL DB index starts at 1
         depth_id = int(context['depth_level']) + 1
         with connection.cursor() as cursor:
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
@@ -37,8 +39,8 @@ class MapView(TemplateView):
             cursor.execute(
                 "SELECT grid_id, name, depth_level1[%s], tair[%s] FROM temperature_depth_level" % (date_id, date_id))
             cg = cursor.fetchall()
+            # turn query data into json data
             for cg_data in cg:
-                # entry = depth.values_list('depth_level1', 'tair').filter(grid_id__exact=cg.grid_id)
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
@@ -49,10 +51,12 @@ class MapView(TemplateView):
                     'date': self.today
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
+        # query to get shape data for grid map
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')
         return render(request, self.template_name,
                       {'grid_data': geojson, 'context': context['depth_level'], 'cg_data': context['cg_data']})
 
+    # request function to get data for selected depth level
     @csrf_exempt
     def get_depth_level_data(self, **kwargs):
         if self.method == 'POST':
@@ -60,6 +64,7 @@ class MapView(TemplateView):
             temp = {'cg_data': {}}
             today = datetime.date.today()
             date_idx = Date.objects.get(time=today).id
+            # postgreSQL DB index starts at 1
             depth_id = int(self.POST.get('url_data')) + 1
             with connection.cursor() as cursor:
                 cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
@@ -75,18 +80,19 @@ class MapView(TemplateView):
                         'depth_idx': str(depth_id),
                     }
                     temp['cg_data'].update({data[0]: json_data})
-                print('filter query: ', temp['cg_data'][1415])
             return JsonResponse([{'cg_data': temp['cg_data']}, {'depth_level': depth_id}], safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
                                           format(self.method), status=405)
 
+    # request function to get data for selected cell for the chart
     @csrf_exempt
     def get_cell_data(self, **kwargs):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
-            date_idx = Date.objects.get(time=today).id
+            # date_idx = Date.objects.get(time=today).id
+            # definition of interval
             start_interval = 14611  # id for 2020-01-01
             end_interval = start_interval + 365  # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
@@ -106,6 +112,101 @@ class MapView(TemplateView):
                 )
                 interval = cursor.fetchall()
             return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}],
+                                safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
+
+    # request function to get data for trumpet curve
+    @csrf_exempt
+    def get_max_min(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            idx = self.POST.get('idx')
+            start_interval = 14611  # id for 2020-01-01
+            end_interval = start_interval + 365  # id for 2020-12-31
+            depth_list = {}
+            with connection.cursor() as cursor:
+                for x in range(1, 16):
+                    cursor.execute(
+                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                            x, start_interval, end_interval, idx
+                        )
+                    )
+                    cg = cursor.fetchall()
+                    depth_list[x] = [float(i) for i in cg[0][0]]
+            for idx in depth_list:
+                arr = np.array(depth_list[idx])
+                json_data = {
+                    'min': np.round(np.min(arr), 2),
+                    'max': np.round(np.max(arr), 2),
+                    'mean': np.round(np.mean(arr), 2),
+                    'median': np.round(np.median(arr), 2),
+                    'max_quantile': np.round(np.quantile(arr, 0.9), 2),
+                    'min_quantile': np.round(np.quantile(arr, 0.1), 2),
+                }
+                depth_list[idx] = json_data
+            return JsonResponse([{'depth_list': depth_list}],
+                                safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
+
+    # request function to get data for trumpet curve
+    @csrf_exempt
+    def get_ground_profile(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
+            idx = self.POST.get('idx')
+            start_interval = 14609  # id for 2019-12-30 Monday
+            end_interval = start_interval + 365 + 5  # id for 2020-12-31 -> id for 2021-01-03
+            depth_list = {}
+            with connection.cursor() as cursor:
+                for x in range(1, 11):
+                    cursor.execute(
+                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                            x, start_interval, end_interval, idx
+                        )
+                    )
+                    cg = cursor.fetchall()
+                    depth_list[x] = [float(i) for i in cg[0][0]]
+                cursor.execute(
+                    "SELECT id, z_level FROM cgmap_depthlevel"
+                )
+                z_level = cursor.fetchall()
+                cursor.execute(
+                    "SELECT time FROM cgmap_date WHERE id >= %s and id <= %s;" % (
+                        start_interval, end_interval
+                    )
+                )
+                interval = cursor.fetchall()
+            # calculating weekly mean values -> 5 days in first week and 4 days in last week; 357 days left -> 51 weeks
+            for i in depth_list:
+                z_level.sort()
+                temp = []
+                arr = np.array(depth_list[i])
+                week = 1
+                for x in range(0, len(arr), 7):
+                    mean = np.round(np.mean(arr[x:x+7]), 2)
+                    temp.append({'x': week, 'y': float(z_level[i-1][1]), 'r': mean})
+                    week += 1
+                json_data = {
+                    'data': temp,
+                }
+                depth_list[i] = json_data
+            interval = np.arange(1, 54, 1, dtype=int).tolist()
+            # convert query data to json data for easy is in chart js code
+            '''for idx in depth_list:
+                z_level.sort()
+                temp = []
+                for i, val in enumerate(depth_list[idx]):
+                    temp.append({'x': interval[i][0], 'y': float(z_level[idx-1][1]), 'r': val})
+                json_data = {
+                    'data': temp,
+                }
+                depth_list[idx] = json_data'''
+
+            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}],
                                 safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \

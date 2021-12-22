@@ -4,7 +4,7 @@ html, body {
 }
 
 /****************
-* Colour Scheme *
+* Color Scheme *
 ****************/
 :root{
     --primary: #2BB3C0;
@@ -281,8 +281,12 @@ hr {
     padding: 0px;
 
     position: static;
-    width: 120px;
-    height: 40px;
+    /* width: 120px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 40px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 8px;
     top: 8px;
 
@@ -383,8 +387,12 @@ hr {
 /* scale related ui */
 .scale-element-group {
     position: relative;
-    width: 16px;
-    height: 100px;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 100px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 0%;
     right: -525%;
     top: 0%;
@@ -427,8 +435,12 @@ hr {
 
 .scale-group {
     position: static;
-    width: 16px;
-    height: 500px;
+    /* width: 16px; */
+    width: -moz-fit-content;
+    width: fit-content;
+    /* height: 500px; */
+    height: -moz-fit-content;
+    height: fit-content;
     left: 8px;
     top: 10px;
 
@@ -538,10 +550,12 @@ hr {
     flex-direction: row;
     align-items: center;
     padding: 0px;
+    width: -moz-fit-content;
+    width: fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
 
     position: static;
-    width: 120px;
-    height: 40px;
     left: 8px;
     top: 8px;
 
@@ -830,27 +844,100 @@ hr {
     align-items: flex-right;
     padding: 0px;
 
-    width: 600px;
-    height: 400px;
-    top: 1em;
-    right: 4em;
-    z-index: 1;
+    left: 2.5em;
+    top: 3em;
+
+    width: -moz-fit-content;
+    width: fit-content;
+    height: -moz-fit-content;
+    height: fit-content;
+
+}
+
+.nav .chart-container{
+    display: flex;
+
+    height: 420px;
+    width: 685px;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    color: #fff;
+    background-color: var(--primary);
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+    background-color: transparent;
+}
+
+.canvas-container{
+    height: 600px;
+    width: 800px;
+}
+
+#tab-nav{
+    align-items: center;
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
+#tab-content{
+    align-items: center;
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
 }
 
 #tempChart{
     z-index: 1;
     display: flex;
     flex-direction: column;
-    padding: 40px;
 
-    position: static;
+    left: 0%;
+    top: 0%;
+    right: 0%;
+    bottom: 0%;
+
+    background: #FAFCFE;
+    border-radius: 12px;
+
+    flex: none;
+}
+
+#trumpetChart{
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+
     left: 0%;
     right: 0%;
     top: 0%;
     bottom: 0%;
 
     background: #FAFCFE;
-    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
+#groundProfile{
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+
+    left: 0%;
+    right: 0%;
+    top: 0%;
+    bottom: 0%;
+
+    background: #FAFCFE;
     border-radius: 12px;
 
     flex: none;
