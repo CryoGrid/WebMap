@@ -8,11 +8,14 @@ $(window).on('map:init', function (e) {
 
     var layerGroup = new L.layerGroup();
     var gridLayer;
+    var gridID;
+    var prevSelectedLayer = null;
 
     var geojson;
     var boundArray = [];
     var polygonArray = [];
     var geoJsonArray = [];
+    var activeYears = [];
 
     /**
     parsing data from backend
@@ -20,13 +23,43 @@ $(window).on('map:init', function (e) {
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
+    temperatureScale(cg);
+    /**
+    testing
+    **/
+
+    function temperatureScale(cgData){
+        let cg_arr = Object.values(cgData);
+        let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
+        let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
+        let maxCol = getColor(maxObj);
+        let minCol = getColor(minObj);
+        document.getElementById('temp_scale').min = minObj;
+        document.getElementById('temp_scale').max = maxObj;
+        document.getElementById('temp_scale').value = maxObj;
+        document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
+        var temp_slider = document.getElementById('temp_scale').style;
+    }
+    /**
+    button setup with related function for setting responding id
+    **/
+    const y2010 = document.getElementById('year1');
+    const y2030 = document.getElementById('year3');
+    const y2050 = document.getElementById('year5');
+    const y2070 = document.getElementById('year7');
+    const y2090 = document.getElementById('year9');
+    y2010.addEventListener('click', function(){const id = 1; addYear(id, gridID)});
+    y2030.addEventListener('click', function(){const id = 3; addYear(id, gridID)});
+    y2050.addEventListener('click', function(){const id = 5; addYear(id, gridID)});
+    y2070.addEventListener('click', function(){const id = 7; addYear(id, gridID)});
+    y2090.addEventListener('click', function(){const id = 9; addYear(id, gridID)});
 
     /**
     getting 2d context and creating charts via function call
     **/
-    var ctx = document.getElementById('tempChart').getContext('2d');
-    var ctx2 = document.getElementById('trumpetChart').getContext('2d');
-    var ctx3 = document.getElementById('groundProfile').getContext('2d');
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    const ctx2 = document.getElementById('trumpetChart').getContext('2d');
+    const ctx3 = document.getElementById('groundProfile').getContext('2d');
     // declaring charts
     var tempChart;
     var trumpetChart;
@@ -35,6 +68,21 @@ $(window).on('map:init', function (e) {
     createChart();
     createTrumpetChart();
     createGroundProfile();
+    // add datasets to trumpet chart
+    function addYear(id, gridID){
+        if(!activeYears.length){ // if array is empty -> add
+            getMaxMin(gridID, id);
+        }
+        else if(!activeYears.includes(id)){ // if id is not set in array -> add
+            getMaxMin(gridID, id);
+        }
+        else if(activeYears.includes(id)){ // if id is already in array -> remove and update chart
+            let setSize = 6; // number of displayed data fields
+            trumpetChart.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+            activeYears.splice(activeYears.indexOf(id), 1);
+            trumpetChart.update();
+        }
+    };
 
     $('#bs-tab2').on("shown.bs.tab", function() {
         createChart();
@@ -71,20 +119,38 @@ $(window).on('map:init', function (e) {
         };
     };
 
+    // hsl to hex converter
+    function hsltohex(h, s, l){
+         l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+    }
+
+    // source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
+    function getHue(t){
+        var maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
+        var minHsl = 360; //  minhsl maps to min temp counter clockwise
+        var rngHsl = maxHsl - minHsl; // = 210
+        var maxTemp = 15;
+        var minTemp = -10;
+        var rngTemp = maxTemp - minTemp; // 60
+        var degCnt = maxTemp - t; // 0
+        var hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
+        var returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
+        return returnHue;
+    }
+
     // color for grid cells
     function getColor(t) {
-        return t > 30  ? '#EB5757' :
-               t > 25  ? '#F2994A' :
-               t > 20  ? '#F2AF74' :
-               t > 15  ? '#F2C94C' :
-               t > 10  ? '#F2D374' :
-               t > 5   ? '#86CFA4' :
-               t > 0   ? '#6FCF97' :
-               t > -5  ? '#5AACDB' :
-               t > -10 ? '#2D9CDB' :
-               t > -15 ? '#AC75E0' :
-               t > -20 ? '#9B51E0' :
-                         '#FFEDA0';
+        const s = 100;
+        const l = 50;
+        const h = getHue(t);
+        return hsltohex(h, s, l);
     }
     // style for grid cells
     function style(feature) {
@@ -126,8 +192,8 @@ $(window).on('map:init', function (e) {
     detail.map.addControl(search);
     // set marker and populate the content with db data
     detail.map.on('geosearch/showlocation', function(e) {
-        if(marker){
-            detail.map.removeLayer(marker);
+        if(popup){
+            detail.map.removeLayer(popup);
         }
         var lat = Math.round((e.location.y + Number.EPSILON) * 100) / 100;
         var long = Math.round((e.location.x + Number.EPSILON) * 100) / 100;
@@ -145,27 +211,30 @@ $(window).on('map:init', function (e) {
 
     // grid cell click event: set marker and open popup window.
     function whenClicked(e) {
-
         var lat = e.latlng.lat;
         var long = e.latlng.lng;
         createGridMarker(lat, long, e);
+        var div = document.getElementById('tab-nav');
+        if (div.style.display === "none") {
+            div.style.display = "flex";
+        }
     }
 
-    function setMarkerContent(data, lat, long){
+    function setPopupContent(data, lat, long){
         // content for popup window -> includes the button for activating the charts
         var content = `
-            <h3 class=header3>Cell ${ data.id }
+            <h3 class=header3>Zelle ${ data.id }
                 <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
-            <div><hr>The cell was clicked at LatLong: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>with a calculated soil temperature of: ${parseFloat(data.soil_temp).toFixed(2)}°C at a depth of ${parseFloat(data.depth_level).toFixed(2)} m.</div>
-            <div>Assumed air temperature of:  ${parseFloat(data.air_temp).toFixed(2)}°C for the date: ${data.date}.</div>
-            <div>For up-to-date temperatures visit the DWD website
-                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>here</a>
-                and for soil temperatures
-                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>here</a>.
+            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(2)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(2)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+            <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
+                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
+                und Bodentemperaturen
+                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>hier</a>.
             </div>
 
         `;
@@ -175,20 +244,30 @@ $(window).on('map:init', function (e) {
 
     // creates a grid marker for selected coordinates with db data
     function createGridMarker(lat, long, e){
-        const content = setMarkerContent(e.target.feature.properties, lat, long);
+        const content = setPopupContent(e.target.feature.properties, lat, long);
 
     // delete existing marker
-        if(marker){
-            detail.map.removeLayer(marker);
+        if(popup){
+            detail.map.removeLayer(popup);
         };
-        // add a new marker with a popup
+        /** add a new marker with a popup
         marker = L.marker([lat, long]).addTo(detail.map)
                     .bindPopup(content)
-                    .openPopup();
-        detail.map.fitBounds(e.target.getBounds());
+                    .openPopup();**/
+        popup
+            .setLatLng(e.latlng)
+            .setContent(content)
+            .openOn(detail.map);
+        // detail.map.fitBounds(e.target.getBounds());
 
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
-        var minMax = getMaxMin(e.target.feature.properties.id);
+        trumpetChart.data.datasets.forEach((dataset) => {
+            dataset.data.pop();
+        });
+        trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
+        activeYears.splice(0, activeYears.length);
+        trumpetChart.update();
+        var maxMin = getMaxMin(e.target.feature.properties.id, 1);
         var gP = getGroundProfile(e.target.feature.properties.id);
     }
 
@@ -221,7 +300,7 @@ $(window).on('map:init', function (e) {
         gridLayer.resetStyle(e.target);
     }
 
-    //zooms to the cell
+    //zooms to the cell -> not used
     function zoomToFeature(e) {
         detail.map.fitBounds(e.target.getBounds());
     }
@@ -242,9 +321,9 @@ $(window).on('map:init', function (e) {
     jquery for dynamically updating the temperature data of the selected level for all grid cells
 **/
     $(document).ready(function(){
-        var slider = document.getElementById('myRange');
+        var slider = document.getElementById('depth_range');
         var depth_level;
-        $('#myRange').change(function(event) {
+        $('#depth_range').change(function(event) {
             event.preventDefault();
             depth_level = slider.value;
             depth_level  = Math.abs(depth_level);
@@ -278,13 +357,18 @@ $(window).on('map:init', function (e) {
                 }).addTo(layerGroup).addTo(detail.map);
                 layerControl.addOverlay(gridLayer, 'Grid Layer');
                 // get new data for marker popup window
-                var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                // var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                var id =  parseInt(popup.getContent().split(/[\s]+/)[3]); // --> has to be changed for later updates, when id is not displayed anymore
                 var obj = geoJsonArray.find(o => o.properties.id === id);
-                var lat = marker.getLatLng().lat;
-                var lng = marker.getLatLng().lng;
-                // set content of popup and update popup
-                marker.getPopup().setContent(setMarkerContent(obj.properties, lat, lng));
-                marker.getPopup().update();
+                var lat = popup.getLatLng().lat;
+                var lng = popup.getLatLng().lng;
+                /** set content of popup and update popup
+                marker.getPopup().setContent(setPopupContent(obj.properties, lat, lng));
+                marker.getPopup().update();**/
+                popup.setContent(setPopupContent(obj.properties, lat, lng));
+                popup.update();
+                // update temperature scale after depth selection
+                temperatureScale(response[0].cg_data);
             })
             .fail(function(){
                 console.log('Failed!')
@@ -303,6 +387,8 @@ ajax function to get data for selected grid cell and updating corresponding char
             dataType: "json"
         })
         .done(function(response){
+            gridID = cell_id;
+
             var query_data = response[0].cell_data;
             var interval = response[2].date_interval;
             changeData(query_data, interval, e);
@@ -332,15 +418,16 @@ ajax function to get ground profile data for selected grid cell and updating cor
 /**
 ajax function to get min, max and mean values for selected grid cell and updating corresponding chart
 **/
-    function getMaxMin(cell_id){
+    function getMaxMin(cell_id, yearID){
         $.ajax({
             url: 'get_max_min/',
-            data: {idx:cell_id},
+            data: {idx:cell_id, yID: yearID},
             type: 'POST',
         })
         .done(function(response){
             var data = response[0]['depth_list'];
-            updateData(data);
+            activeYears.push(yearID);
+            updateData(data, yearID);
         })
         .fail(function(){
             console.log('Failed!')
@@ -353,61 +440,18 @@ function for creating trumpet chart, contains config data for chart
         const labels = [0.01, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 ];
         const data = {
             labels: labels,
-            datasets: [{
-                label: 'Min',
-                data: [],
-                fill: false,
-                borderColor: '#F2C94C',
-                tension: 0.1
-            },
-            {
-                label: 'Max',
-                data: [],
-                fill: false,
-                borderColor: '#F2C94C',
-                tension: 0.1
-            },
-            {
-                label: 'Mean',
-                data: [],
-                fill: false,
-                borderColor: '#693D00',
-                tension: 0.1
-            },
-            {
-                label: 'Median',
-                data: [],
-                fill: false,
-                borderColor: '#BA700B',
-                borderDash: [5, 5],
-                tension: 0.1
-            },
-            {
-                label: 'Max. Quantile',
-                data: [],
-                fill: false,
-                borderColor: '#EB8702',
-                borderDash: [5, 5],
-                tension: 0.1
-            },
-            {
-                label: 'Min. Quantile',
-                data: [],
-                fill: false,
-                borderColor: '#EB8702',
-                borderDash: [5, 5],
-                tension: 0.1
-            }],
+            datasets: [],
         };
         trumpetChart = new Chart(ctx2, {
             type: 'line',
             data: data,
             options: {
                 response: true,
+                tension: 0.2,
                 indexAxis: 'y',
                 title: {
                     display: true,
-                    text: 'Soil Temperature over the year 2020'
+                    text: 'Bodentemperatur über das Jahr 2020'
                 },
                 interaction: {
                     mode: 'index',
@@ -417,12 +461,81 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Soil Temperature 2020'
+                        text: (ctx) => 'Bodentermperaturprofiel zwischen 2000 und 2020'
                     },
                     legend: {
                         display: true,
                         position: 'right',
-                        align: 'middle'
+                        align: 'middle',
+                        labels: {
+                            boxHeight: 2,
+                            filter: function(item, chart) {
+                                return !item.text.includes('_');
+                            }
+                        },
+                        onClick: function(e, legendItem) { // need to hide index +1
+                            var index = legendItem.datasetIndex;
+                            var ci = this.chart;
+                            var alreadyHidden = (ci.getDatasetMeta(index).hidden === null) ? false : ci.getDatasetMeta(index).hidden;
+                            var meta = ci.getDatasetMeta(index);
+                            if ( index === 0 || index === 4) {
+                                var meta_hi = ci.getDatasetMeta(index + 1);
+                                if (!alreadyHidden) {
+                                    meta.hidden = true;
+                                    meta_hi.hidden = true;
+                                } else {
+                                    meta.hidden = null;
+                                    meta_hi.hidden = null;
+                                }
+                            }
+                            ci.update();
+                        },
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            title: function(context){
+                                for( var i = 0; i < context.length; i++){
+                                    var lbl = context[i].label;
+                                    if (lbl.includes('.')){
+                                        lbl = parseFloat(lbl)/0.01;
+                                        return context[i].label = ' in ' + lbl + ' cm';
+                                    }
+                                    return context[i].label = ' in ' + lbl + ' m';
+                                }
+                            },
+                            label: function(context){
+                                var label = context.dataset.label;
+                                var data = context.dataset.data;
+                                // update tooltip temperature data with lower and upper limits
+                                if (context.raw.length == undefined){
+                                    if (label.includes('Min/Max')){
+                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
+                                        let newData = data.map(function(e, i){
+                                            return [e, nextData[i]];
+                                        });
+                                        context.dataset.data = newData;
+                                    }
+                                    if (label.includes('10%/90%')){
+                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
+                                        let newData = nextData.map(function(e, i){
+                                            return [e, data[i]];
+                                        });
+                                        context.dataset.data = newData;
+                                    }
+                                    label += ' : ' + context.raw + '°';
+                                } else {
+                                    label += ' : ' + context.raw[0] + '°/'+ context.raw[1] + '°';
+                                }
+                                return label;
+                            },
+                        },
+                        filter: function(context) {
+                            var label = context.dataset.label;
+                            var data = context.dataset.data;
+
+                            return !label.includes('_');
+                        }
                     },
                 },
                 scales: {
@@ -430,7 +543,7 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title:{
                             display: true,
-                            text: 'Temperature'
+                            text: 'Temperatur'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -443,12 +556,17 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title: {
                             display: true,
-                            text: 'Depth'
+                            text: 'Tiefe'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
 
                             callback: function(val, index) {
+                                var lbl = this.getLabelForValue(index).toString();
+                                    if (lbl.includes('.')){
+                                        lbl = parseFloat(lbl)/0.01;
+                                        return lbl + ' cm';
+                                    }
                                 return this.getLabelForValue(index) + ' m';
                             },
                         },
@@ -461,13 +579,17 @@ function for creating trumpet chart, contains config data for chart
 /**
 function to update trumpet chart with requested data -> is called in ajax function
 **/
-    function updateData(newData){
+    function updateData(newData, yearID){
         var min = [];
         var max = [];
         var mean = [];
         var median = [];
         var max_quantile = [];
         var min_quantile = [];
+        var bgCol1;
+        var bgCol2;
+        var years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+
         for (var i = 1; i < 16; i++){
             min.push(newData[i]['min']);
             max.push(newData[i]['max']);
@@ -476,12 +598,65 @@ function to update trumpet chart with requested data -> is called in ajax functi
             max_quantile.push(newData[i]['max_quantile']);
             min_quantile.push(newData[i]['min_quantile'])
         }
-        trumpetChart.data.datasets[0].data = min;
-        trumpetChart.data.datasets[1].data = max;
-        trumpetChart.data.datasets[2].data = mean;
-        trumpetChart.data.datasets[3].data = median;
-        trumpetChart.data.datasets[4].data = max_quantile;
-        trumpetChart.data.datasets[5].data = min_quantile;
+        if ( yearID === 1){
+            bgCol1 = 'rgba(45,156,219,0.1)';
+            bgCol2 = 'rgba(45,156,219,0.2)';
+        } else if ( yearID === 5) {
+            bgCol1 = 'rgba(242,201,76,0.1)';
+            bgCol2 = 'rgba(242,201,76,0.2)';
+        } else if ( yearID === 7) {
+            bgCol1 = 'rgba(242,153,74,0.1)';
+            bgCol2 = 'rgba(242,153,74,0.2)';
+        } else if ( yearID === 9) {
+            bgCol1 = 'rgba(235,87,87,0.1)';
+            bgCol2 = 'rgba(235,87,87,0.2)';
+        } else if ( yearID === 3) {
+            bgCol1 = 'rgba(111,207,151,0.1)';
+            bgCol2 = 'rgba(111,207,151,0.2)';
+        }
+        trumpetChart.data.datasets.push({
+                data: min,
+                label: 'Min/Max ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: '+1',
+                backgroundColor: bgCol1,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: max,
+                label: '_Max_ ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: mean,
+                label: 'Mean ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#693D00',
+            },
+            {
+                data: median,
+                label: 'Median ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#BA700B',
+                borderDash: [5, 5],
+            },
+            {
+                data: max_quantile,
+                label: 'Quantile 10%/90%',
+                fill: false,
+                fill: '+1',
+                backgroundColor: bgCol2,
+                borderColor: '#EB8702',
+                borderDash: [5, 5],
+            },
+            {
+                data: min_quantile,
+                label: '_Quantile_ ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#EB8702',
+                borderDash: [5, 5],
+            });
+
         trumpetChart.update();
     }
     /**
@@ -755,14 +930,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Ground Profile for 2020'
+                        text: (ctx) => 'Tiefen-Zeit Diagramm für 2020'
                     },
                     tooltip: {
                         mode: 'index',
                         callbacks: {
                             title: function(context){
                                 for( var i = 0; i < context.length; i++){
-                                    return context[i].label = 'Week ' + context[i].label;
+                                    return context[i].label = 'Woche ' + context[i].label;
                                 }
                             },
                             label: function(context){
@@ -774,7 +949,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     },
                     legend: {
                         display: false,
-                        position: 'top',
+                        position: 'right',
                         align: 'middle'
                     },
                     afterLayout: chart => {
@@ -802,18 +977,17 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     x: {
                         title: {
                             display: true,
-                            text: 'Weeks'
+                            text: 'Wochen'
                         },
                     },
                     y: {
                         reverse: true,
                         title: {
                             display: true,
-                            text: 'Depth'
+                            text: 'Tiefe'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-
                             callback: function(val, index) {
                                 return val + ' m';
                             },
@@ -899,14 +1073,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         const data = {
             labels: labels,
             datasets: [{
-                label: '50 cm',
+                label: '1 m',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#F2C94C',
                 tension: 0.1
             },
             {
-                label: '3 m',
+                label: '2 m',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#BA700B',
@@ -920,7 +1094,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 tension: 0.1
             },
             {
-                label: 'air temperature',
+                label: '2 m Lufttemperatur',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#2D9CDB',
@@ -940,12 +1114,22 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Ground temperature for 2020'
+                        text: (ctx) => 'Bodentemperatur für 2020'
                     },
                     legend: {
                         display: true,
                         position: 'right',
                         align: 'middle'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            label: function(context){
+                                var label = context.dataset.label;
+                                label += ' : ' + context.raw + '°';
+                                return label;
+                            }
+                        },
                     },
                 },
                 scales: {
@@ -954,7 +1138,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         display: true,
                         title:{
                             display: true,
-                            text: 'Temperature'
+                            text: 'Temperatur'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -976,7 +1160,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         tempChart.data.datasets[0].data = q_data[0][1];
         tempChart.data.datasets[1].data = q_data[0][2];
         tempChart.data.datasets[2].data = q_data[0][0];
-        tempChart.data.datasets[2].label = e.target.feature.properties.depth_level + ' m';
+        var lbl = parseFloat(e.target.feature.properties.depth_level[0]);
+        if (lbl < 1.0) {
+            lbl = lbl/0.01 + ' cm';
+        }
+        else{
+            lbl = lbl + ' m';
+        }
+        tempChart.data.datasets[2].label = lbl;
         tempChart.data.datasets[3].data = q_data[0][3];
         tempChart.update();
     }

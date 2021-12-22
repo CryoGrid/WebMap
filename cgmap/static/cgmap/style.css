@@ -247,11 +247,29 @@ hr {
     z-index: 1;
 }
 
+/* adjust colors for subpage navbars */
+#navbar {
+    background: var(--accent);
+}
+
+#navbar .navbar-toggler {
+    color: var(--accent);
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: var(--primary);
+}
+
 /* footer location on map */
 #footer {
     position:absolute;
     bottom: 5px;
     width: 100%;
+    background: #EAF7F994;
+}
+
+#footer span + span {
+    margin-left: 10px;
 }
 /* size of map in background */
 #map {
@@ -311,7 +329,7 @@ hr {
     /* height: 600px; */
     height: moz-fit-content;
     height: fit-content;
-    left: -110px;
+    left: 6px;
     top: 25%;
 
     /* Accent */
@@ -336,6 +354,10 @@ hr {
 
 .depth-container-open {
     left: 6px !important;
+}
+
+.depth-container-close {
+    left: -110px !important;
 }
 
 .depth-container .description {
@@ -364,7 +386,6 @@ hr {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 0px 8px;
 
     position: static;
     width: 66px;
@@ -385,14 +406,10 @@ hr {
 }
 
 /* scale related ui */
-.scale-element-group {
-    position: relative;
-    /* width: 16px; */
-    width: -moz-fit-content;
-    width: fit-content;
-    /* height: 100px; */
-    height: -moz-fit-content;
-    height: fit-content;
+.scale-group-temperature {
+    position: static;
+    width: 300px;
+    height: 16px;
     left: 0%;
     right: -525%;
     top: 0%;
@@ -466,19 +483,6 @@ hr {
     transform: rotate(-90deg);
 }
 
-.rectangle {
-    position: relative;
-    width: 16px;
-    height: 20px;
-    left: 0%;
-    right: 0%;
-    top: 0%;
-    bottom: 0%;
-    z-index: 1;
-
-    background: #FFFFFF;
-}
-
 .scale-group-text {
     position: static;
     /* width: 16px; */
@@ -519,8 +523,8 @@ hr {
     /* height: 676px; */
     height: -moz-fit-content;
     height: fit-content;
-    top: 20%;
-    right: -110px;
+    top: 25%;
+    right: 6px;
 
     /* Accent */
     background: var(--accent);
@@ -542,6 +546,10 @@ hr {
 
 .temperature-container-open {
     right: 6px !important;
+}
+
+.temperature-container-close {
+    right: -110px !important;
 }
 
 .temperature-title-wrapper {
@@ -617,6 +625,25 @@ hr {
     order: 1;
     flex-grow: 0;
     margin: 4px 4px;
+}
+
+.temperature-container .scale-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    position: static;
+    width: 66px;
+    height: 325px;
+    left: 32.5px;
+    top: 36px;
+
+    background: #FFFFFF;
+    border: 1px solid var(--primary);
+    box-sizing: border-box;
+    box-shadow: 0px 0px 0px 4px rgba(43, 179, 192, 0.2);
+    border-radius: 8px;
 }
 
 /* ui for timeline element */
@@ -856,9 +883,11 @@ hr {
 
 .nav .chart-container{
     display: flex;
+    width: -moz-fit-content;
+    width: fit-content;
 
-    height: 420px;
-    width: 685px;
+    height: -moz-fit-content;
+    height: fit-content;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {
@@ -944,9 +973,9 @@ a {
 }
 
 
-/**********************
-* Custom depth slider *
-**********************/
+/*****************
+* Custom sliders *
+*****************/
 
 #number{
   height: 16px;
@@ -957,6 +986,14 @@ a {
   margin: 4px;
 }
 
+#depth_range{
+  background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
+}
+
+#temp_scale{
+  background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
+}
+
 .slider-container {
   position: relative;
   height: 16px; /* height of the outside container */
@@ -964,7 +1001,7 @@ a {
   width: -moz-fit-content;
   width: fit-content;
   /*transform: rotate(-90deg);*/
-  left: -10px;
+  left: -20px;
   justify-content: top;
   /* Accent */
   border: 1px solid var(--accent);
@@ -1026,13 +1063,8 @@ a {
     height: -moz-fit-content;
     height: fit-content;
     transform:rotate(90deg);
-    top: -135px;
+    top: -130px;
     left: 125px;
-
-    /* Accent */
-    border: 1px solid var(--accent);
-    box-sizing: border-box;
-    border-radius: 8px;
 
     /* Inside Auto Layout */
     flex: none;
@@ -1041,6 +1073,36 @@ a {
     margin: 0px 8px;
 
 }
+
+    #tooltip {
+        position: absolute;
+        top: 2.25rem;
+        right: -1.5rem;
+        transform: rotate(90deg);
+    }
+    #tooltip span {
+        position: absolute;
+        text-align: center;
+        display: block;
+        line-height: 1;
+        padding: 0.125rem 0.25rem;
+        color: #fff;
+        border-radius: 0.125rem;
+        background: var(--primary);
+        font-size: 1.25rem;
+        left: 50%;
+        transform: translate(-50%, 0);
+    }
+    #tooltip span:before {
+        position: absolute;
+        content: "";
+        bottom: 35%; left: -8px;
+        /*transform: translateX(-50%);*/
+        transform: rotate(90deg);
+        width: 0; height: 0;
+        border: 4px solid transparent;
+        border-top-color: #6BA132;
+    }
 
 /*****************************
 * Opacity and Color elements *
@@ -1057,8 +1119,8 @@ a {
 .sand_brown{background: var(--sand_brown);}
 .orange_brown{background: var(--orange_brown);}
 
-.red{background: var(--red);}
-.orange{background: var(--orange);}
+.red{background: linear-gradient( var(--red), var(--accent));}
+.orange{background: linear-gradient( var(--orange), var(--accent));}
 .yellow{background: var(--yellow);}
 .green{background: var(--green);}
 .blue{background: var(--blue);}
