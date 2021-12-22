@@ -252,6 +252,11 @@ hr {
     position:absolute;
     bottom: 5px;
     width: 100%;
+    background: #EAF7F994;
+}
+
+#footer span + span {
+    margin-left: 10px;
 }
 /* size of map in background */
 #map {

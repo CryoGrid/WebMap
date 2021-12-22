@@ -15,7 +15,14 @@
 
 {% endblock footer_javascript_page %}
 
+{% block Navbar %}
+    {% with nav_tmpl="nav_header.html" %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
 {% block content %}
+<div></div>
 <div class="container m-t-md" style="background: var(--accent)">
     <div class="row" role="main">
         <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-main">
