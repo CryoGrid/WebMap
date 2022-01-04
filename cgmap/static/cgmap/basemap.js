@@ -229,8 +229,8 @@ $(window).on('map:init', function (e) {
                 </button>
             </h3>
             <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(2)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
-            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(2)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(1)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
             <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
                 und Bodentemperaturen
@@ -523,9 +523,10 @@ function for creating trumpet chart, contains config data for chart
                                         });
                                         context.dataset.data = newData;
                                     }
-                                    label += ' : ' + context.raw + '°';
+                                    var val = Math.round(context.raw  * 10) / 10;
+                                    label += ' : ' + val + '°';
                                 } else {
-                                    label += ' : ' + context.raw[0] + '°/'+ context.raw[1] + '°';
+                                    label += ' : ' + Math.round(context.raw[0]  * 10) / 10 + '°/'+ Math.round(context.raw[1]  * 10) / 10 + '°';
                                 }
                                 return label;
                             },
@@ -1126,7 +1127,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         callbacks: {
                             label: function(context){
                                 var label = context.dataset.label;
-                                label += ' : ' + context.raw + '°';
+                                var val = Math.round(context.raw  * 10) / 10;
+                                label += ' : ' + val + '°';
                                 return label;
                             }
                         },
