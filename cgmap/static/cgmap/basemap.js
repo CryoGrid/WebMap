@@ -222,6 +222,13 @@ $(window).on('map:init', function (e) {
 
     function setPopupContent(data, lat, long){
         // content for popup window -> includes the button for activating the charts
+        let lbl = parseFloat(data.depth_level[0]);
+        if (lbl < 1.0) {
+            lbl = lbl/0.01 + ' cm';
+        }
+        else{
+            lbl = lbl + ' m';
+        }
         var content = `
             <h3 class=header3>Zelle ${ data.id }
                 <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
@@ -229,7 +236,7 @@ $(window).on('map:init', function (e) {
                 </button>
             </h3>
             <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
-            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${lbl} .</div>
             <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(1)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
             <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
@@ -943,7 +950,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                             },
                             label: function(context){
                                 var label = context.dataset.label;
-                                label += ' : ' + context.raw.r + '°';
+                                var val = Math.round(context.raw.r  * 10) / 10;
+                                label += ' : ' + val + '°';
                                 return label;
                             }
                         },
