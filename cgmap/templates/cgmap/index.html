@@ -18,23 +18,15 @@
       rel="stylesheet"
       href="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.css"
     />
-    <link rel="stylesheet" type="text/css" href="{% static 'cgmap/style.css' %}"/>
 {% endblock head_css_page %}
 
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.0/dist/chart.min.js"></script>
-
-
-
-
-
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     <script type="module" src="{% static 'cgmap/basemap.js' %}"></script>
     <!-- Make sure you put this AFtER leaflet.js, when using with leaflet -->
     <script src="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.umd.js"></script>
-
     {# to get access from view in external js files #}
     {{grid_data|json_script:"grid_data"}}
     {{context|json_script:"context"}}
@@ -51,7 +43,7 @@
     <script>
         $('#depth-slider').on('click', function(){
             console.log( "Button depth-slider was clicked!" );
-            $('#left-slider').toggleClass('depth-container-open');
+            $('#left-slider').toggleClass('depth-container-close');
             var icon = $('#depth_chevron');
             icon.toggleClass('left');
             if( icon.hasClass('left')){
@@ -63,7 +55,7 @@
 
         $('#temperature-slider').on('click', function(){
             console.log( "Button temperature-slider was clicked!" );
-            $('#right-slider').toggleClass('temperature-container-open');
+            $('#right-slider').toggleClass('temperature-container-close');
             var icon = $('#temperature_chevron');
             icon.toggleClass('right');
             if( icon.hasClass('right')){
@@ -87,6 +79,26 @@
                 div.style.display = "none";
             }
         };
+
+        $(document).ready(function() {
+            var slider = document.getElementById('temp_scale');
+            var tooltip = document.getElementById('tooltip');
+            var $ruler = $('<div class="rangeslider__ruler" />');
+
+            setValue = () => {
+                const val = slider.value;
+                const min = slider.min ? slider.min : 0;
+                const max = slider. max ? slider.max: 100;
+                const newValue = Number((val - min) * 100 / (max - min));
+                const newPosition = 18 - (newValue * 0.17);
+                console.log('new value in %: ', newValue);
+                tooltip.innerHTML = `<span>${val}</span>`;
+                tooltip.style.left = `calc(${newValue}% - (${newPosition}rem))`;
+                tooltip.style.background = slider.style.background;
+            };
+            document.addEventListener("DOMContentLoaded", setValue);
+            slider.addEventListener('input', setValue);
+        });
     </script>
 {% endblock footer_javascript_page %}
 
@@ -96,130 +108,110 @@
         <div id="map">
             {% leaflet_map "main" %}
         </div>
- <!--       <div class="dialog-container">
-            <div class="dialog-content">
-                <div class="dialog-content-title header3">
-                    {% for data in cg_data %}
-                        {{ data.name }}
-                    {% endfor %}
-                </div>
-                <div class="dialog-content-text default-text-small">
-                    {% for data in cg_data %}
-                       at the location with latitude {{ data.lat }} and longitude {{ data.long }}. </br>
-                    {% endfor %}
-                    With forcing data:
-                    {% for forcing in fd_data%}
-                        {{ forcing.name }}
-                    {% endfor %}
-
-                </div>
-            </div>
-        </div>-->
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
-                <div class="description default-text-small">Depth in m</div>
+                <div class="description default-text-small">Tiefe in cm/m</div>
                 <button class="btn btn-primary btn-sm" id="depth-slider" >
-                    <span class="material-icons md-18 right" id="depth_chevron">chevron_right</span>
+                    <span class="material-icons md-18 left" id="depth_chevron">chevron_left</span>
                 </button>
             </div>
             <div class="scale-container">
                 <div class="slider-container" id="depth">
                     <div class="scale-group-depth">
-                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;">
+                        <form action="" method="get" id="load_data_form" style="margin-bottom: 8px;">
                             {% csrf_token %}
-                            <input type="range" min="-14" max="0" step="1" value="0" class="slider" id="myRange">
+                            <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="depth_range">
                         </form>
                     </div>
 
                     <div class="scale-group-depth-text">
                         <span class="default-text-small">
-                            0.01<br> 0.05<br> 0.1<br> 0.2<br> 0.5<br> 1.0<br> 2.0<br> 3.0<br> 4.0<br> 5.0<br> 6.0<br> 7.0<br>
-                            8.0<br> 9.0<br> 10.0 </span>
+                            1 cm<br> 5 cm<br> 10 cm<br> 20 cm<br> 50 cm<br> 1 m<br> 2 m<br> 3 m<br> 4 m<br> 5 m<br> 6 m<br> 7 m<br>
+                            8 m<br> 9 m<br> 10 m </span>
                     </div>
                 </div>
             </div>
         </div>
         <div class="nav chart-container" id="tab-nav" style="display: none;">
-            <!--<button class="btn btn-primary btn-sm" type="button" id="close-btn" style="width: 18px;height: 18px;">
-                <span class="material-icons md-18 close">close</span>
-            </button>-->
+
             <ul class="nav nav-pills nav-jt">
-               <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Annual Soil Temperature Chart</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Soil Temperature Trumpet Chart</a></li>
-               <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Ground Profile Chart</a></li>
+                <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Jährliches Bodentemperatur Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Bodentemperaturprofiel</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Tiefen-Zeit Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
             </ul>
-            <div class="tab-content" id="tab-content">
+            <div class="tab-content" id="tab-content">-
                 <div id="first" class="tab-pane fade in active show">
                     <div class="canvas-container" id="chart-container">
-                        <canvas id="tempChart" width="800" height="600"></canvas>
+                        <canvas id="tempChart" height="190"></canvas>
                     </div>
                 </div>
                 <div id="second" class="tab-pane fade">
                     <div class="canvas-container" id="chart2-container" >
-                        <canvas id="trumpetChart" width="800" height="600"></canvas>
+                        <canvas id="trumpetChart" height="190"></canvas>
+                        <hr>
+                        <div id="year_selector">
+                            <input class="btn btn-secondary" type="button" name="year" id="year1" value="2000 - 2020">
+                            <input class="btn btn-secondary" type="button" name="year" id="year3" value="2020 - 2040">
+                            <input class="btn btn-secondary" type="button" name="year" id="year5" value="2040 - 2060">
+                            <input class="btn btn-secondary" type="button" name="year" id="year7" value="2060 - 2080">
+                            <input class="btn btn-secondary" type="button" name="year" id="year9" value="2080 - 2100">
+                        </div>
                     </div>
                 </div>
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
-                        <canvas id="groundProfile" width="800" height="600"></canvas>
-                    </div>
+                        <canvas id="groundProfile" height="190"></canvas>
+                    </div><!--
+                    <div class="scale-container">
+                        <div class="scale-group">
+                            <div class="scale-element-group red">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group orange">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group yellow">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group green">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group blue">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                        </div>
+                        <div class="scale-group-text">
+                            <span class="default-text-small" style="transform: rotate(90deg);">25<br> 20<br> 15<br> 10<br> 5<br></span>
+                        </div>
+                    </div>-->
                 </div>
             </div>
         </div>
         <div class="temperature-container right-transition" id="right-slider">
             <div class="temperature-title-wrapper">
-                <div class="description default-text-small">Temperature in °C</div>
+                <div class="description default-text-small">Temperatur in °C</div>
                 <button class="btn btn-primary btn-sm" id="temperature-slider">
-                    <span class="material-icons md-18 left" id="temperature_chevron">chevron_left</span>
+                    <span class="material-icons md-18 right" id="temperature_chevron">chevron_right</span>
                 </button>
             </div>
             <div class="scale-container">
-                <div class="scale-group">
-                    <div class="scale-element-group red">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
+                <div class="slider-container" id="temperature">
+                    <div class="scale-group-temperature">
+                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
+                        <div class="sliderticks">
+                            <p><span>3</span></p>
+                            <p><span>4</span></p>
+                            <p><span>5</span></p>
+                            <p><span>6</span></p>
+                            <p><span>7</span></p>
+                            <p><span>8</span></p>
+                            <p><span>9</span></p>
+                            <p><span>10</span></p>
+                            <p><span>11</span></p>
+                        </div>
+                        <div id="tooltip"></div>
                     </div>
-                    <div class="scale-element-group orange">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group yellow">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group green">
-                        <div class="rectangle opacity0"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity075"></div>
-                    </div>
-                    <div class="scale-element-group blue">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>
-                    <!--<div class="scale-element-group purple">
-                        <div class="rectangle opacity075"></div>
-                        <div class="rectangle opacity05"></div>
-                        <div class="rectangle opacity025"></div>
-                        <div class="rectangle opacity015"></div>
-                        <div class="rectangle opacity0"></div>
-                    </div>-->
-                </div>
-                <div class="scale-group-text">
-                    <span class="default-text-small" style="transform: rotate(90deg);">38<br> 36<br> 34<br> 32<br> 30<br> 28<br> 26<br> 24<br> 22<br> 20<br> 18<br> 16<br> 14<br> 12<br> 10<br> 8<br> 6<br> 4<br> 2<br> 0<br> -2<br> -4<br> -6<br> -8<br> -10 </span>
                 </div>
             </div>
         </div>
