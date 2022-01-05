@@ -994,6 +994,34 @@ a {
   background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
 }
 
+/** Labels below slider**/
+.sliderticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.sliderticks p {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  width: 1px;
+  background: #D3D3D3;
+  height: 10px;
+  line-height: 40px;
+  margin: 0 0 20px 0;
+}
+.sliderticks span{
+  transform: rotate(90deg);
+  transform-origin: right, top;
+  -ms-transform: rotate(90deg);
+  -ms-transform-origin:right, top;
+  -webkit-transform: rotate(90deg);
+  -webkit-transform-origin:right, top;
+  position: absolute;
+}
+
 .slider-container {
   position: relative;
   height: 16px; /* height of the outside container */

@@ -83,6 +83,7 @@
         $(document).ready(function() {
             var slider = document.getElementById('temp_scale');
             var tooltip = document.getElementById('tooltip');
+            var $ruler = $('<div class="rangeslider__ruler" />');
 
             setValue = () => {
                 const val = slider.value;
@@ -117,7 +118,7 @@
             <div class="scale-container">
                 <div class="slider-container" id="depth">
                     <div class="scale-group-depth">
-                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;">
+                        <form action="" method="get" id="load_data_form" style="margin-bottom: 8px;">
                             {% csrf_token %}
                             <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="depth_range">
                         </form>
@@ -197,7 +198,18 @@
             <div class="scale-container">
                 <div class="slider-container" id="temperature">
                     <div class="scale-group-temperature">
-                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true">
+                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
+                        <div class="sliderticks">
+                            <p><span>3</span></p>
+                            <p><span>4</span></p>
+                            <p><span>5</span></p>
+                            <p><span>6</span></p>
+                            <p><span>7</span></p>
+                            <p><span>8</span></p>
+                            <p><span>9</span></p>
+                            <p><span>10</span></p>
+                            <p><span>11</span></p>
+                        </div>
                         <div id="tooltip"></div>
                     </div>
                 </div>
