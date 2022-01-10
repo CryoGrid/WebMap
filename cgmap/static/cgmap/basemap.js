@@ -696,6 +696,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         return gradient;
     }
+
     /**
     function for ground profile chart settings and options for drawing the chart
     **/
@@ -705,7 +706,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
         /* const up checks if the next point has a different color as the current -> in datasets the color will be changed accordingly */
         const up = (ctx, value) => ctx.p0.options.borderColor != ctx.p1.options.borderColor ? value : undefined;
         const down = (ctx, value) => ctx.p0.options.borderColor == ctx.p1.options.borderColor ? value : undefined;
-        const skip = (ctx, value) => ctx.p1.raw.x - ctx.p0.raw.x > 1 ? value : undefined;
+        const skip = (ctx, value) => ctx.p1.parsed.x - ctx.p0.parsed.x > 1 ? value : undefined;
         const data = {
             labels: labels,
             datasets: [
@@ -952,6 +953,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -966,6 +968,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -980,6 +983,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -994,6 +998,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1008,6 +1013,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1022,6 +1028,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1036,6 +1043,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1050,6 +1058,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1064,6 +1073,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 backgroundColor: [],
                 borderColor: [],
                 fill: 'origin',
+                spanGaps: true,
                 showLine: true,
                 segment: {
                     borderColor: ctx => skip(ctx, 'transparent'),
@@ -1185,39 +1195,52 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var color = [];
 
         for( var i = 0; i < data.length; i++){
-            if( data[i].r > 20){
-                color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
-            }
-            else if( data[i].r > 16){
-                color.push('rgba(226,123,31,0.4)'); /* hex: #E27B1F#F2994A - rgb: (226,123,31) */
-            }
-            else if( data[i].r > 14){
-                color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
-            }
-            else if( data[i].r > 12){
-                color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
-            }
-            else if( data[i].r > 10){
-                color.push('rgba(225,178,35,0.4)'); /* hex: #E1B223 - rgb: (225,178,35) */
-            }
-            else if( data[i].r > 8){
-                color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
-            }
-            else if( data[i].r > 6){
-                color.push('rgba(157,229,186,0.4)'); /* hex: #9DE5BA - rgb: (157,229,186) */
-            }
-            else if( data[i].r > 4){
-                color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
-            }
-            else{
-                color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
+            if(data[i] != null){
+                if( data[i].r > 20){
+                    color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
+                }
+                else if( data[i].r > 16){
+                    color.push('rgba(226,123,31,0.4)'); /* hex: #E27B1F#F2994A - rgb: (226,123,31) */
+                }
+                else if( data[i].r > 14){
+                    color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
+                }
+                else if( data[i].r > 12){
+                    color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
+                }
+                else if( data[i].r > 10){
+                    color.push('rgba(225,178,35,0.4)'); /* hex: #E1B223 - rgb: (225,178,35) */
+                }
+                else if( data[i].r > 8){
+                    color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
+                }
+                else if( data[i].r > 6){
+                    color.push('rgba(157,229,186,0.4)'); /* hex: #9DE5BA - rgb: (157,229,186) */
+                }
+                else if( data[i].r > 4){
+                    color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
+                }
+                else{
+                    color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
+                }
             }
         }
         return color
     }
 
-    function drawCurve(cluster){
+    function factorData(data){
+        let _data = data.map((e, i, a) => {
+            let prev = a[i - 1];
+            let next = a[i + 1];
+            if ( typeof prev !== 'undefined' && typeof next !== 'undefined' ){
+                if (e.x === prev.x && e.x === next.x ) return null;
+                console.log('e: ', typeof e);
+            }
+            return e;
+        });
 
+        console.log('_data: ', _data);
+        return _data;
     }
 
 /**
@@ -1234,12 +1257,16 @@ function to update trumpet chart with requested data -> is called in ajax functi
         }**/
 
         for( var i = 0; i < Object.size(cluster); i++){
-            groundProfile.data.datasets[i].data = cluster[i];
+            cluster[i].sort(function(a, b){
+                return a.x - b.x;
+            });
+            groundProfile.data.datasets[i].data = factorData(cluster[i]);
             var color = addColor(groundProfile.data.datasets[i].data);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].backgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
         }
+        console.log('ground profile data: ', groundProfile.data.datasets);
 
         Object.size = function(obj) {
             var size = 0, key;
@@ -1263,9 +1290,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
             cluster[j].sort(function(a, b){
                 return a.x - b.x;
             });
+            cluster[j] = factorData(cluster[j]);
         }
 
-        console.log('cluster', cluster[1]);
+        console.log('cluster: ', cluster);
 /**
         const newDataset = {
             label: 'Dataset ' + (groundProfile.data.datasets.length + 1),

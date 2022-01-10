@@ -201,9 +201,8 @@ class MapView(TemplateView):
                 week = 1
                 for x in range(0, len(arr), 7):
                     mean = np.round(np.mean(arr[x:x + 7]), 2)
-                    temp.append({'x': week, 'y': float(z_level[i - 1][1]), 'r': mean})
-                    mean = np.round(np.mean(arr[x:x + 7]), 2)
                     value = {'x': week, 'y': float(z_level[i - 1][1]), 'r': mean}
+                    # temp.append({'x': week, 'y': float(z_level[i - 1][1]), 'r': mean})
                     temp.append(value)
                     if mean > 20:
                         temp20.append(value)
