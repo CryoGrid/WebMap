@@ -468,7 +468,7 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Bodentermperaturprofiel zwischen 2000 und 2020'
+                        text: (ctx) => 'Bodentemperaturprofiel zwischen 2000 und 2020'
                     },
                     legend: {
                         display: true,
@@ -536,6 +536,28 @@ function for creating trumpet chart, contains config data for chart
                                     label += ' : ' + Math.round(context.raw[0]  * 10) / 10 + '°/'+ Math.round(context.raw[1]  * 10) / 10 + '°';
                                 }
                                 return label;
+                            },
+                            labelColor: function(context){
+                                return{
+                                    borderColor: context.dataset.borderColor,
+                                    backgroundColor: context.dataset.borderColor,
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                };
+                            },
+                            labelTextColor: function(context) {
+                                console.log('context: ', context);
+                                let bgColor = context.dataset.backgroundColor;
+                                if (typeof bgColor != 'undefined'){
+                                    var a = bgColor.split("(")[1].split(")")[0].split(",");
+                                    a.splice(-1)
+                                    var b = 'rgb(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')';
+                                    console.log('bgcolor: ', a, ' type: ', typeof a);
+                                    console.log('rgb: ', b);
+                                    return b;
+                                } else {
+                                    return '#FAFCFE';
+                                }
                             },
                         },
                         filter: function(context) {
@@ -953,7 +975,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                                 var val = Math.round(context.raw.r  * 10) / 10;
                                 label += ' : ' + val + '°';
                                 return label;
-                            }
+                            },
                         },
                     },
                     legend: {
@@ -1128,7 +1150,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     legend: {
                         display: true,
                         position: 'right',
-                        align: 'middle'
+                        align: 'middle',
+                        labels: {
+                            boxHeight: 2,
+                        },
                     },
                     tooltip: {
                         mode: 'index',
@@ -1138,7 +1163,15 @@ function to update trumpet chart with requested data -> is called in ajax functi
                                 var val = Math.round(context.raw  * 10) / 10;
                                 label += ' : ' + val + '°';
                                 return label;
-                            }
+                            },
+                            labelColor: function(context){
+                                return{
+                                    borderColor: context.dataset.borderColor,
+                                    backgroundColor: context.dataset.borderColor,
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                };
+                            },
                         },
                     },
                 },
