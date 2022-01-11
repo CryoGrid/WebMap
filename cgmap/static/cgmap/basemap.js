@@ -468,7 +468,7 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Bodentemperaturprofiel zwischen 2000 und 2020'
+                        text: (ctx) => 'Bodentemperaturprofil zwischen 2000 und 2020'
                     },
                     legend: {
                         display: true,
@@ -552,8 +552,6 @@ function for creating trumpet chart, contains config data for chart
                                     var a = bgColor.split("(")[1].split(")")[0].split(",");
                                     a.splice(-1)
                                     var b = 'rgb(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')';
-                                    console.log('bgcolor: ', a, ' type: ', typeof a);
-                                    console.log('rgb: ', b);
                                     return b;
                                 } else {
                                     return '#FAFCFE';

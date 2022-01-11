@@ -83,21 +83,29 @@
         $(document).ready(function() {
             var slider = document.getElementById('temp_scale');
             var tooltip = document.getElementById('tooltip');
-            var $ruler = $('<div class="rangeslider__ruler" />');
+            var ticks = document.getElementsByClassName('sliderticks');
+            console.log('ticks', ticks);
+            const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
             setValue = () => {
                 const val = slider.value;
                 const min = slider.min ? slider.min : 0;
-                const max = slider. max ? slider.max: 100;
+                const max = slider.max ? slider.max : 100;
                 const newValue = Number((val - min) * 100 / (max - min));
                 const newPosition = 18 - (newValue * 0.17);
-                console.log('new value in %: ', newValue);
+
                 tooltip.innerHTML = `<span>${val}</span>`;
                 tooltip.style.left = `calc(${newValue}% - (${newPosition}rem))`;
                 tooltip.style.background = slider.style.background;
+
+                let r = range(parseInt(min), parseInt(max), 1);
+                r.forEach(element => console.log(ticks.innerHTML = '<p><span>' + element + '</span></p>'));
+                console.log('range', r);
             };
             document.addEventListener("DOMContentLoaded", setValue);
             slider.addEventListener('input', setValue);
+
+
         });
     </script>
 {% endblock footer_javascript_page %}
