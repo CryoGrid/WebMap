@@ -162,29 +162,23 @@
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
                         <canvas id="groundProfile" height="190"></canvas>
-                    </div><!--
-                    <div class="scale-container">
-                        <div class="scale-group">
-                            <div class="scale-element-group red">
-                                <div class="rectangle opacity05"></div>
-                            </div>
-                            <div class="scale-element-group orange">
-                                <div class="rectangle opacity05"></div>
-                            </div>
-                            <div class="scale-element-group yellow">
-                                <div class="rectangle opacity05"></div>
-                            </div>
-                            <div class="scale-element-group green">
-                                <div class="rectangle opacity05"></div>
-                            </div>
-                            <div class="scale-element-group blue">
-                                <div class="rectangle opacity05"></div>
+                        <div class="scale-container">
+                            <div class="scale-group-depth" id="depth_temperature">
+                                <input type="range" min="0" max="40" step="0.1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true">
+                                <div class="sliderticks">
+                                    <p><span>0</span></p>
+                                    <p><span>5</span></p>
+                                    <p><span>10</span></p>
+                                    <p><span>15</span></p>
+                                    <p><span>20</span></p>
+                                    <p><span>25</span></p>
+                                    <p><span>30</span></p>
+                                    <p><span>35</span></p>
+                                    <p><span>40</span></p>
+                                </div>
                             </div>
                         </div>
-                        <div class="scale-group-text">
-                            <span class="default-text-small" style="transform: rotate(90deg);">25<br> 20<br> 15<br> 10<br> 5<br></span>
-                        </div>
-                    </div>-->
+                    </div>
                 </div>
             </div>
         </div>
@@ -200,15 +194,15 @@
                     <div class="scale-group-temperature">
                         <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
                         <div class="sliderticks">
-                            <p><span>3</span></p>
-                            <p><span>4</span></p>
-                            <p><span>5</span></p>
-                            <p><span>6</span></p>
-                            <p><span>7</span></p>
-                            <p><span>8</span></p>
-                            <p><span>9</span></p>
-                            <p><span>10</span></p>
-                            <p><span>11</span></p>
+                            <p><span class="temp">3</span></p>
+                            <p><span class="temp">4</span></p>
+                            <p><span class="temp">5</span></p>
+                            <p><span class="temp">6</span></p>
+                            <p><span class="temp">7</span></p>
+                            <p><span class="temp">8</span></p>
+                            <p><span class="temp">9</span></p>
+                            <p><span class="temp">10</span></p>
+                            <p><span class="temp">11</span></p>
                         </div>
                         <div id="tooltip"></div>
                     </div>
