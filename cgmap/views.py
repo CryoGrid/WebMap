@@ -193,7 +193,6 @@ class MapView(TemplateView):
                 )
                 interval = cursor.fetchall()
             # calculating weekly mean values -> 5 days in first week and 4 days in last week; 357 days left -> 51 weeks
-            temp20, temp16, temp14, temp12, temp10, temp8, temp6, temp4, temp0 = [], [], [], [], [], [], [], [], []
             for i in depth_list:
                 z_level.sort()
                 temp = []
@@ -201,35 +200,13 @@ class MapView(TemplateView):
                 week = 1
                 for x in range(0, len(arr), 7):
                     mean = np.round(np.mean(arr[x:x + 7]), 2)
-                    value = {'x': week, 'y': float(z_level[i - 1][1]), 'r': mean}
-                    # temp.append({'x': week, 'y': float(z_level[i - 1][1]), 'r': mean})
-                    temp.append(value)
-                    if mean > 20:
-                        temp20.append(value)
-                    elif mean > 16:
-                        temp16.append(value)
-                    elif mean > 14:
-                        temp14.append(value)
-                    elif mean > 12:
-                        temp12.append(value)
-                    elif mean > 10:
-                        temp10.append(value)
-                    elif mean > 8:
-                        temp8.append(value)
-                    elif mean > 6:
-                        temp6.append(value)
-                    elif mean > 4:
-                        temp4.append(value)
-                    else:
-                        temp0.append(value)
+                    temp.append({'x': week, 'y': float(z_level[i - 1][1]), 'r': mean})
                     week += 1
-
                 json_data = {
                     'data': temp,
                 }
                 depth_list[i] = json_data
             interval = np.arange(1, 54, 1, dtype=int).tolist()
-            temp_list = {'0': temp20, '1': temp16, '2': temp14, '3': temp12, '8': temp10, '7': temp8, '6': temp6, '5': temp4, '4': temp0}
             # convert query data to json data for easy is in chart js code
             '''for idx in depth_list:
                 z_level.sort()
@@ -241,7 +218,7 @@ class MapView(TemplateView):
                 }
                 depth_list[idx] = json_data'''
 
-            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}, {'temp_list': temp_list}],
+            return JsonResponse([{'depth_list': depth_list}, {'date_interval': interval}],
                                 safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \

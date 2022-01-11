@@ -32,8 +32,8 @@ $(window).on('map:init', function (e) {
         let cg_arr = Object.values(cgData);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
-        let maxCol = getColor(maxObj);
-        let minCol = getColor(minObj);
+        let maxCol = getColor(maxObj, -10, 15);
+        let minCol = getColor(minObj, -10, 15);
         document.getElementById('temp_scale').min = minObj;
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
@@ -132,12 +132,12 @@ $(window).on('map:init', function (e) {
     }
 
     // source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
-    function getHue(t){
+    function getHue(t, min, max){
         var maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
         var minHsl = 360; //  minhsl maps to min temp counter clockwise
         var rngHsl = maxHsl - minHsl; // = 210
-        var maxTemp = 15;
-        var minTemp = -10;
+        var maxTemp = max;
+        var minTemp = min;
         var rngTemp = maxTemp - minTemp; // 60
         var degCnt = maxTemp - t; // 0
         var hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
@@ -146,17 +146,17 @@ $(window).on('map:init', function (e) {
     }
 
     // color for grid cells
-    function getColor(t) {
+    function getColor(t, min, max) {
         const s = 100;
         const l = 50;
-        const h = getHue(t);
+        const h = getHue(t, min, max);
         return hsltohex(h, s, l);
     }
     // style for grid cells
     function style(feature) {
         var cellColor = '#FFEDA0';
         if(feature.properties.soil_temp != null){
-            cellColor = getColor(feature.properties.soil_temp)
+            cellColor = getColor(feature.properties.soil_temp, -10, 15)
         }
         return {
             fillColor: cellColor,
@@ -416,8 +416,7 @@ ajax function to get ground profile data for selected grid cell and updating cor
         .done(function(response){
             var data = response[0]['depth_list'];
             var interval = response[1]['date_interval'];
-            var cluster = response[2]['temp_list'];
-            updateProfileData(data, interval, cluster);
+            updateProfileData(data, interval);
         })
         .fail(function(){
             console.log('Failed!')
@@ -524,7 +523,7 @@ function for creating trumpet chart, contains config data for chart
                                         });
                                         context.dataset.data = newData;
                                     }
-                                    if (label.includes('10%/90%')){
+                                    if (label.includes('1 0%/90%')){
                                         let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
                                         let newData = nextData.map(function(e, i){
                                             return [e, data[i]];
@@ -706,7 +705,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
         /* const up checks if the next point has a different color as the current -> in datasets the color will be changed accordingly */
         const up = (ctx, value) => ctx.p0.options.borderColor != ctx.p1.options.borderColor ? value : undefined;
         const down = (ctx, value) => ctx.p0.options.borderColor == ctx.p1.options.borderColor ? value : undefined;
-        const skip = (ctx, value) => ctx.p1.parsed.x - ctx.p0.parsed.x > 1 ? value : undefined;
         const data = {
             labels: labels,
             datasets: [
@@ -716,9 +714,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 pointBackgroundColor: [],
                 backgroundColor: [],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
-                showLine: true,
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
                     backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
@@ -739,7 +735,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -761,7 +756,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -783,7 +777,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -805,7 +798,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -827,7 +819,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -849,7 +840,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -871,7 +861,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill:'+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -893,7 +882,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: '+1',
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
@@ -903,7 +891,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     borderColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
-
                         if ( !chartArea ){
                             // This case happens on initial chart load
                             return null;
@@ -913,9 +900,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     backgroundColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
-
                         console.log('chart of 4m level: ', chart);
-
                         if ( !chartArea ){
                             // This case happens on initial chart load
                             return null;
@@ -939,154 +924,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     return getGradient(ctx, chartArea);
                 }],
                 borderColor: [],
-                tension: 0.9,
                 fill: {value: 6},
             }]
-        };
-        const data2 = {
-            labels: labels,
-            datasets: [
-            {
-                label: 'dataset1',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset2',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset3',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset4',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset5',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset6',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset7',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset8',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            {
-                label: 'dataset9',
-                data: [],
-                pointBackgroundColor: [],
-                backgroundColor: [],
-                borderColor: [],
-                fill: 'origin',
-                spanGaps: true,
-                showLine: true,
-                segment: {
-                    borderColor: ctx => skip(ctx, 'transparent'),
-                    backgroundColor: ctx => skip(ctx, 'transparent'),
-                },
-                tension: 0.5,
-            },
-            ]
         };
 
         groundProfile = new Chart(ctx3, {
             type: 'line',
-            data: data2,
+            data: data,
             options: {
                 responsive: true,
                 plugins: {
@@ -1095,7 +939,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         text: (ctx) => 'Tiefen-Zeit Diagramm für 2020'
                     },
                     tooltip: {
-                        mode: 'x',
+                        mode: 'index',
                         callbacks: {
                             title: function(context){
                                 for( var i = 0; i < context.length; i++){
@@ -1105,16 +949,16 @@ function to update trumpet chart with requested data -> is called in ajax functi
                             label: function(context){
                                 var label = context.dataset.label;
                                 var val = Math.round(context.raw.r  * 10) / 10;
-                                label = context.raw.y + ' m : ' + val + '°';
+                                label += ' : ' + val + '°';
                                 return label;
-                            }
+                            },
                         },
                     },
                     legend: {
                         display: false,
                         position: 'right',
                         align: 'middle'
-                    },/**
+                    },
                     afterLayout: chart => {
                         var ctx = chart.chart.ctx;
                         var xAxis = chart.scales['x-axis-0'];
@@ -1129,9 +973,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         dataset.pointBackgroundColor = gradientStroke;
                         dataset.pointHoverBorderColor = gradientStroke;
                         dataset.pointHoverBackgroundColor = gradientStroke;
-
-                        console.log(dataset.colors);
-                    },**/
+                    },
                 },
                 interaction: {
                     mode: 'nearest',
@@ -1159,11 +1001,11 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         },
                     }
                 },
-                /**elements: {
+                elements: {
                     point: {
                         radius: 0
                     },
-                },**/
+                },
             }
         });
     }
@@ -1195,119 +1037,26 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var color = [];
 
         for( var i = 0; i < data.length; i++){
-            if(data[i] != null){
-                if( data[i].r > 20){
-                    color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
-                }
-                else if( data[i].r > 16){
-                    color.push('rgba(226,123,31,0.4)'); /* hex: #E27B1F#F2994A - rgb: (226,123,31) */
-                }
-                else if( data[i].r > 14){
-                    color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
-                }
-                else if( data[i].r > 12){
-                    color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
-                }
-                else if( data[i].r > 10){
-                    color.push('rgba(225,178,35,0.4)'); /* hex: #E1B223 - rgb: (225,178,35) */
-                }
-                else if( data[i].r > 8){
-                    color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
-                }
-                else if( data[i].r > 6){
-                    color.push('rgba(157,229,186,0.4)'); /* hex: #9DE5BA - rgb: (157,229,186) */
-                }
-                else if( data[i].r > 4){
-                    color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
-                }
-                else{
-                    color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
-                }
-            }
+            color.push(getColor(data[i].r, -15, 20));
         }
         return color
     }
-
-    function factorData(data){
-        let _data = data.map((e, i, a) => {
-            let prev = a[i - 1];
-            let next = a[i + 1];
-            if ( typeof prev !== 'undefined' && typeof next !== 'undefined' ){
-                if (e.x === prev.x && e.x === next.x ) return null;
-                console.log('e: ', typeof e);
-            }
-            return e;
-        });
-
-        console.log('_data: ', _data);
-        return _data;
-    }
-
 /**
     update ground profile data and set colors for graph
 **/
-    function updateProfileData(data, interval, cluster){
+    function updateProfileData(data, interval){
         groundProfile.data.labels = [].concat.apply([], interval);
-        /**
-        for( var i = 0; i < Object.size(data); i++){
+        for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
+            console.log('data: ', data[i+1].data);
             var color = addColor(groundProfile.data.datasets[i].data);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
-        }**/
-
-        for( var i = 0; i < Object.size(cluster); i++){
-            cluster[i].sort(function(a, b){
-                return a.x - b.x;
-            });
-            groundProfile.data.datasets[i].data = factorData(cluster[i]);
-            var color = addColor(groundProfile.data.datasets[i].data);
-            groundProfile.data.datasets[i].pointBackgroundColor = color;
-            groundProfile.data.datasets[i].backgroundColor = color;
-            groundProfile.data.datasets[i].borderColor = color;
-        }
-        console.log('ground profile data: ', groundProfile.data.datasets);
-
-        Object.size = function(obj) {
-            var size = 0, key;
-            for( key in obj){
-                if(obj.hasOwnProperty(key)) size ++;
-            }
-            return size;
-        };
-        Object.groupBy2 = function(arr, property) {
-            var grouped = {};
-            for( var i=0; i<arr.length; i++){
-                var p = arr[i][property];
-                if(!grouped[p]){ grouped[p] = [];}
-                grouped[p].push(arr[i]);
-            }
-            return grouped;
-        };
-        // console.log('ground profile', groundProfile.data);
-        console.log('cluster length; ', Object.size(cluster));
-        for( var j = 0; j< Object.size(cluster); j++){
-            cluster[j].sort(function(a, b){
-                return a.x - b.x;
-            });
-            cluster[j] = factorData(cluster[j]);
         }
 
-        console.log('cluster: ', cluster);
-/**
-        const newDataset = {
-            label: 'Dataset ' + (groundProfile.data.datasets.length + 1),
-            data: cluster[1],
-            backgroundColor = color,
-            borderColor = color,
-            borderWidth = 1,
-            showLine = true,
-            tension = 0.1,
-        };
-
-        //groundProfile.data.datasets.push(newDataset)**/
         groundProfile.update();
     }
+
 /**
     functions for temperature graph settings and options for drawing the chart
 **/
