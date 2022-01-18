@@ -162,19 +162,16 @@
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
                         <canvas id="groundProfile" height="190"></canvas>
-                        <div class="scale-container">
+                        <div class="scale-container" style="margin-left: 8">
                             <div class="scale-group-depth" id="depth_temperature">
-                                <input type="range" min="0" max="40" step="0.1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true">
-                                <div class="sliderticks">
+                                <input type="range" min="-5" max="35" step="1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+                                <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
                                     <p><span>0</span></p>
                                     <p><span>5</span></p>
                                     <p><span>10</span></p>
                                     <p><span>15</span></p>
                                     <p><span>20</span></p>
                                     <p><span>25</span></p>
-                                    <p><span>30</span></p>
-                                    <p><span>35</span></p>
-                                    <p><span>40</span></p>
                                 </div>
                             </div>
                         </div>

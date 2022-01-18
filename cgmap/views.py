@@ -206,6 +206,7 @@ class MapView(TemplateView):
                     'data': temp,
                 }
                 depth_list[i] = json_data
+
             interval = np.arange(1, 54, 1, dtype=int).tolist()
             # convert query data to json data for easy is in chart js code
             '''for idx in depth_list:
