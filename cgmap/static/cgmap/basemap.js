@@ -691,17 +691,30 @@ function to update trumpet chart with requested data -> is called in ajax functi
     /**
     calculate line gradient for the depth time chart with respect to each point -> not working right now
     **/
-    function getLineGradient(startPoint, endPoint){
+    function getLineGradient(startPoint){
+        console.log('ctx: ', startPoint);
         var gradient = null;
         let y_label = startPoint.parsed.y + ' m';
         let legend_id = groundProfile.legend.legendItems
         let y_id = legend_id.findIndex(x => x.text === y_label) + 1;
+        let x_id = parseInt(startPoint.parsed.x) + 1;
 
-        let coords = groundProfile._metasets[y_id].data[startPoint.parsed.x];
-        gradient = ctx3.createLinearGradient(coords.x, coords.y, startPoint.x, startPoint.y);
-        console.log('gradient coords: ', startPoint.x, ' y: ', startPoint.y, ' end x: ', coords.x, ' y ', coords.y);
+        if( y_id > 9){
+            y_id = 0;
+        }
+
+        let coords = groundProfile._metasets[y_id].data[x_id];
+        gradient = ctx3.createLinearGradient(startPoint.x, startPoint.y, coords.x, coords.y);
+        console.log('gradient coords: ', coords, ' start point: ', startPoint);
+        console.log('start point color: ', startPoint.options.borderColor, ' end point color: ', groundProfile._metasets[y_id]._dataset.borderColor[startPoint.parsed.x]);
         gradient.addColorStop(0, startPoint.options.borderColor);
-        gradient.addColorStop(1, endPoint.borderColor[startPoint.parsed.x]);
+        gradient.addColorStop(1, groundProfile._metasets[y_id]._dataset.pointBackgroundColor[startPoint.parsed.x]);
+
+        ctx3.fillStyle = gradient;
+        let w = coords.x - startPoint.x;
+        let h = coords.y - startPoint.y;
+        console.log('rect coords: x', startPoint.x, 'y', startPoint.y, 'w', w, 'h', h);
+        ctx3.fillRect(startPoint.x, startPoint.y, w, h);
 
         return gradient;
     }
@@ -727,8 +740,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
                     backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
                 },
             },
             {
@@ -894,7 +907,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         position: 'right',
                         align: 'middle'
                     },
-                    afterLayout: chart => {
+                    /*afterLayout: chart => {
                         var ctx = chart.chart.ctx;
                         var yAxis = chart.scales['y-axis-0'];
                         var gradientStroke = ctx.createLinearGradient(0, yAxis.top, 0, yAxis.bottom);
@@ -909,7 +922,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         dataset.pointBackgroundColor = gradientStroke;
                         dataset.pointHoverBorderColor = gradientStroke;
                         dataset.pointHoverBackgroundColor = gradientStroke;
-                    },
+                    },*/
                 },
                 interaction: {
                     mode: 'nearest',
@@ -990,6 +1003,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             let color = addColor(groundProfile.data.datasets[i].data);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
+            groundProfile.data.datasets[i].backgroundColor = color;
             flat_arr.push(data[i+1].data);
         }
 

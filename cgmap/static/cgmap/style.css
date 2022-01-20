@@ -1058,8 +1058,7 @@ a {
   -webkit-appearance: none;  /* Override default CSS styles */
   height: 100%;
   position: relative;
-  background-color: #d3d3d3;
-  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  background-color: #d3d3d3;ö
   -webkit-transition: .2s; /* 0.2 seconds transition on hover */
   transition: opacity .2s;
   border-radius: 5px;
