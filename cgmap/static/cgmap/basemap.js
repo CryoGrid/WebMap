@@ -29,8 +29,9 @@ $(window).on('map:init', function (e) {
     update temperature scale data with requested cg data
     **/
     function temperatureScale(cgData){
-        const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
+        const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step)); // range function
 
+        // set min, max, value slider values
         let cg_arr = Object.values(cgData);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
@@ -41,13 +42,14 @@ $(window).on('map:init', function (e) {
         document.getElementById('temp_scale').value = maxObj;
         document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
 
+        // init ticks for temperature scale
         let r = range(parseInt(minObj), parseInt(maxObj), 1);
         let spn = '';
         r.forEach(element => spn += '<p><span>' + element + '</span></p>');
         document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
     }
     /**
-    button setup with related function for setting responding id
+    button setup with related function for setting responding id and add event listeners
     **/
     const y2010 = document.getElementById('year1');
     const y2030 = document.getElementById('year3');
@@ -263,10 +265,7 @@ $(window).on('map:init', function (e) {
         if(popup){
             detail.map.removeLayer(popup);
         };
-        /** add a new marker with a popup
-        marker = L.marker([lat, long]).addTo(detail.map)
-                    .bindPopup(content)
-                    .openPopup();**/
+        /** add popup with content to map**/
         popup
             .setLatLng(e.latlng)
             .setContent(content)
@@ -318,6 +317,7 @@ $(window).on('map:init', function (e) {
         detail.map.fitBounds(e.target.getBounds());
     }
 
+    // populate grid layer
     gridLayer = L.geoJSON(geoJsonArray, {
         style: style,
         onEachFeature: onEachFeature,
@@ -326,6 +326,7 @@ $(window).on('map:init', function (e) {
         }
     }).addTo(layerGroup).addTo(detail.map);
 
+    //assign grid layer to the control layer
     const layerControl = new L.Control.Layers(null, {
         'Grid Layer': gridLayer,
     }).addTo(detail.map);
@@ -348,6 +349,7 @@ $(window).on('map:init', function (e) {
                 dataType: 'json'
             })
             .done(function(response){
+                // if request is successful update grid layers
                 $('#context').html(response[1].depth_level);
                 for (var i = 0; i < geoJsonArray.length; i++){
                     var id = geoJsonArray[i].properties['id'];
@@ -375,9 +377,7 @@ $(window).on('map:init', function (e) {
                 var obj = geoJsonArray.find(o => o.properties.id === id);
                 var lat = popup.getLatLng().lat;
                 var lng = popup.getLatLng().lng;
-                /** set content of popup and update popup
-                marker.getPopup().setContent(setPopupContent(obj.properties, lat, lng));
-                marker.getPopup().update();**/
+                // set content of popup and update popup
                 popup.setContent(setPopupContent(obj.properties, lat, lng));
                 popup.update();
                 // update temperature scale after depth selection
@@ -400,6 +400,7 @@ ajax function to get data for selected grid cell and updating corresponding char
             dataType: "json"
         })
         .done(function(response){
+            // if request is successful update data in changeData function
             gridID = cell_id;
 
             var query_data = response[0].cell_data;
@@ -420,6 +421,7 @@ ajax function to get ground profile data for selected grid cell and updating cor
             type: 'POST',
         })
         .done(function(response){
+            // if request is successful update data in updateProfileData function
             var data = response[0]['depth_list'];
             var interval = response[1]['date_interval'];
             updateProfileData(data, interval);
@@ -438,6 +440,7 @@ ajax function to get min, max and mean values for selected grid cell and updatin
             type: 'POST',
         })
         .done(function(response){
+            // if request is successful update data in updateData
             var data = response[0]['depth_list'];
             activeYears.push(yearID);
             updateData(data, yearID);
@@ -624,6 +627,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var bgCol2;
         var years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
 
+        // divide values into different sets
         for (var i = 1; i < 16; i++){
             min.push(newData[i]['min']);
             max.push(newData[i]['max']);
@@ -632,6 +636,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
             max_quantile.push(newData[i]['max_quantile']);
             min_quantile.push(newData[i]['min_quantile'])
         }
+
+        // set colors for different sets
         if ( yearID === 1){
             bgCol1 = 'rgba(45,156,219,0.1)';
             bgCol2 = 'rgba(45,156,219,0.2)';
@@ -648,6 +654,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
             bgCol1 = 'rgba(111,207,151,0.1)';
             bgCol2 = 'rgba(111,207,151,0.2)';
         }
+
+        // setup datasets with new data for the trumpet curve
         trumpetChart.data.datasets.push({
                 data: min,
                 label: 'Min/Max ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
@@ -691,7 +699,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderDash: [5, 5],
             });
 
-        trumpetChart.update();
+        trumpetChart.update(); // update chart
     }
     /**
     function for creating a color gradient
