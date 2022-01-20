@@ -24,11 +24,13 @@ $(window).on('map:init', function (e) {
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
     temperatureScale(cg);
-    /**
-    testing
-    **/
 
+    /**
+    update temperature scale data with requested cg data
+    **/
     function temperatureScale(cgData){
+        const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
+
         let cg_arr = Object.values(cgData);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
@@ -38,7 +40,11 @@ $(window).on('map:init', function (e) {
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
         document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
-        var temp_slider = document.getElementById('temp_scale').style;
+
+        let r = range(parseInt(minObj), parseInt(maxObj), 1);
+        let spn = '';
+        r.forEach(element => spn += '<p><span>' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
     }
     /**
     button setup with related function for setting responding id

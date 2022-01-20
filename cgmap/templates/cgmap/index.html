@@ -84,7 +84,6 @@
             var slider = document.getElementById('temp_scale');
             var tooltip = document.getElementById('tooltip');
             var ticks = document.getElementsByClassName('sliderticks');
-            console.log('ticks', ticks);
             const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
             setValue = () => {
@@ -99,13 +98,12 @@
                 tooltip.style.background = slider.style.background;
 
                 let r = range(parseInt(min), parseInt(max), 1);
-                r.forEach(element => console.log(ticks.innerHTML = '<p><span>' + element + '</span></p>'));
-                console.log('range', r);
+                let spn = '';
+                r.forEach(element => spn += '<p><span>' + element + '</span></p>');
+                document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
             };
             document.addEventListener("DOMContentLoaded", setValue);
             slider.addEventListener('input', setValue);
-
-
         });
     </script>
 {% endblock footer_javascript_page %}
@@ -208,15 +206,6 @@
                     <div class="scale-group-temperature">
                         <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
                         <div class="sliderticks">
-                            <p><span>3</span></p>
-                            <p><span>4</span></p>
-                            <p><span>5</span></p>
-                            <p><span>6</span></p>
-                            <p><span>7</span></p>
-                            <p><span>8</span></p>
-                            <p><span>9</span></p>
-                            <p><span>10</span></p>
-                            <p><span>11</span></p>
                         </div>
                         <div id="tooltip"></div>
                     </div>
