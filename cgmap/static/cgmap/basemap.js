@@ -524,25 +524,18 @@ function for creating trumpet chart, contains config data for chart
                                 var label = context.dataset.label;
                                 var data = context.dataset.data;
                                 // update tooltip temperature data with lower and upper limits
-                                if (context.raw.length == undefined){
-                                    if (label.includes('Min/Max')){
-                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
-                                        let newData = data.map(function(e, i){
-                                            return [e, nextData[i]];
-                                        });
-                                        context.dataset.data = newData;
-                                    }
-                                    if (label.includes('10%/90%')){
-                                        let nextData = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data;
-                                        let newData = nextData.map(function(e, i){
-                                            return [e, data[i]];
-                                        });
-                                        context.dataset.data = newData;
-                                    }
+                                if (label.includes('Min/Max')){
+                                    let max = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
+                                    label += ' : ' + Math.round(context.raw * 10) / 10 + '°/'+ Math.round(max * 10) / 10 + '°';
+                                }
+                                else if (label.includes('10%/90%')){
+                                    let min = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
+                                    label += ' : ' + Math.round(min  * 10) / 10 + '°/'+ Math.round(context.raw  * 10) / 10 + '°';
+                                }
+                                else{
+                                    // other labels for tooltips
                                     var val = Math.round(context.raw  * 10) / 10;
                                     label += ' : ' + val + '°';
-                                } else {
-                                    label += ' : ' + Math.round(context.raw[0]  * 10) / 10 + '°/'+ Math.round(context.raw[1]  * 10) / 10 + '°';
                                 }
                                 return label;
                             },
@@ -555,7 +548,6 @@ function for creating trumpet chart, contains config data for chart
                                 };
                             },
                             labelTextColor: function(context) {
-                                console.log('context: ', context);
                                 let bgColor = context.dataset.backgroundColor;
                                 if (typeof bgColor != 'undefined'){
                                     var a = bgColor.split("(")[1].split(")")[0].split(",");
@@ -597,7 +589,6 @@ function for creating trumpet chart, contains config data for chart
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
-
                             callback: function(val, index) {
                                 var lbl = this.getLabelForValue(index).toString();
                                     if (lbl.includes('.')){
@@ -670,19 +661,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: '#F2C94C',
             },
             {
-                data: mean,
-                label: 'Mean ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
-                fill: false,
-                borderColor: '#693D00',
-            },
-            {
-                data: median,
-                label: 'Median ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
-                fill: false,
-                borderColor: '#BA700B',
-                borderDash: [5, 5],
-            },
-            {
                 data: max_quantile,
                 label: 'Quantile 10%/90%',
                 fill: false,
@@ -696,6 +674,19 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 label: '_Quantile_ ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
                 fill: false,
                 borderColor: '#EB8702',
+                borderDash: [5, 5],
+            },
+            {
+                data: mean,
+                label: 'Mean ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#693D00',
+            },
+            {
+                data: median,
+                label: 'Median ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#BA700B',
                 borderDash: [5, 5],
             });
 
