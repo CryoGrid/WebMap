@@ -691,30 +691,31 @@ function to update trumpet chart with requested data -> is called in ajax functi
     /**
     calculate line gradient for the depth time chart with respect to each point -> not working right now
     **/
-    function getLineGradient(startPoint){
+    function getLineGradient(startPoint, origin, idx){
         console.log('ctx: ', startPoint);
+        console.log('original dataset: ', origin, ' idx: ', idx);
         var gradient = null;
-        let y_label = startPoint.parsed.y + ' m';
-        let legend_id = groundProfile.legend.legendItems
-        let y_id = legend_id.findIndex(x => x.text === y_label) + 1;
-        let x_id = parseInt(startPoint.parsed.x) + 1;
+        //let y_label = startPoint.y + ' m';
+        //let legend_id = groundProfile.legend.legendItems
+        let y_id = idx + 2;
+        let x_id = parseInt(startPoint.x) - 1;
 
-        if( y_id > 9){
-            y_id = 0;
+        if( y_id > 10){
+            y_id = 1;
         }
 
-        let coords = groundProfile._metasets[y_id].data[x_id];
+        let coords = origin[y_id].data[x_id];
         gradient = ctx3.createLinearGradient(startPoint.x, startPoint.y, coords.x, coords.y);
         console.log('gradient coords: ', coords, ' start point: ', startPoint);
-        console.log('start point color: ', startPoint.options.borderColor, ' end point color: ', groundProfile._metasets[y_id]._dataset.borderColor[startPoint.parsed.x]);
-        gradient.addColorStop(0, startPoint.options.borderColor);
-        gradient.addColorStop(1, groundProfile._metasets[y_id]._dataset.pointBackgroundColor[startPoint.parsed.x]);
+        console.log('start point color: ', getColor(startPoint.r, -15, 20), ' end point color: ', getColor(coords.r, -15, 20));
+        gradient.addColorStop(0, getColor(startPoint.r, -15, 20));
+        gradient.addColorStop(1, getColor(coords.r, -15, 20));
 
-        ctx3.fillStyle = gradient;
+        /**ctx3.strokeStyle = gradient;
         let w = coords.x - startPoint.x;
         let h = coords.y - startPoint.y;
         console.log('rect coords: x', startPoint.x, 'y', startPoint.y, 'w', w, 'h', h);
-        ctx3.fillRect(startPoint.x, startPoint.y, w, h);
+        ctx3.fillRect(startPoint.x, startPoint.y, w, h);**/
 
         return gradient;
     }
@@ -838,8 +839,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 segment: {
                     borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
                     backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                },
-                /**segment: {
+                },/**
+                segment: {
                     borderColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
@@ -982,10 +983,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
 /**
     depending on temperature set color
 **/
-    function addColor(data){
+    function addColor(data, origin, idx){
         var color = [];
 
         for( var i = 0; i < data.length; i++){
+            let col = getLineGradient(data[i], origin, idx);
+            console.log('gradient color: ', col);
+            //color.push(col);
             color.push(getColor(data[i].r, -15, 20));
         }
         return color
@@ -1000,7 +1004,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
-            let color = addColor(groundProfile.data.datasets[i].data);
+            let color = addColor(groundProfile.data.datasets[i].data, data, i);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
             groundProfile.data.datasets[i].backgroundColor = color;
@@ -1016,18 +1020,18 @@ function to update trumpet chart with requested data -> is called in ajax functi
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
 
         console.log('min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
+        /** calculate color for range slider **/
         let maxCol = getColor(25, -15, 20);
         let meanCol1 = getColor(20, -15, 20);
         let meanCol2 = getColor(15, -15, 20);
         let meanCol3 = getColor(10, -15, 20);
         let meanCol4 = getColor(5, -15, 20);
         let minCol = getColor(-0.1, -15, 20);
+        /** set values for range slider**/
         document.getElementById('depth_temp_scale').min = minObj;
         document.getElementById('depth_temp_scale').max = maxObj;
         document.getElementById('depth_temp_scale').value = minObj;
         document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+meanCol4+','+meanCol2+','+meanCol1+','+maxCol+');';
-        /**let depth_temp_slider = document.getElementById('depth_temp_scale');
-        console.log('depth_temp_slider: ', depth_temp_slider);**/
     }
 
 /**
