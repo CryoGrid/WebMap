@@ -101,7 +101,7 @@ class CryoGridData(models.Model):
     name = models.CharField(max_length=50, default=None)
     lat = models.DecimalField(max_digits=6, decimal_places=3, default=None)
     long = models.DecimalField(max_digits=6, decimal_places=3, default=None)
-    alt = models.DecimalField(max_digits=6, decimal_places=3, default=None, blank=True, null=True)
+    alt = models.DecimalField(max_digits=9, decimal_places=3, default=None, blank=True, null=True)
     tsoil = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=6, decimal_places=3, default=None)

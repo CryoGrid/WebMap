@@ -1,10 +1,7 @@
 # Create your views here.
 import datetime
-import json
-import numpy
 import numpy as np
 
-from django.contrib import messages
 from django.core.serializers import serialize
 from django.db import connection
 from django.shortcuts import render
@@ -12,7 +9,7 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-from .models import MapGrid, Date, DepthLevel
+from .models import MapGrid, Date
 
 
 # This class contains to logic for the main page where the map is initiated
@@ -32,13 +29,15 @@ class MapView(TemplateView):
         # depth level is set to 0, because the ui slider starts at the index of 0
         context['depth_level'] = 2
         context['cg_data'] = {}
-        date_id = int(self.date_idx.id)
+        # date_id = int(self.date_idx.id)
 
         # postgreSQL DB index starts at 1
         depth_id = int(context['depth_level']) + 1
         with connection.cursor() as cursor:
             cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id=%s;" % depth_id)
             depth = cursor.fetchone()
+            cursor.execute("SELECT grid_id, alt FROM cgmap_cryogriddata;")
+            alt = cursor.fetchall()
             cursor.execute(
                 "SELECT grid_id, name, (select avg(cg) from unnest(depth_level%s[%s:%s]) as cg), (select avg(tair) from unnest(tair[%s:%s]) as tair) FROM temperature_depth_level" % (
                     depth_id, start_date, end_date, start_date, end_date))
@@ -52,9 +51,13 @@ class MapView(TemplateView):
                     'air_temp': cg_data[3],
                     'depth_idx': depth_id,
                     'depth_level': depth,
-                    'date': start_date
+                    'date': start_date,
+
                 }
                 context['cg_data'].update({cg_data[0]: json_data})
+            # add alt value to cg data json
+            for val in alt:
+                context['cg_data'][val[0]]['alt'] = float(val[1])
         # query to get shape data for grid map
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')
         return render(request, self.template_name,

@@ -124,6 +124,7 @@ $(window).on('map:init', function (e) {
             geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
             geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
+            geoJsonArray[i].properties["alt"] = cg[data.features[i].properties.id].alt;
         };
     };
 
@@ -243,7 +244,7 @@ $(window).on('map:init', function (e) {
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
-            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), mit einer Durchschnittshöhe von ${parseFloat(data.alt).toFixed(0)} m </div>
             <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${lbl} .</div>
             <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(1)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
             <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
