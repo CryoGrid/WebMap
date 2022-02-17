@@ -692,8 +692,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
     calculate line gradient for the depth time chart with respect to each point -> not working right now
     **/
     function getLineGradient(startPoint, origin, idx){
-        console.log('ctx: ', startPoint);
-        console.log('original dataset: ', origin, ' idx: ', idx);
         var gradient = null;
         //let y_label = startPoint.y + ' m';
         //let legend_id = groundProfile.legend.legendItems
@@ -706,8 +704,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         let coords = origin[y_id].data[x_id];
         gradient = ctx3.createLinearGradient(startPoint.x, startPoint.y, coords.x, coords.y);
-        console.log('gradient coords: ', coords, ' start point: ', startPoint);
-        console.log('start point color: ', getColor(startPoint.r, -15, 20), ' end point color: ', getColor(coords.r, -15, 20));
         gradient.addColorStop(0, getColor(startPoint.r, -15, 20));
         gradient.addColorStop(1, getColor(coords.r, -15, 20));
 
@@ -988,7 +984,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         for( var i = 0; i < data.length; i++){
             let col = getLineGradient(data[i], origin, idx);
-            console.log('gradient color: ', col);
             //color.push(col);
             color.push(getColor(data[i].r, -15, 20));
         }
@@ -1011,7 +1006,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
             flat_arr.push(data[i+1].data);
         }
 
-        console.log('ground profile data: ', groundProfile.data);
+        //console.log('ground profile data: ', groundProfile.data);
 
         groundProfile.update();
         /** set background color of range slider to a gradient **/
@@ -1019,7 +1014,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
 
-        console.log('min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
+        //console.log('min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
         /** calculate color for range slider **/
         let maxCol = getColor(25, -15, 20);
         let meanCol1 = getColor(20, -15, 20);
