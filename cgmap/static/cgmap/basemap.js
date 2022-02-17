@@ -23,9 +23,11 @@ $(window).on('map:init', function (e) {
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
+    // initiate values for dynamic temperature scale
     temperatureScale(cg);
 
     /**
+    set dynamic temperature values for range slider and a gradient background
     update temperature scale data with requested cg data
     **/
     function temperatureScale(cgData){
@@ -35,8 +37,9 @@ $(window).on('map:init', function (e) {
         let cg_arr = Object.values(cgData);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
-        let maxCol = getColor(maxObj);
-        let minCol = getColor(minObj);
+        let maxCol = getColor(maxObj, -10, 15);
+        let minCol = getColor(minObj, -10, 15);
+        // set values in ui element
         document.getElementById('temp_scale').min = minObj;
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
@@ -141,31 +144,31 @@ $(window).on('map:init', function (e) {
     }
 
     // source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
-    function getHue(t){
-        var maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
-        var minHsl = 360; //  minhsl maps to min temp counter clockwise
-        var rngHsl = maxHsl - minHsl; // = 210
-        var maxTemp = 15;
-        var minTemp = -10;
-        var rngTemp = maxTemp - minTemp; // 60
-        var degCnt = maxTemp - t; // 0
-        var hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
-        var returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
+    function getHue(t, min, max){
+        let maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
+        let minHsl = 360; //  minhsl maps to min temp counter clockwise
+        let rngHsl = maxHsl - minHsl; // = 210
+        let maxTemp = max;
+        let minTemp = min;
+        let rngTemp = maxTemp - minTemp; // 60
+        let degCnt = maxTemp - t; // 0
+        let hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
+        let returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
         return returnHue;
     }
 
     // color for grid cells
-    function getColor(t) {
+    function getColor(t, min, max) {
         const s = 100;
         const l = 50;
-        const h = getHue(t);
+        const h = getHue(t, min, max);
         return hsltohex(h, s, l);
     }
     // style for grid cells
     function style(feature) {
-        var cellColor = '#FFEDA0';
+        let cellColor = '#FFEDA0';
         if(feature.properties.soil_temp != null){
-            cellColor = getColor(feature.properties.soil_temp)
+            cellColor = getColor(feature.properties.soil_temp, -10, 15)
         }
         return {
             fillColor: cellColor,
@@ -590,6 +593,7 @@ function for creating trumpet chart, contains config data for chart
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+
                             callback: function(val, index) {
                                 var lbl = this.getLabelForValue(index).toString();
                                     if (lbl.includes('.')){
@@ -713,11 +717,30 @@ function to update trumpet chart with requested data -> is called in ajax functi
         return gradient;
     }
 
-    function getLineGradient(ctx, startPoint, endPoint){
+    /**
+    calculate line gradient for the depth time chart with respect to each point -> not working right now
+    **/
+    function getLineGradient(startPoint, origin, idx){
         var gradient = null;
-        gradient = ctx.createLinearGradient(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-        gradient.addColorStop(0, startPoint.options.borderColor);
-        gradient.addColorStop(1, endPoint.options.borderColor);
+        //let y_label = startPoint.y + ' m';
+        //let legend_id = groundProfile.legend.legendItems
+        let y_id = idx + 2;
+        let x_id = parseInt(startPoint.x) - 1;
+
+        if( y_id > 10){
+            y_id = 1;
+        }
+
+        let coords = origin[y_id].data[x_id];
+        gradient = ctx3.createLinearGradient(startPoint.x, startPoint.y, coords.x, coords.y);
+        gradient.addColorStop(0, getColor(startPoint.r, -15, 20));
+        gradient.addColorStop(1, getColor(coords.r, -15, 20));
+
+        /**ctx3.strokeStyle = gradient;
+        let w = coords.x - startPoint.x;
+        let h = coords.y - startPoint.y;
+        console.log('rect coords: x', startPoint.x, 'y', startPoint.y, 'w', w, 'h', h);
+        ctx3.fillRect(startPoint.x, startPoint.y, w, h);**/
 
         return gradient;
     }
@@ -741,182 +764,109 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                    borderColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
                 label: '0.05 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
                 label: '0.1 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
                 label: '0.2 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
                 label: '0.5 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
                 label: '1 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
                 label: '2 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
                 label: '3 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill:'+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
                 label: '4 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p1.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p1.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
-                },
-                /**segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx =>ctx.p0.options.borderColor,
+                },/**
+                segment: {
                     borderColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
-
                         if ( !chartArea ){
                             // This case happens on initial chart load
                             return null;
@@ -926,9 +876,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     backgroundColor: ctx => up(ctx, function(context) {
                         const chart = context.chart;
                         const {ctx, chartArea} = chart;
-
                         console.log('chart of 4m level: ', chart);
-
                         if ( !chartArea ){
                             // This case happens on initial chart load
                             return null;
@@ -941,18 +889,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 label: '5 m',
                 data: [],
                 pointBackgroundColor: [],
-                backgroundColor: [function(context) {
-                    const chart = context.chart;
-                    const {ctx, chartArea} = chart;
-
-                    if ( !chartArea ){
-                        // This case happens on initial chart load
-                        return null;
-                    }
-                    return getGradient(ctx, chartArea);
-                }],
+                backgroundColor: [],
                 borderColor: [],
                 fill: {value: 6},
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
             }]
         };
 
@@ -967,7 +910,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         text: (ctx) => 'Tiefen-Zeit Diagramm für 2020'
                     },
                     tooltip: {
-                        mode: 'index',
+                        mode: 'x',
                         callbacks: {
                             title: function(context){
                                 for( var i = 0; i < context.length; i++){
@@ -987,10 +930,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         position: 'right',
                         align: 'middle'
                     },
-                    afterLayout: chart => {
+                    /*afterLayout: chart => {
                         var ctx = chart.chart.ctx;
-                        var xAxis = chart.scales['x-axis-0'];
-                        var gradientStroke = ctx.createLinearGradient(xAxis.left, 0, xAxis.right, 0);
+                        var yAxis = chart.scales['y-axis-0'];
+                        var gradientStroke = ctx.createLinearGradient(0, yAxis.top, 0, yAxis.bottom);
                         var dataset = chart.data.datasets[0];
                         dataset.borderColor.forEach((c,i) => {
                             var stop = 1/(dataset.borderColor.length - 1) * i;
@@ -1001,7 +944,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         dataset.pointBackgroundColor = gradientStroke;
                         dataset.pointHoverBorderColor = gradientStroke;
                         dataset.pointHoverBackgroundColor = gradientStroke;
-                    },
+                    },*/
                 },
                 interaction: {
                     mode: 'nearest',
@@ -1061,28 +1004,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
 /**
     depending on temperature set color
 **/
-    function addColor(data){
+    function addColor(data, origin, idx){
         var color = [];
 
         for( var i = 0; i < data.length; i++){
-            if( data[i].r > 25){
-                color.push('rgba(235,87,87,0.4)'); /* hex: #EB5757 - rgb: (235,87,87) */
-            }
-            else if( data[i].r > 20){
-                color.push('rgba(242,153,74,0.4)'); /* hex: #F2994A - rgb: (242,153,74) */
-            }
-            else if( data[i].r > 15){
-                color.push('rgba(255,179,112,0.4)'); /* hex: #FFB370 - rgb: (255,179,112) */
-            }
-            else if( data[i].r > 10){
-                color.push('rgba(242,201,76,0.4)'); /* hex: #F2C94C - rgb: (242,201,76) */
-            }
-            else if( data[i].r > 5){
-                color.push('rgba(111,207,151,0.4)'); /* hex: #6FCF97 - rgb: (111,207,151) */
-            }
-            else{
-                color.push('rgba(45,156,219,0.4)'); /* hex: #2D9CDB - rgb: (45,156,219) */
-            }
+            let col = getLineGradient(data[i], origin, idx);
+            //color.push(col);
+            color.push(getColor(data[i].r, -15, 20));
         }
         return color
     }
@@ -1091,15 +1019,41 @@ function to update trumpet chart with requested data -> is called in ajax functi
 **/
     function updateProfileData(data, interval){
         groundProfile.data.labels = [].concat.apply([], interval);
+        let flat_arr = [];
+
         for( var i = 0; i < 10; i++){
             groundProfile.data.datasets[i].data = data[i+1].data;
-            var color = addColor(groundProfile.data.datasets[i].data);
+            let color = addColor(groundProfile.data.datasets[i].data, data, i);
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
+            groundProfile.data.datasets[i].backgroundColor = color;
+            groundProfile.data.datasets[i].segment.fillColor = color;
+            console.log('ground profile segment: ', groundProfile.data.datasets[i]);
+            flat_arr.push(data[i+1].data);
         }
+
+        /** set background color of range slider to a gradient **/
+        let cg_arr = [].concat.apply([], flat_arr);
+        let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
+        let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
+
+        //console.log('min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
+        /** calculate color for range slider **/
+        let maxCol = getColor(25, -15, 20);
+        let meanCol1 = getColor(20, -15, 20);
+        let meanCol2 = getColor(15, -15, 20);
+        let meanCol3 = getColor(10, -15, 20);
+        let meanCol4 = getColor(5, -15, 20);
+        let minCol = getColor(-0.1, -15, 20);
+        /** set values for range slider**/
+        document.getElementById('depth_temp_scale').min = minObj;
+        document.getElementById('depth_temp_scale').max = maxObj;
+        document.getElementById('depth_temp_scale').value = minObj;
+        document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+meanCol4+','+meanCol2+','+meanCol1+','+maxCol+');';
 
         groundProfile.update();
     }
+
 /**
     functions for temperature graph settings and options for drawing the chart
 **/

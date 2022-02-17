@@ -405,6 +405,17 @@ hr {
     margin: 8px 0px;
 }
 
+.scale-group-depth {
+    position: static;
+    width: 16px;
+    height: 300px;
+    left: 0%;
+    right: -525%;
+    top: 0%;
+    bottom: 0%;
+    background: #FFFFFF;
+}
+
 /* scale related ui */
 .scale-group-temperature {
     position: static;
@@ -977,20 +988,16 @@ a {
 * Custom sliders *
 *****************/
 
-#number{
-  height: 16px;
-  width: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 4px;
-}
-
+/** linear gradients for all range slider backgrounds**/
 #depth_range{
   background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
 }
 
 #temp_scale{
+  background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
+}
+
+#depth_temp_scale{
   background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
 }
 
@@ -1012,7 +1019,7 @@ a {
   line-height: 40px;
   margin: 0 0 20px 0;
 }
-.sliderticks span{
+.sliderticks .temp{
   transform: rotate(90deg);
   transform-origin: right, top;
   -ms-transform: rotate(90deg);
@@ -1051,8 +1058,7 @@ a {
   -webkit-appearance: none;  /* Override default CSS styles */
   height: 100%;
   position: relative;
-  background-color: #d3d3d3;
-  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  background-color: #d3d3d3;ö
   -webkit-transition: .2s; /* 0.2 seconds transition on hover */
   transition: opacity .2s;
   border-radius: 5px;
@@ -1073,6 +1079,16 @@ a {
   background: #04AA6D; /* Green background */
   cursor: pointer; /* Cursor on hover */
   border-radius: 50%;
+}
+
+/* hide input thumb for chart legend range*/
+#depth_temp_scale::-webkit-slider-thumb {
+  display: none;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
 }
 
 .slider::-moz-range-thumb {
