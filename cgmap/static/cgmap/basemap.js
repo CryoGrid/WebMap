@@ -737,8 +737,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                    borderColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
@@ -749,8 +749,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
@@ -761,8 +761,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
@@ -773,8 +773,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
@@ -785,8 +785,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
@@ -797,8 +797,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.backgroundColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             },
             {
@@ -809,8 +809,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
@@ -821,8 +821,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill:'+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
                 },
             },
             {
@@ -833,8 +833,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: '+1',
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx =>ctx.p0.options.borderColor,
                 },/**
                 segment: {
                     borderColor: ctx => up(ctx, function(context) {
@@ -866,8 +866,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: [],
                 fill: {value: 6},
                 segment: {
-                    borderColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, ctx.p0.options.borderColor) || down(ctx, ctx.p0.options.backgroundColor),
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
                 },
             }]
         };
@@ -877,7 +877,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
             data: data,
             options: {
                 responsive: true,
-                indexAxis: 'x',
                 plugins: {
                     title: {
                         display: true,
@@ -1003,12 +1002,11 @@ function to update trumpet chart with requested data -> is called in ajax functi
             groundProfile.data.datasets[i].pointBackgroundColor = color;
             groundProfile.data.datasets[i].borderColor = color;
             groundProfile.data.datasets[i].backgroundColor = color;
+            groundProfile.data.datasets[i].segment.fillColor = color;
+            console.log('ground profile segment: ', groundProfile.data.datasets[i]);
             flat_arr.push(data[i+1].data);
         }
 
-        //console.log('ground profile data: ', groundProfile.data);
-
-        groundProfile.update();
         /** set background color of range slider to a gradient **/
         let cg_arr = [].concat.apply([], flat_arr);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
@@ -1027,6 +1025,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
         document.getElementById('depth_temp_scale').max = maxObj;
         document.getElementById('depth_temp_scale').value = minObj;
         document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+meanCol4+','+meanCol2+','+meanCol1+','+maxCol+');';
+
+        groundProfile.update();
     }
 
 /**
