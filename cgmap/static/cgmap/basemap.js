@@ -44,12 +44,6 @@ $(window).on('map:init', function (e) {
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
         document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
-
-        // init ticks for temperature scale
-        let r = range(parseInt(minObj), parseInt(maxObj), 1);
-        let spn = '';
-        r.forEach(element => spn += '<p><span>' + element + '</span></p>');
-        document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
     }
     /**
     button setup with related function for setting responding id and add event listeners
