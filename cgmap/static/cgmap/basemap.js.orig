@@ -241,9 +241,31 @@ $(window).on('map:init', function (e) {
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
+<<<<<<< HEAD
+
+
+
+
+
+
+
+
+
+
+            
+
+
+
+                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>here</a>.
+
+            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), </div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(2)}°C in einer Tiefe von ${parseFloat(data.depth_level).toFixed(2)} m.</div>
+            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(2)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+=======
             <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), mit einer Durchschnittshöhe von ${parseFloat(data.alt).toFixed(0)} m </div>
             <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${lbl} .</div>
             <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(1)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+>>>>>>> 0b28c8ae38b463db1f8e78345142b8fea1136236
             <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
                 <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
                 und Bodentemperaturen
@@ -264,7 +286,25 @@ $(window).on('map:init', function (e) {
         if(popup){
             detail.map.removeLayer(popup);
         };
+<<<<<<< HEAD
+
+
+
+
+
+
+
+
+
+
+
+        /** add a new marker with a popup
+        marker = L.marker([lat, long]).addTo(detail.map)
+                    .bindPopup(content)
+                    .openPopup();**/
+=======
         /** add popup with content to map**/
+>>>>>>> 0b28c8ae38b463db1f8e78345142b8fea1136236
         popup
             .setLatLng(e.latlng)
             .setContent(content)

@@ -1,5 +1,9 @@
 # Create your views here.
 import datetime
+<<<<<<< HEAD
+import json
+=======
+>>>>>>> 0b28c8ae38b463db1f8e78345142b8fea1136236
 import numpy as np
 
 from django.core.serializers import serialize
