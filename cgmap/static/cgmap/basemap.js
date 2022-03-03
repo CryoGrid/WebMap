@@ -23,6 +23,8 @@ $(window).on('map:init', function (e) {
     var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
     var depth_level = JSON.parse(document.getElementById('context').textContent);
     var cg = JSON.parse(document.getElementById('cg_data').textContent);
+    // range function
+    const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
     // initiate values for dynamic temperature scale
     temperatureScale(cg);
 
@@ -31,7 +33,6 @@ $(window).on('map:init', function (e) {
     update temperature scale data with requested cg data
     **/
     function temperatureScale(cgData){
-        const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step)); // range function
 
         // set min, max, value slider values
         let cg_arr = Object.values(cgData);
@@ -44,6 +45,12 @@ $(window).on('map:init', function (e) {
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
         document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
+        console.log('min: ', minObj, ' max: ', maxObj);
+        let r = range(parseInt(minObj), parseInt(maxObj), 1);
+        console.log('temp range: ', r);
+        let spn = '';
+        r.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks temp_scale')[0].innerHTML = spn;
     }
     /**
     button setup with related function for setting responding id and add event listeners
@@ -1031,8 +1038,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
 
-        //console.log('min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
+        console.log('diagram min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
+        let r = range(parseInt(Math.floor(minObj)), parseInt(Math.ceil(maxObj)), 1);
+        let col_r = []
+        console.log('range of diagram scale: ', r);
         /** calculate color for range slider **/
+        for( var j = 0; j < r.length; j++){
+            col_r.push(getColor(r[j], -15, 20));
+        }
         let maxCol = getColor(25, -15, 20);
         let meanCol1 = getColor(20, -15, 20);
         let meanCol2 = getColor(15, -15, 20);
@@ -1043,7 +1056,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
         document.getElementById('depth_temp_scale').min = minObj;
         document.getElementById('depth_temp_scale').max = maxObj;
         document.getElementById('depth_temp_scale').value = minObj;
-        document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+meanCol4+','+meanCol2+','+meanCol1+','+maxCol+');';
+        let col_st = '';
+        col_r.forEach(c => col_st += ' ,' + c );
+        console.log('col_st: ', col_st);
+        document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
+        let spn = '';
+        r.forEach(element => spn += '<p><span>' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
 
         groundProfile.update();
     }

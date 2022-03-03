@@ -103,8 +103,8 @@ class MapView(TemplateView):
             today = datetime.date.today()
             # date_idx = Date.objects.get(time=today).id
             # definition of interval
-            start_interval = 14611  # id for 2020-01-01
-            end_interval = start_interval + 365  # id for 2020-12-31
+            start_interval = int(Date.objects.get(time='2020-01-01').id)  # id for 2020-01-01
+            end_interval = int(Date.objects.get(time='2020-12-31').id)  # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
             with connection.cursor() as cursor:
@@ -137,9 +137,9 @@ class MapView(TemplateView):
             # start_date = 14611  # id for 2020-01-01
             # end_date = start_interval + 365  # id for 2020-12-31
             # determined by the send id for the year
-            years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+            years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2099']
             start_date = Date.objects.get(time=str(years[yID] + '-01-01')).id
-            end_date = Date.objects.get(time=str(years[yID + 2] + '-01-01')).id
+            end_date = Date.objects.get(time=str(years[yID + 2] + '-12-31')).id
             depth_list = {}
             with connection.cursor() as cursor:
                 for x in range(1, 16):
@@ -173,7 +173,7 @@ class MapView(TemplateView):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             idx = self.POST.get('idx')
-            start_interval = 14609  # id for 2019-12-30 Monday
+            start_interval = int(Date.objects.get(time='2019-12-30').id)  # id for 2019-12-30 Monday
             end_interval = start_interval + 365 + 5  # id for 2020-12-31 -> id for 2021-01-03
             depth_list = {}
             with connection.cursor() as cursor:

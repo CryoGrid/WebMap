@@ -30,7 +30,7 @@ class ForcingData(models.Model):
     )
     tair = ArrayField(
         ArrayField(
-            models.DecimalField(max_digits=6, decimal_places=3, default=None)
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
     )
     created_at = models.DateTimeField(default=datetime.datetime.now)
@@ -104,7 +104,7 @@ class CryoGridData(models.Model):
     alt = models.DecimalField(max_digits=9, decimal_places=3, default=None, blank=True, null=True)
     tsoil = ArrayField(
         ArrayField(
-            models.DecimalField(max_digits=6, decimal_places=3, default=None)
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
     )
     created_at = models.DateTimeField(default=datetime.datetime.now)
@@ -130,22 +130,22 @@ class CryoGridData(models.Model):
 class TemperatureDepthLevel(models.Model):
     name = models.CharField(max_length=50, default=None)
     grid_id = models.PositiveIntegerField()
-    depth_level1 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level2 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level3 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level4 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level5 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level6 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level7 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level8 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level9 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level10 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level11 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level12 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level13 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level14 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    depth_level15 = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
-    tair = ArrayField(models.DecimalField(max_digits=6, decimal_places=3, default=None))
+    depth_level1 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level2 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level3 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level4 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level5 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level6 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level7 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level8 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level9 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level10 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level11 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level12 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level13 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level14 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    depth_level15 = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
+    tair = ArrayField(models.DecimalField(max_digits=9, decimal_places=3, default=None))
 
     class Meta:
         managed = False

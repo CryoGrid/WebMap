@@ -98,9 +98,10 @@
                 tooltip.style.background = slider.style.background;
 
                 let r = range(parseInt(min), parseInt(max), 1);
+                console.log('temp range: ', r);
                 let spn = '';
-                r.forEach(element => spn += '<p><span>' + element + '</span></p>');
-                document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
+                r.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
+                document.getElementsByClassName('sliderticks temp_scale')[0].innerHTML = spn;
             };
             document.addEventListener("DOMContentLoaded", setValue);
             slider.addEventListener('input', setValue);
@@ -168,16 +169,10 @@
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
                         <canvas id="groundProfile" height="190"></canvas>
-                        <div class="scale-container" style="margin-left: 8">
-                            <div class="scale-group-depth" id="depth_temperature">
+                        <div class="scale-container" style="margin-left: 8; width: fit-content">
+                            <div class="scale-group-depth" id="depth_temperature" style="width: 766px">
                                 <input type="range" min="-5" max="35" step="1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
                                 <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
-                                    <p><span>0</span></p>
-                                    <p><span>5</span></p>
-                                    <p><span>10</span></p>
-                                    <p><span>15</span></p>
-                                    <p><span>20</span></p>
-                                    <p><span>25</span></p>
                                 </div>
                             </div>
                         </div>
@@ -196,7 +191,7 @@
                 <div class="slider-container" id="temperature">
                     <div class="scale-group-temperature">
                         <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
-                        <div class="sliderticks" style="padding-left: 5px; padding-right: 8px;">
+                        <div class="sliderticks temp_scale" style="padding-left: 5px; padding-right: 8px;">
                             <p><span class="temp">3</span></p>
                             <p><span class="temp">4</span></p>
                             <p><span class="temp">5</span></p>
