@@ -47,9 +47,6 @@ $(window).on('map:init', function (e) {
             col_r.push(getColor(r[j], -10, 15));
         }
 
-        let maxCol = getColor(maxObj, -10, 15);
-        let minCol = getColor(minObj, -10, 15);
-
         // set values in ui element
         document.getElementById('temp_scale').min = minObj;
         document.getElementById('temp_scale').max = maxObj;
