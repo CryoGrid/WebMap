@@ -83,25 +83,17 @@
         $(document).ready(function() {
             var slider = document.getElementById('temp_scale');
             var tooltip = document.getElementById('tooltip');
-            var ticks = document.getElementsByClassName('sliderticks');
-            const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
             setValue = () => {
                 const val = slider.value;
                 const min = slider.min ? slider.min : 0;
-                const max = slider.max ? slider.max : 100;
+                const max = slider. max ? slider.max: 100;
                 const newValue = Number((val - min) * 100 / (max - min));
                 const newPosition = 18 - (newValue * 0.17);
-
+                console.log('new value in %: ', newValue);
                 tooltip.innerHTML = `<span>${val}</span>`;
                 tooltip.style.left = `calc(${newValue}% - (${newPosition}rem))`;
                 tooltip.style.background = slider.style.background;
-
-                let r = range(parseInt(min), parseInt(max), 1);
-                console.log('temp range: ', r);
-                let spn = '';
-                r.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
-                document.getElementsByClassName('sliderticks temp_scale')[0].innerHTML = spn;
             };
             document.addEventListener("DOMContentLoaded", setValue);
             slider.addEventListener('input', setValue);
@@ -117,11 +109,11 @@
         </div>
         <div class="depth-container left-transition" id="left-slider">
             <div class="depth-title-wrapper">
-
-
-
+<<<<<<< HEAD
+                <div class="description default-text-small">Tiefe in m</div>
+=======
                 <div class="description default-text-small">Tiefe in cm/m</div>
-
+>>>>>>> 48a5b33f6eb84a8d8b58ee5d90f3e422d72f8e5c
                 <button class="btn btn-primary btn-sm" id="depth-slider" >
                     <span class="material-icons md-18 left" id="depth_chevron">chevron_left</span>
                 </button>
@@ -129,7 +121,7 @@
             <div class="scale-container">
                 <div class="slider-container" id="depth">
                     <div class="scale-group-depth">
-                        <form action="" method="get" id="load_data_form" style="margin-bottom: 8px;">
+                        <form action=""method="get" id="load_data_form" style="margin-bottom: 8px;">
                             {% csrf_token %}
                             <input type="range" min="-14" max="0" step="1" value="-2" class="slider" id="depth_range">
                         </form>
@@ -151,7 +143,7 @@
                 <li class="nav-item"><a class="nav-link" id="bs-tab3" href="#third" data-toggle="tab">Tiefen-Zeit Diagramm</a></li>
                 <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
             </ul>
-            <div class="tab-content" id="tab-content">
+            <div class="tab-content" id="tab-content">-
                 <div id="first" class="tab-pane fade in active show">
                     <div class="canvas-container" id="chart-container">
                         <canvas id="tempChart" height="190"></canvas>
@@ -173,14 +165,29 @@
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container" id="chart3-container" >
                         <canvas id="groundProfile" height="190"></canvas>
-                        <div class="scale-container" style="margin-left: 8; width: fit-content">
-                            <div class="scale-group-depth" id="depth_temperature" style="width: 766px">
-                                <input type="range" min="-5" max="35" step="1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
-                                <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
-                                </div>
+                    </div><!--
+                    <div class="scale-container">
+                        <div class="scale-group">
+                            <div class="scale-element-group red">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group orange">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group yellow">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group green">
+                                <div class="rectangle opacity05"></div>
+                            </div>
+                            <div class="scale-element-group blue">
+                                <div class="rectangle opacity05"></div>
                             </div>
                         </div>
-                    </div>
+                        <div class="scale-group-text">
+                            <span class="default-text-small" style="transform: rotate(90deg);">25<br> 20<br> 15<br> 10<br> 5<br></span>
+                        </div>
+                    </div>-->
                 </div>
             </div>
         </div>
@@ -194,18 +201,7 @@
             <div class="scale-container">
                 <div class="slider-container" id="temperature">
                     <div class="scale-group-temperature">
-                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
-                        <div class="sliderticks temp_scale" style="padding-left: 5px; padding-right: 8px;">
-                            <p><span class="temp">3</span></p>
-                            <p><span class="temp">4</span></p>
-                            <p><span class="temp">5</span></p>
-                            <p><span class="temp">6</span></p>
-                            <p><span class="temp">7</span></p>
-                            <p><span class="temp">8</span></p>
-                            <p><span class="temp">9</span></p>
-                            <p><span class="temp">10</span></p>
-                            <p><span class="temp">11</span></p>
-                        </div>
+                        <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true">
                         <div id="tooltip"></div>
                     </div>
                 </div>

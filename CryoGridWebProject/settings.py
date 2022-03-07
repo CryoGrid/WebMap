@@ -38,9 +38,9 @@ if os.name == 'nt':
 SECRET_KEY = str(os.getenv('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['172.18.17.19']
 
 # Leaflet configurations
 LEAFLET_CONFIG = {
@@ -84,7 +84,8 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_WHITELIST = [
-    "http://localhost:8000"
+    'http://localhost:8000',
+    'http://172.18.17.19'
 ]
 
 ROOT_URLCONF = 'CryoGridWebProject.urls'
@@ -124,8 +125,8 @@ DATABASES = {
         # local configurations for db
         # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'postgres',
-        'USER': 'postgres',
+        'NAME': 'cg_postgres',
+        'USER': 'cg_admin',
         'PASSWORD': str(os.getenv('LOCAL_DB_KEY')),
         'HOST': 'localhost',  # this works only for docker, old host 'localhost'; host for docker 'db'
         'PORT': '5432',
@@ -171,5 +172,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
