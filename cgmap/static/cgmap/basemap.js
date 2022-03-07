@@ -38,16 +38,27 @@ $(window).on('map:init', function (e) {
         let cg_arr = Object.values(cgData);
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
+
+        let r = range(parseInt(minObj), parseInt(maxObj), 1);
+
+        let col_r = []
+        /** calculate color for range slider **/
+        for( var j = 0; j < r.length; j++){
+            col_r.push(getColor(r[j], -10, 15));
+        }
+
         let maxCol = getColor(maxObj, -10, 15);
         let minCol = getColor(minObj, -10, 15);
+
         // set values in ui element
         document.getElementById('temp_scale').min = minObj;
         document.getElementById('temp_scale').max = maxObj;
         document.getElementById('temp_scale').value = maxObj;
-        document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn, '+minCol+','+maxCol+');';
-        console.log('min: ', minObj, ' max: ', maxObj);
-        let r = range(parseInt(minObj), parseInt(maxObj), 1);
-        console.log('temp range: ', r);
+
+        let col_st = '';
+        col_r.forEach(c => col_st += ' ,' + c );
+        document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
+
         let spn = '';
         r.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
         document.getElementsByClassName('sliderticks temp_scale')[0].innerHTML = spn;
@@ -275,7 +286,6 @@ $(window).on('map:init', function (e) {
             .setLatLng(e.latlng)
             .setContent(content)
             .openOn(detail.map);
-        // detail.map.fitBounds(e.target.getBounds());
 
         var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
         trumpetChart.data.datasets.forEach((dataset) => {
@@ -737,12 +747,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
         gradient.addColorStop(0, getColor(startPoint.r, -15, 20));
         gradient.addColorStop(1, getColor(coords.r, -15, 20));
 
-        /**ctx3.strokeStyle = gradient;
-        let w = coords.x - startPoint.x;
-        let h = coords.y - startPoint.y;
-        console.log('rect coords: x', startPoint.x, 'y', startPoint.y, 'w', w, 'h', h);
-        ctx3.fillRect(startPoint.x, startPoint.y, w, h);**/
-
         return gradient;
     }
     /**
@@ -863,28 +867,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 segment: {
                     borderColor: ctx => ctx.p0.options.borderColor,
                     backgroundColor: ctx =>ctx.p0.options.borderColor,
-                },/**
-                segment: {
-                    borderColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getLineGradient(ctx, ctx.p0, ctx.p1);
-                    }) || down(ctx, ctx.p0.options.borderColor),
-                    backgroundColor: ctx => up(ctx, function(context) {
-                        const chart = context.chart;
-                        const {ctx, chartArea} = chart;
-                        console.log('chart of 4m level: ', chart);
-                        if ( !chartArea ){
-                            // This case happens on initial chart load
-                            return null;
-                        }
-                        return getLineGradient(ctx, ctx.p0, ctx.p1);
-                    }) || down(ctx, ctx.p0.options.backgroundColor),
-                },**/
+                },
             },
             {
                 label: '5 m',
@@ -931,21 +914,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
                         position: 'right',
                         align: 'middle'
                     },
-                    /*afterLayout: chart => {
-                        var ctx = chart.chart.ctx;
-                        var yAxis = chart.scales['y-axis-0'];
-                        var gradientStroke = ctx.createLinearGradient(0, yAxis.top, 0, yAxis.bottom);
-                        var dataset = chart.data.datasets[0];
-                        dataset.borderColor.forEach((c,i) => {
-                            var stop = 1/(dataset.borderColor.length - 1) * i;
-                            gradientStroke.addColorStop(stop, dataset.borderColor[i]);
-                        });
-                        dataset.borderColor = gradientStroke;
-                        dataset.pointBorderColor = gradientStroke;
-                        dataset.pointBackgroundColor = gradientStroke;
-                        dataset.pointHoverBorderColor = gradientStroke;
-                        dataset.pointHoverBackgroundColor = gradientStroke;
-                    },*/
                 },
                 interaction: {
                     mode: 'nearest',
@@ -991,17 +959,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
         return size;
     };
 
-    /*function convertToTuple(data, interval){
-        var size = Object.size(data);
-        for( var i = 1; i <= size; i++){
-            temp = [];
-            for( var j = 0; j < data[i].x.length; j++){
-            temp.push({'x':interval[j][0], 'y': data[i].y, 'r':data[i].x[j]});
-            }
-            data[i] = temp;
-        }
-        return data;
-    }*/
 /**
     depending on temperature set color
 **/
@@ -1029,7 +986,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
             groundProfile.data.datasets[i].borderColor = color;
             groundProfile.data.datasets[i].backgroundColor = color;
             groundProfile.data.datasets[i].segment.fillColor = color;
-            console.log('ground profile segment: ', groundProfile.data.datasets[i]);
             flat_arr.push(data[i+1].data);
         }
 
@@ -1038,27 +994,18 @@ function to update trumpet chart with requested data -> is called in ajax functi
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
 
-        console.log('diagram min: ', minObj, ' max: ', maxObj, ' mean: ', ((maxObj+minObj)/3));
         let r = range(parseInt(Math.floor(minObj)), parseInt(Math.ceil(maxObj)), 1);
         let col_r = []
-        console.log('range of diagram scale: ', r);
         /** calculate color for range slider **/
         for( var j = 0; j < r.length; j++){
             col_r.push(getColor(r[j], -15, 20));
         }
-        let maxCol = getColor(25, -15, 20);
-        let meanCol1 = getColor(20, -15, 20);
-        let meanCol2 = getColor(15, -15, 20);
-        let meanCol3 = getColor(10, -15, 20);
-        let meanCol4 = getColor(5, -15, 20);
-        let minCol = getColor(-0.1, -15, 20);
         /** set values for range slider**/
         document.getElementById('depth_temp_scale').min = minObj;
         document.getElementById('depth_temp_scale').max = maxObj;
         document.getElementById('depth_temp_scale').value = minObj;
         let col_st = '';
         col_r.forEach(c => col_st += ' ,' + c );
-        console.log('col_st: ', col_st);
         document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
         let spn = '';
         r.forEach(element => spn += '<p><span>' + element + '</span></p>');
