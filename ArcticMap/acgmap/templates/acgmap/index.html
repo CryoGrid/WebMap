@@ -1,0 +1,55 @@
+{% extends 'base_template.html' %}
+{% load leaflet_tags %}
+{% load static %}
+
+
+{% block title %} Arctic Map {% endblock %}
+{% block head_meta_page %}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock head_meta_page %}
+
+{% block head_css_page %}
+    <style xmlns="http://www.w3.org/1999/html">
+        .leaflet-container { height: 100%; overflow: hidden}
+        {#.leaflet-tile { border: solid black 2px; }#}
+    </style>
+    <style>
+      html, body{padding: 0; margin: 0;}
+      #earth_div{top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.css"
+    />
+{% endblock head_css_page %}
+
+{% block footer_javascript_page %}
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <!-- Make sure you put this AFTER leaflet.js, when using with leaflet -->
+    <script src="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.umd.js"></script>
+    <!-- js code for spherical map -->
+    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <script>
+      function initialize() {
+        var earth = new WE.map('earth_div');
+        WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+          attribution: '© OpenStreetMap contributors'
+        }).addTo(earth);
+      }
+    </script>
+{% endblock footer_javascript_page %}
+
+
+{% block content %}
+    <body onload="initialize()">
+        <div id="earth_div"></div>
+        <!--<div id="map-wrapper">
+            <div id="map">
+                {% leaflet_map "main" %}
+            </div>
+        </div>-->
+    </body>
+{% endblock content %}
