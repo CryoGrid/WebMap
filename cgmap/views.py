@@ -16,7 +16,6 @@ from .models import MapGrid, Date
 class MapView(TemplateView):
     template_name = 'cgmap/index.html'
     today = datetime.date.today()
-    print('current date: ', today)
     if Date.objects.filter(time=today).exists():
         date_idx = Date.objects.get(time=today)
 
@@ -25,7 +24,6 @@ class MapView(TemplateView):
         context = super().get_context_data(**kwargs)
         start_date = int(Date.objects.get(time='2000-01-01').id)
         end_date = int(Date.objects.get(time='2020-12-31').id)
-        print('first_date ', start_date, ' end_date ', end_date)
         # depth level is set to 0, because the ui slider starts at the index of 0
         context['depth_level'] = 2
         context['cg_data'] = {}
@@ -121,7 +119,9 @@ class MapView(TemplateView):
                     )
                 )
                 interval = cursor.fetchall()
-            return JsonResponse([{'cell_data': cg}, {'depth_level': depth_level}, {'date_interval': interval}],
+                cursor.execute("SELECT z_level FROM cgmap_depthlevel WHERE id = %s" % depth_level)
+                z_level = cursor.fetchall()
+            return JsonResponse([{'cell_data': cg}, {'depth_level': z_level}, {'date_interval': interval}],
                                 safe=False)
         else:
             return HttpResponseBadRequest('This view can not handle method {0}'. \
