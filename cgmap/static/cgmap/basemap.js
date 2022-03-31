@@ -285,7 +285,7 @@ $(window).on('map:init', function (e) {
             .setContent(content)
             .openOn(detail.map);
 
-        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, e);
+        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id);
         trumpetChart.data.datasets.forEach((dataset) => {
             dataset.data.pop();
         });
@@ -396,6 +396,8 @@ $(window).on('map:init', function (e) {
                 popup.update();
                 // update temperature scale after depth selection
                 temperatureScale(response[0].cg_data);
+                // update charts after depth selection
+                getCellData(depth_level+1, id);
             })
             .fail(function(){
                 console.log('Failed!')
@@ -406,7 +408,7 @@ $(window).on('map:init', function (e) {
 /**
 ajax function to get data for selected grid cell and updating corresponding chart
 **/
-    function getCellData(depth_level, cell_id, e){
+    function getCellData(depth_level, cell_id){
         $.ajax({
             url: 'get_cell_data/',
             type: 'POST',
@@ -418,8 +420,9 @@ ajax function to get data for selected grid cell and updating corresponding char
             gridID = cell_id;
 
             var query_data = response[0].cell_data;
+            var depth_lvl = response[1].depth_level[0][0];
             var interval = response[2].date_interval;
-            changeData(query_data, interval, e);
+            changeData(query_data, interval, depth_lvl);
         })
         .fail(function(){
             console.log('Failed!')
@@ -1021,14 +1024,14 @@ function to update trumpet chart with requested data -> is called in ajax functi
         const data = {
             labels: labels,
             datasets: [{
-                label: '1 m',
+                label: '1 m Bodentemperatur',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#F2C94C',
                 tension: 0.1
             },
             {
-                label: '2 m',
+                label: '2 m Bodentemperatur',
                 data: [0, 0.1],
                 fill: false,
                 borderColor: '#BA700B',
@@ -1127,17 +1130,17 @@ function to update trumpet chart with requested data -> is called in ajax functi
 /**
     change data of temperature graph -> will be updated when new depth is selected
 **/
-    function changeData(q_data, interval, e){
+    function changeData(q_data, interval, lvl){
         tempChart.data.labels = [].concat.apply([], interval);
         tempChart.data.datasets[0].data = q_data[0][1];
         tempChart.data.datasets[1].data = q_data[0][2];
         tempChart.data.datasets[2].data = q_data[0][0];
-        var lbl = parseFloat(e.target.feature.properties.depth_level[0]);
+        var lbl = parseFloat(lvl);
         if (lbl < 1.0) {
-            lbl = lbl/0.01 + ' cm';
+            lbl = lbl/0.01 + ' cm Bodentemperatur';
         }
         else{
-            lbl = lbl + ' m';
+            lbl = lbl + ' m Bodentemperatur';
         }
         tempChart.data.datasets[2].label = lbl;
         tempChart.data.datasets[3].data = q_data[0][3];
