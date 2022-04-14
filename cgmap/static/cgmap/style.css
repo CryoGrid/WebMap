@@ -1083,6 +1083,7 @@ a {
 /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none; /* Override default look */
+  -moz-appearance: none;
   appearance: none;
   width: 15px; /* Set a specific slider handle width */
   height: 100%; /* Slider handle height */
@@ -1091,8 +1092,7 @@ a {
   border-radius: 50%;
 }
 
-/* hide input thumb for chart legend range*/
-#depth_temp_scale::-webkit-slider-thumb {
+#temp_scale::-webkit-slider-thumb{
   display: none;
   border: none;
   -webkit-appearance: none;
@@ -1100,6 +1100,35 @@ a {
   width: 0;
   height: 0;
 }
+
+#temp_scale[type=range]::-moz-range-thumb {
+  display: none;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
+}
+
+/* hide input thumb for chart legend range*/
+#depth_temp_scale::-webkit-slider-thumb{
+  display: none;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
+}
+
+#depth_temp_scale[type=range]::-moz-range-thumb {
+  display: none;
+  border: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 0;
+  height: 0;
+}
+
 
 .slider::-moz-range-thumb {
   width: 15px; /* Set a specific slider handle width */
