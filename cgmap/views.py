@@ -9,6 +9,9 @@ from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
+from hitcount.models import HitCount
+from hitcount.views import HitCountMixin
+
 from .models import MapGrid, Date
 
 
@@ -18,6 +21,7 @@ class MapView(TemplateView):
     today = datetime.date.today()
     if Date.objects.filter(time=today).exists():
         date_idx = Date.objects.get(time=today)
+    count_hit = True
 
     # get request is called at initial load of the page, it sets up the grid layer and loads the data for the grid cells
     def get(self, request, *args, **kwargs):

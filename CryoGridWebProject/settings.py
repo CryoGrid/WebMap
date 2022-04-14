@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'debug_toolbar',
     'leaflet',
+    'hitcount',
     'djgeojson',
     'cgmap',
 ]
