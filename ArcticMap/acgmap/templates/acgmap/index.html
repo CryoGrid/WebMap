@@ -10,13 +10,11 @@
 {% endblock head_meta_page %}
 
 {% block head_css_page %}
+    <link rel="stylesheet" type="text/css" href="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css">
+    <!--<link rel="stylesheet" type="text/css" href="{% static 'Cesium/Widgets/widgets.css' %}">-->
     <style xmlns="http://www.w3.org/1999/html">
         .leaflet-container { height: 100%; overflow: hidden}
         {#.leaflet-tile { border: solid black 2px; }#}
-    </style>
-    <style>
-      html, body{padding: 0; margin: 0;}
-      #earth_div{top: 0; right: 0; bottom: 0; left: 0; position: absolute !important;}
     </style>
     <link
       rel="stylesheet"
@@ -26,30 +24,59 @@
 
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+    <!-- <script type="module" src="{% static 'Cesium/Cesium.js' %}"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.14.1/build/ol.js"></script>
+    <script type="module" src="{% static 'acgmap/arctic_map.js' %}"></script>
     <!-- Make sure you put this AFTER leaflet.js, when using with leaflet -->
     <script src="https://unpkg.com/leaflet-geosearch@3.6.0/dist/geosearch.umd.js"></script>
+    <!-- to get access from view in external js files -->
+    {{grid_data|json_script:"grid_data"}}
+    {{cg_data|json_script:"cg_data"}}
+
     <!-- js code for spherical map -->
     <script src="http://www.webglearth.com/v2/api.js"></script>
     <script>
-      function initialize() {
-        var earth = new WE.map('earth_div');
-        WE.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-          attribution: '© OpenStreetMap contributors'
-        }).addTo(earth);
-      }
+        function initialize() {
+            var earth = new WE.map('earth_div');
+            var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
+            WE.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(earth);
+            console.log('grid data: ', data);
+            var geoJsonArray = [];
+            for (var i = 0; i < data.features.length; i++){
+                geoJsonArray.push({"type": "Feature",
+                    "properties": {"id": data.features[i].properties.id,
+                                   "popupContent": " This is a Cell number: " + data.features[i].properties.id},
+                    "geometry": {"type": "Polygon", "coordinates": [
+                        [[data.features[i].properties.left, data.features[i].properties.top],
+                        [data.features[i].properties.right, data.features[i].properties.top],
+                        [data.features[i].properties.right, data.features[i].properties.bottom],
+                        [data.features[i].properties.left, data.features[i].properties.bottom]]
+                        ]}
+                    });
+            };
+            console.log('geo json array: ', geoJsonArray);
+        }
     </script>
 {% endblock footer_javascript_page %}
 
 
 {% block content %}
-    <body onload="initialize()">
-        <div id="earth_div"></div>
-        <!--<div id="map-wrapper">
+    <div id="cesiumContainer"></div>
+   <!-- <body onload="initialize()">
+        <div id="map-wrapper">
+            <div id="earth_div"></div>
+
+
+            <div id="map" class="map"></div>
             <div id="map">
                 {% leaflet_map "main" %}
             </div>
-        </div>-->
-    </body>
+
+        </div>
+    </body>-->
 {% endblock content %}

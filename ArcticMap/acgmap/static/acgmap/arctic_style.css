@@ -1,0 +1,219 @@
+html, body {
+    max-width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+}
+
+html body .container-fluid.body-content {
+    position: absolute;
+    top: 50px;
+    bottom: 30px;
+    right: 0;
+    left: 0;
+    overflow-y: auto;
+}
+
+
+/*************
+* Custom CSS *
+*************/
+
+#earth_div {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    position: absolute !important;
+}
+
+/* footer location on map */
+#footer {
+    position:absolute;
+    bottom: 5px;
+    width: 100%;
+    background: #EAF7F994;
+}
+
+#footer span + span {
+    margin-left: 10px;
+}
+
+.map {
+    height: 400px;
+    width: 100%;
+}
+
+#cesiumContainer {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+/**************************
+* Bootstrap Customization *
+**************************/
+.btn-secondary {
+    color: var(--primary);
+    background: var(--primary_light);
+    border-color: 1px solid var(--primary);
+}
+.btn-secondary:hover {
+    color: var(--primary_light);
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-secondary:focus {
+    color: var(--primary_light);
+    background: var(--primary);
+    border-color: var(--primary);
+
+    box-shadow: var(--primary_light);
+}
+
+.btn-secondary:not(:disabled):not(.disabled).active, .btn-secondary:not(:disabled):not(.disabled):active, .show>.btn-secondary.dropdown-toggle {
+    color: var(--primary_light);
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-secondary.focus, btn-secondary:focus{ box-shadow: 0px 0px 2px 4px rgba(234,247,249,0.6)}
+
+.btn-group-vertical { display:block; text-align: right; }
+.btn-group-vertical .dropdown { float: none; }
+
+.btn-primary {
+    /* Inside Auto Layout */
+    flex: none;
+    flex-grow: 0;
+    padding: 0px 0px;
+
+    color: var(--primary);
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.btn-primary:hover {
+    /* Inside Auto Layout */
+    color: var(--primary_light);
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:focus, .btn-primary:active {
+    /* Inside Auto Layout */
+    color: var(--primary_light);
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-primary:not(:disabled):not(.disabled):active:focus,
+.btn-primary:focus, .btn-primary.focus
+{
+    shadow-color: var(--primary);
+}
+
+
+/****************
+* Color Scheme *
+****************/
+:root{
+    --primary: #2BB3C0;
+    --primary_light: #EAF7F9;
+    --secondary: #EF6C35;
+    --tertiary: #FAF7F2;
+    --dark: #161C2E;
+    --success: #69DE05;
+    --error: #DE0E05;
+    --text: #4A4A68;
+    --subtle_text: #8C8CA1;
+    --accent: #ECF1F4;
+    --light: #FAFCFE;
+
+    --dark_brown: #3E2400;
+    --brown: #693D00;
+    --sand_brown: #BA700B;
+    --orange_brown: #EB8702;
+    --yellow: #F2C94C;
+
+    --red: #EB5757;
+    --orange: #F2994A;
+    --green: #6FCF97;
+    --blue: #2D9CDB;
+    --purple: #9B51E0;
+}
+
+/*************
+* Typography *
+*************/
+.header1{
+    font-family: "Work Sans", sans-serif;
+    font-weight: bold;
+    font-size: 64px;
+    letter-spacing: -2%;
+}
+
+.header2{
+    font-family: "Work Sans", sans-serif;
+    font-weight: bold;
+    font-size: 40px;
+    letter-spacing: -2%;
+}
+
+.header3{
+    font-family: "Work Sans", sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    letter-spacing: -2%;
+}
+
+.default-text-large{
+    font-family: "Work Sans", sans-serif;
+    font-weight: 500;
+    font-size: 24px;
+}
+
+.default-text{
+    font-family: "Work Sans", sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 75px;
+    line-height: 140%;
+}
+
+.default-text-bold{
+    font-weight: bold;
+}
+
+.default-text-small{
+    font-family: "Work Sans", sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.pre-title{
+    font-family: "Work Sans", sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 3%;
+}
+
+.button-text{
+    font-family: "Work Sans", sans-serif;
+    font-style: bold;
+    font-size: 16px;
+    Letter Spacing: 3%;
+}
+
+.link-text{
+    font-family: "Work Sans", sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    decoration: underline;
+}

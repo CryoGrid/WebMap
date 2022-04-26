@@ -23,10 +23,14 @@ if os.name == 'nt':
     if '64' in platform.architecture()[0]:
         OSGEO4W += "64"
     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+
     os.environ['OSGEO4W_ROOT'] = OSGEO4W
     os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+
+    GEOS_LIBRARY_PATH = str(os.path.join(OSGEO4W, r"bin\geos_c.dll"))
+    GDAL_LIBRARY_PATH = str(os.path.join(OSGEO4W, r"bin\gdal301.dll"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -39,6 +43,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Leaflet configurations
+LEAFLET_CONFIG = {
+    # 'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 64),
+    'DEFAULT_CENTER': (52.38131276242783, 13.066351933955268),
+    'DEFAULT_ZOOM': 7,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'DEFAULT_PRECISION': 6,
+}
 
 # Application definition
 
@@ -68,6 +81,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 
@@ -156,6 +170,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

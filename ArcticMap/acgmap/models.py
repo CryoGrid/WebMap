@@ -28,6 +28,16 @@ class Date(models.Model):
     )
 
 
+class DepthLevel(models.Model):
+    z_level = models.DecimalField(
+        max_digits=6,
+        decimal_places=3,
+        default=None,
+        blank=True,
+        null=True,
+    )
+
+
 class ForcingData(models.Model):
     db_table = 'forcing_data'
     name = models.CharField(max_length=50)
@@ -56,17 +66,47 @@ class CryoGridData(models.Model):
     name = models.CharField(max_length=50, default=None)
     lat = models.DecimalField(max_digits=6, decimal_places=3, default=None)
     long = models.DecimalField(max_digits=6, decimal_places=3, default=None)
-    t_max_all = ArrayField(
+    t_max_all_rev = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
     )
-    t_min_all = ArrayField(
+    t_min_all_rev = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
     )
-    t_av_all = ArrayField(
+    t_av_all_rev = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_max_all_51 = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_min_all_51 = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_av_all_51 = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_max_all_101 = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_min_all_101 = ArrayField(
+        ArrayField(
+            models.DecimalField(max_digits=9, decimal_places=3, default=None)
+        ), default=None
+    )
+    t_av_all_101 = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
