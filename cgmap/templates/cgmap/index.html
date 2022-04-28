@@ -73,6 +73,7 @@
         function open_graph(){
             console.log("container has been opened");
             var div = document.getElementById('tab-nav');
+            let body = document.querySelector('body');
             if (div.style.display === "none") {
                 div.style.display = "flex";
             } else {
@@ -81,6 +82,14 @@
         };
 
         $(document).ready(function() {
+            $('.btn-secondary').click(function(){
+                if($(this).hasClass('active')){
+                    $(this).removeClass('active')
+                } else {
+                    $(this).addClass('active')
+                }
+            });
+
             var slider = document.getElementById('temp_scale');
             var tooltip = document.getElementById('tooltip');
             var ticks = document.getElementsByClassName('sliderticks');
@@ -158,7 +167,7 @@
                         <canvas id="trumpetChart" height="190"></canvas>
                         <hr>
                         <div id="year_selector">
-                            <input class="btn btn-secondary" type="button" name="year" id="year1" value="2000 - 2020">
+                            <input class="btn btn-secondary active" type="button" name="year" id="year1" value="2000 - 2020">
                             <input class="btn btn-secondary" type="button" name="year" id="year3" value="2020 - 2040">
                             <input class="btn btn-secondary" type="button" name="year" id="year5" value="2040 - 2060">
                             <input class="btn btn-secondary" type="button" name="year" id="year7" value="2060 - 2080">

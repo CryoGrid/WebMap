@@ -194,7 +194,7 @@ hr {
     border-color: var(--primary);
 }
 
-.btn-secondary:focus {
+.btn-secondary:active {
     color: var(--primary_light);
     background: var(--primary);
     border-color: var(--primary);
@@ -886,14 +886,14 @@ hr {
 **********************/
 
 .chart-container{
-    position: fixed;
-    display: flex;
+    position: absolute;
+    display: none;
     flex-direction: column;
     align-items: flex-right;
     padding: 0px;
 
-    left: 2.5em;
-    top: 3em;
+    left: 10%;
+    top: 10%;
 
     width: -moz-fit-content;
     width: fit-content;
@@ -903,12 +903,17 @@ hr {
 }
 
 .nav .chart-container{
-    display: flex;
+    display: none;
     width: -moz-fit-content;
     width: fit-content;
 
     height: -moz-fit-content;
     height: fit-content;
+}
+
+.chart-container:target {
+    visibility: visible;
+    display: block;
 }
 
 .nav-pills .nav-link.active, .nav-pills .show>.nav-link {

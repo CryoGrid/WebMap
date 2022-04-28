@@ -495,7 +495,7 @@ function for creating trumpet chart, contains config data for chart
                 plugins: {
                     title: {
                         display: true,
-                        text: (ctx) => 'Bodentemperaturprofil zwischen 2000 und 2020'
+                        text: (ctx) => 'Bodentemperaturprofil in 20 Jahresschritten'
                     },
                     legend: {
                         display: true,
