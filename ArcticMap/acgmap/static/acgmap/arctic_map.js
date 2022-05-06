@@ -38,8 +38,8 @@ parsing data from backend
 **/
 var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
 var cg = JSON.parse(document.getElementById('cg_data').textContent);
+console.log('cg data: ', cg);
 var geoJsonArray = [];
-
 /**
 populating geojson array with db data
 **/
@@ -70,15 +70,96 @@ for (var i = 0; i < data.features.length; i++){
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
         };
     };
-console.log('geo json array:', geoJsonArray);
+
+// hsl to hex converter
+function hsltohex(h, s, l){
+     l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+        const k = (n + h / 30) % 12;
+        const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+        return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+}
+// hsl to rgb converter -> https://stackoverflow.com/questions/2353211/hsl-to-rgb-color-conversion
+function hslToRgb(h, s, l){
+    s /= 100;
+  l /= 100;
+  const k = n => (n + h / 30) % 12;
+  const a = s * Math.min(l, 1 - l);
+  const f = n =>
+    l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+  return [f(0) , f(8), f(4)];
+}
+
+function addAlpha(color, opacity){
+    // coerce values so ti is between 0 and 1.
+    const _opacity = Math.round(Math.min(Math.max(opacity || 1, 0), 1) * 255);
+    return color + _opacity.toString(16).toUpperCase();
+}
+
+// source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
+function getHue(t, min, max){
+    let maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
+    let minHsl = 360; //  minhsl maps to min temp counter clockwise
+    let rngHsl = maxHsl - minHsl; // = 210
+    let maxTemp = max;
+    let minTemp = min;
+    let rngTemp = maxTemp - minTemp; // 60
+    let degCnt = maxTemp - t; // 0
+    let hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
+    let returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
+    return returnHue;
+}
+
+// color for grid cells
+function getColor(t, min, max) {
+    const s = 100;
+    const l = 50;
+    const h = getHue(t, min, max);
+    return hsltohex(h, s, l);
+}
+console.log('geo json array:', geoJsonArray[170]);
 for (var j = 0; j < geoJsonArray.length; j++){
+    let c = getColor(geoJsonArray[j].properties["t_av_all_51"], -40, 10);
+    let ac = addAlpha(c, 0.5)
+    console.log('new color: ', c, ' with alpha: ', ac);
     viewer.dataSources.add(Cesium.GeoJsonDataSource.load(geoJsonArray[j], {
         clampToGround: true,
-        stroke: Cesium.Color.HOTPINK,
+        stroke: Cesium.Color.fromCssColorString(c),
+        fill: Cesium.Color.fromCssColorString(c),
         strokeWidth: 3,
         markerSymbol: '?'
     }));
 }
+/**
+promise
+    .then(function (dataSource){
+        viewer.dataSources.add(dataSource);
+        const entities = dataSource.entities.values;
+        const colorHash = {};
+
+        for(let i = 0; i < entities.length; i++){
+            const entity = entities[i];
+            const tmp = entity.properties["t_av_all_51"];
+            let color = colorHash[tmp];
+            if(!color){
+                color = Cesium.Color(getColor(geoJsonArray[j].properties["t_av_all_51"], -10, 15));
+                colorHash[tmp] = color;
+            }
+
+            entity.polygon.material = color;
+            entity.polygon.outline = false;
+        }
+
+    })
+    .catch(function(error){
+        window.alert(error);
+    });
+**/
+
+
 
 // Add Cesium OSM Buildings, a global 3D buildings layer.
 const tileset = viewer.scene.primitives.add(
@@ -86,13 +167,3 @@ const tileset = viewer.scene.primitives.add(
         url: Cesium.IonResource.fromAssetId(96188),
     })
 );
-
-
-// Fly the camera to San Francisco at the given longitude, latitude, and height.
-viewer.camera.flyTo({
-    destination : Cesium.Cartesian3.fromDegrees(-122.4175, 37.655, 400),
-    orientation : {
-        heading : Cesium.Math.toRadians(0.0),
-        pitch : Cesium.Math.toRadians(-15.0),
-    }
-});

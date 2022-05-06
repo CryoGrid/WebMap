@@ -17,10 +17,11 @@ class MapView(TemplateView):
     # get request is called at initial load of the page and sets up the map
     def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
-        start_date = int(Date.objects.get(year='2000-01-01 00:00:00+01').id)
-        end_date = int(Date.objects.get(year='2020-01-01 00:00:00+01').id)
-        # depth level is set to 0, because the ui slider starts at the index of 0
-        context['depth_level'] = 0
+        start_date = int(Date.objects.get(year='1850-01-01 00:00:00+01').id)
+        end_date = int(Date.objects.get(year='1900-01-01 00:00:00+01').id)
+        print('start date id: ', start_date, ' end date id: ', end_date)
+        # depth level is set to 38, for the standard depth of 9.95 m
+        context['depth_level'] = 38
         context['cg_data'] = {}
         # date_id = int(self.date_idx.id)
 
@@ -32,8 +33,9 @@ class MapView(TemplateView):
             #cursor.execute("SELECT grid_id, alt FROM acgmap_cryogriddata;")
             #alt = cursor.fetchall()
             cursor.execute(
-                "SELECT grid_id, name, t_av_all_51[%s:%s][%s], t_max_all_51[%s:%s][%s], t_min_all_51[%s:%s][%s] FROM acgmap_cryogriddata" % (
-                     start_date, end_date, depth_id, start_date, end_date, depth_id, start_date, end_date, depth_id))
+                "SELECT grid_id, name, (select avg(cg) from unnest(t_av_all_51[1][%s:%s][%s]) as cg), (select avg(cg) from unnest(t_max_all_51[1][%s:%s][%s]) as cg), (select avg(cg) from unnest(t_min_all_51[1][%s:%s][%s]) as cg) FROM acgmap_cryogriddata" % (
+                    start_date, end_date, depth_id, start_date, end_date, depth_id, start_date, end_date, depth_id
+                ))
             cg = cursor.fetchall()
             # turn query data into json data
             for cg_data in cg:
