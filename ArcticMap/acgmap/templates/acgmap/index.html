@@ -10,8 +10,9 @@
 {% endblock head_meta_page %}
 
 {% block head_css_page %}
-    <link rel="stylesheet" type="text/css" href="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Widgets/widgets.css">
-    <!--<link rel="stylesheet" type="text/css" href="{% static 'Cesium/Widgets/widgets.css' %}">-->
+    <link rel="stylesheet" type="text/css" href="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Widgets/widgets.css">
+    <!--<link rel="stylesheet" type="text/css" href="/static/Cesium/Widgets/widgets.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'Cesium/Widgets/widgets.css' %}">-->
     <style xmlns="http://www.w3.org/1999/html">
         .leaflet-container { height: 100%; overflow: hidden}
         {#.leaflet-tile { border: solid black 2px; }#}
@@ -24,7 +25,8 @@
 
 {% block footer_javascript_page %}
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cesium.com/downloads/cesiumjs/releases/1.92/Build/Cesium/Cesium.js"></script>
+    <!--<script src="/static/Cesium/Cesium.js"></script>-->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Cesium.js"></script>
     <!-- <script type="module" src="{% static 'Cesium/Cesium.js' %}"></script>-->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
@@ -39,6 +41,13 @@
     <!-- js code for spherical map -->
     <script src="http://www.webglearth.com/v2/api.js"></script>
     <script>
+        var positiveX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.png' %}"
+        var negativeX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.png' %}"
+        var positiveY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.png' %}"
+        var negativeY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.png' %}"
+        var positiveZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.png' %}"
+        var negativeZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.png' %}"
+
         function initialize() {
             var earth = new WE.map('earth_div');
             var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
@@ -66,7 +75,22 @@
 
 
 {% block content %}
+<div id="map-wrapper">
     <div id="cesiumContainer"></div>
+    <div class="nav chart-container" id="tab-nav" style="display: none;">
+        <ul class="nav nav-pills nav-jt">
+            <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Trumpet Curve</a></li>
+            <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
+        </ul>
+        <div class="tab-content" id="tab-content">
+            <div id="first" class="tab-pane fade in active show">
+                <div class="canvas-container" id="chart-container">
+                    <canvas id="trumpetChart" height="190"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
    <!-- <body onload="initialize()">
         <div id="map-wrapper">
             <div id="earth_div"></div>

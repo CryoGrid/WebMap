@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from .views import MapView, AboutView, ContactView, LegalView
 
@@ -7,3 +9,5 @@ urlpatterns = [
     path('contact/', ContactView.as_view(), name='contact'),
     path('legal/', LegalView.as_view(), name='legal')
 ]
+
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

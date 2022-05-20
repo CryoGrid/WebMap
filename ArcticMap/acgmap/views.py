@@ -33,8 +33,8 @@ class MapView(TemplateView):
             #cursor.execute("SELECT grid_id, alt FROM acgmap_cryogriddata;")
             #alt = cursor.fetchall()
             cursor.execute(
-                "SELECT grid_id, name, (select avg(cg) from unnest(t_av_all_51[1][%s:%s][%s]) as cg), (select avg(cg) from unnest(t_max_all_51[1][%s:%s][%s]) as cg), (select avg(cg) from unnest(t_min_all_51[1][%s:%s][%s]) as cg) FROM acgmap_cryogriddata" % (
-                    start_date, end_date, depth_id, start_date, end_date, depth_id, start_date, end_date, depth_id
+                "SELECT grid_id, name, t_av_preindustrial_51[%s], t_max_preindustrial_51[%s], t_min_preindustrial_51[%s] FROM acgmap_cryogriddata" % (
+                    depth_id, depth_id, depth_id
                 ))
             cg = cursor.fetchall()
             # turn query data into json data
@@ -42,9 +42,9 @@ class MapView(TemplateView):
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
-                    't_av_all_51': cg_data[2],
-                    't_max_all_51': cg_data[3],
-                    't_min_all_51': cg_data[4],
+                    't_av_preindustrial_51': cg_data[2],
+                    't_max_preindustrial_51': cg_data[3],
+                    't_min_preindustrial_51': cg_data[4],
                     'depth_idx': depth_id,
                     'depth_level': depth,
                     'date': start_date,

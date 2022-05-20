@@ -96,6 +96,33 @@ class CryoGridData(models.Model):
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
     )
+    t_av_iceage_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_av_preindustrial_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_av_historical_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_iceage_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_preindustrial_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_historical_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_iceage_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_preindustrial_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_historical_51 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
     t_max_all_101 = ArrayField(
         ArrayField(
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
@@ -110,6 +137,33 @@ class CryoGridData(models.Model):
         ArrayField(
             models.DecimalField(max_digits=9, decimal_places=3, default=None)
         ), default=None
+    )
+    t_av_iceage_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_av_preindustrial_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_av_historical_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_iceage_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_preindustrial_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_min_historical_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_iceage_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_preindustrial_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3)
+    )
+    t_max_historical_101 = ArrayField(
+        models.DecimalField(max_digits=9, decimal_places=3, default=0.0)
     )
     created_at = models.DateTimeField(default=datetime.datetime.now)
     modified_at = models.DateTimeField(auto_now=True)
