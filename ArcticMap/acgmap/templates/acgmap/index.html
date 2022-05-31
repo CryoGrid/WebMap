@@ -24,6 +24,9 @@
 {% endblock head_css_page %}
 
 {% block footer_javascript_page %}
+    <script>
+        window.CESIUM_BASE_URL = '/static/Cesium/';
+    </script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <!--<script src="/static/Cesium/Cesium.js"></script>-->
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.93/Build/Cesium/Cesium.js"></script>
@@ -38,15 +41,15 @@
     {{grid_data|json_script:"grid_data"}}
     {{cg_data|json_script:"cg_data"}}
 
-    <!-- js code for spherical map -->
-    <script src="http://www.webglearth.com/v2/api.js"></script>
+    <!-- js code for spherical map-->
+    <script type="module" src="{% static 'Cesium/Cesium.js' %}"></script>
     <script>
-        var positiveX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.png' %}"
-        var negativeX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.png' %}"
-        var positiveY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.png' %}"
-        var negativeY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.png' %}"
-        var positiveZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.png' %}"
-        var negativeZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.png' %}"
+        var positiveX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_px.jpg' %}"
+        var negativeX = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mx.jpg' %}"
+        var positiveY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_py.jpg' %}"
+        var negativeY = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_my.jpg' %}"
+        var positiveZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_pz.jpg' %}"
+        var negativeZ = "{% static 'Cesium/Assets/Textures/SkyBox/tycho2t3_80_mz.jpg' %}"
 
         function initialize() {
             var earth = new WE.map('earth_div');

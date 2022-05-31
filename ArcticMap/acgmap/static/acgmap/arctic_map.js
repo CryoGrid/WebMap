@@ -1,15 +1,19 @@
 // Your access token can be found at: https://cesium.com/ion/tokens.
 // This is the default access token from your ion account
+/**import * as Cesium from '/static/Cesium';
+import "/static/Cesium/Build/Cesium/Widgets/widgets.css";
 
-//Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMTU2OWE4Mi01YjkwLTRiZjYtOWYxMC00M2NmYjI2MTgzOWUiLCJpZCI6ODc1OTgsImlhdCI6MTY0ODcxNzgyNn0.QCtgrJaz2qBi-y4d02uLG-W5tfKitz1UlANQxhV7-2E';
+Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMTU2OWE4Mi01YjkwLTRiZjYtOWYxMC00M2NmYjI2MTgzOWUiLCJpZCI6ODc1OTgsImlhdCI6MTY0ODcxNzgyNn0.QCtgrJaz2qBi-y4d02uLG-W5tfKitz1UlANQxhV7-2E';
 //Cesium.Ion.defaultAccessToken = null; //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMTU2OWE4Mi01YjkwLTRiZjYtOWYxMC00M2NmYjI2MTgzOWUiLCJpZCI6ODc1OTgsImlhdCI6MTY0ODcxNzgyNn0.QCtgrJaz2qBi-y4d02uLG-W5tfKitz1UlANQxhV7-2E';
-Cesium.BingMapsApi.defaultKey = 'AvgY2m7VyKZj6P0MLanxAsLwy6gN4OdbJWKoXkIRQSbcPWRMa0wtHc3pVFFHA1to';
+**/
+const BingMapsApi = 'AvgY2m7VyKZj6P0MLanxAsLwy6gN4OdbJWKoXkIRQSbcPWRMa0wtHc3pVFFHA1to';
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
+
 const viewer = new Cesium.Viewer('cesiumContainer', {
     imageryProvider: new Cesium.BingMapsImageryProvider({
         url : 'https://dev.virtualearth.net',
-        key : Cesium.BingMapsApi.defaultKey ,
+        key : BingMapsApi ,
         mapStyle : Cesium.BingMapsStyle.AERIAL_WITH_LABELS
     }),
     requestRenderMode: true,
@@ -20,9 +24,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     sceneModePicker: false,
 });
 
-var scene = viewer.scene;
-
-scene.skyBox = new Cesium.SkyBox({
+viewer.skyBox = new Cesium.SkyBox({
     sources : {
         positiveX : positiveX,
         negativeX : negativeX,
@@ -52,6 +54,7 @@ for (var i = 0; i < data.features.length; i++){
 
     geoJsonArray.push({"type": "Feature",
         "properties": {"id": data.features[i].properties.id,
+                       "name": data.features[i].properties.name,
                        "popupContent": " This is a Cell number: " + data.features[i].properties.id},
         "geometry": {"type": "Polygon", "coordinates": [
             [[data.features[i].properties.left, data.features[i].properties.top],
@@ -154,25 +157,43 @@ function getColor(t, min, max) {
     const h = getHue(t, min, max);
     return hsltohex(h, s, l);
 }
+
+function createEntity(e, mat_col, lin_col){
+    return new Cesium.Entity({
+
+    });
+}
+
+// create features
 for (var j = 0; j < geoJsonArray.length; j++){
     let hex_col = getHexCol(geoJsonArray[j].properties["t_av_preindustrial_51"]);
     let rgba_col = hexToRgbA(hex_col);
-    //console.log('temperature of: ', geoJsonArray[j].properties["t_av_preindustrial_51"]);
-    //console.log('new color: ', hex_col, ' with alpha: ', rgba_col);
     viewer.dataSources.add(Cesium.GeoJsonDataSource.load(geoJsonArray[j], {
         clampToGround: true,
         stroke: Cesium.Color.fromCssColorString(hex_col),
         fill: Cesium.Color.fromCssColorString(rgba_col),
         strokeWidth: 5,
-        markerSymbol: '?'
+        markerSymbol: '?',
+        entities: createEntity(geoJsonArray[j], rgba_col, hex_col)
     }));
 }
 
+// Information about the currently selected feature
+const selected = {
+    feature: undefined,
+    originalColor: new Cesium.Color(),
+}
+// An entity object which will hold info about the currently selected feature for infobox display
+const selectedEntity = new Cesium.Entity();
+// Get default left click handler for when a feature is not picked on left click
+const clickHandler = viewer.screenSpaceEventHandler.getInputAction(
+    Cesium.ScreenSpaceEventType.LEFT_CLICK
+);
 
 // chart implementation
 setTimeout(function(){
     var cssLink = document.createElement("link");
-    cssLink.href = Cesium.buildModuleUrl('./static/acgmap/arctic_style.css');
+    cssLink.href = Cesium.buildModuleUrl('/static/acgmap/arctic_style.css');
     cssLink.rel = "stylesheet";
     cssLink.type = "text/css";
     viewer.infoBox.frame.contentDocument.head.appendChild(cssLink);
