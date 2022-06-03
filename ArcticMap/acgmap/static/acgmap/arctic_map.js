@@ -23,7 +23,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     baseLayerPicker: false,
     sceneModePicker: false,
 });
-
+// setup cesium skybox
 viewer.skyBox = new Cesium.SkyBox({
     sources : {
         positiveX : positiveX,
@@ -54,7 +54,7 @@ for (var i = 0; i < data.features.length; i++){
 
     geoJsonArray.push({"type": "Feature",
         "properties": {"id": data.features[i].properties.id,
-                       "name": data.features[i].properties.name,
+                       "name": cg[data.features[i].properties.id].file_name,
                        "popupContent": " This is a Cell number: " + data.features[i].properties.id},
         "geometry": {"type": "Polygon", "coordinates": [
             [[data.features[i].properties.left, data.features[i].properties.top],
@@ -64,9 +64,9 @@ for (var i = 0; i < data.features.length; i++){
             ]}
         });
         if(cg[data.features[i].properties.id] != null){
-            geoJsonArray[i].properties["t_av_preindustrial_51"] = cg[data.features[i].properties.id].t_av_preindustrial_51;
-            geoJsonArray[i].properties["t_max_preindustrial_51"] = cg[data.features[i].properties.id].t_max_preindustrial_51;
-            geoJsonArray[i].properties["t_min_preindustrial_51"] = cg[data.features[i].properties.id].t_min_preindustrial_51;
+            geoJsonArray[i].properties["av_preindustrial_51"] = cg[data.features[i].properties.id].av_preindustrial_51;
+            geoJsonArray[i].properties["max_preindustrial_51"] = cg[data.features[i].properties.id].max_preindustrial_51;
+            geoJsonArray[i].properties["min_preindustrial_51"] = cg[data.features[i].properties.id].min_preindustrial_51;
             geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
             geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
             geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
@@ -98,12 +98,6 @@ function hexToRgbA(hex){
     return hex;
 }
 
-function addAlpha(color, opacity){
-    // coerce values so ti is between 0 and 1.
-    const _opacity = Math.round(Math.min(Math.max(opacity || 1, 0), 1) * 255);
-    return color + _opacity.toString(16).toUpperCase();
-}
-
 // source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
 function getHue(t, min, max, hslMax, hslMin){
     let maxHsl = hslMax; // maxHsl maps to max temp (here: 20deg past 360)
@@ -117,16 +111,7 @@ function getHue(t, min, max, hslMax, hslMin){
     let returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
     return returnHue;
 }
-
-function pickHex(col_start, col_end, weight){
-    var w1 = weight/255;
-    var w2 = 1 - w1;
-    var rgb = [Math.round(col_start[0] * w1 + col_end[0] * w2),
-        Math.round(col_start[1] * w1 + col_end[1] * w2),
-        Math.round(col_start[2] * w1 + col_end[2] * w2)];
-    return rgb;
-}
-
+// get hex color for to different intervals -> ],0] and [0,[
 function getHexCol(t){
     const s = 100;
     const l = 50;
@@ -158,49 +143,93 @@ function getColor(t, min, max) {
     return hsltohex(h, s, l);
 }
 
-function createEntity(e, mat_col, lin_col){
+function createEntity(data, mat_col, line_col){
     return new Cesium.Entity({
-
+        id: data.properties.id,
+        name: data.properties.name,
+        average_preindustrial: data.properties.av_preindustrial_51,
+        min_preindustrial: data.properties.min_preindustrial_51,
+        max_preindustrial: data.properties.max_preindustrial_51,
+        polygon: {
+            hierarchy: Cesium.Cartesian3.fromDegreesArray([
+                data.geometry.coordinates[0][0][0], data.geometry.coordinates[0][0][1],
+                data.geometry.coordinates[0][1][0], data.geometry.coordinates[0][1][1],
+                data.geometry.coordinates[0][2][0], data.geometry.coordinates[0][2][1],
+                data.geometry.coordinates[0][3][0], data.geometry.coordinates[0][3][1]
+            ]),
+            height: 0,
+            material: Cesium.Color.fromCssColorString(mat_col),
+            outline: true,
+            outlineColor: Cesium.Color.fromCssColorString(line_col),
+            outlineWidth: 5
+        },
+        entityCollection: 'GeoJsonData',
     });
 }
 
-// create features
-for (var j = 0; j < geoJsonArray.length; j++){
-    let hex_col = getHexCol(geoJsonArray[j].properties["t_av_preindustrial_51"]);
+/** create features**/
+var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
+for(var v = 0; v < geoJsonArray.length; v++){
+    let hex_col = getHexCol(geoJsonArray[v].properties["av_preindustrial_51"]);
     let rgba_col = hexToRgbA(hex_col);
-    viewer.dataSources.add(Cesium.GeoJsonDataSource.load(geoJsonArray[j], {
-        clampToGround: true,
-        stroke: Cesium.Color.fromCssColorString(hex_col),
-        fill: Cesium.Color.fromCssColorString(rgba_col),
-        strokeWidth: 5,
-        markerSymbol: '?',
-        entities: createEntity(geoJsonArray[j], rgba_col, hex_col)
-    }));
+    var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
+    entity.addProperty('name');
+    entity.name = geoJsonArray[v].properties.name;
+    customDataSource.entities.add(entity);
 }
+viewer.dataSources.add(customDataSource)
 
-// Information about the currently selected feature
-const selected = {
-    feature: undefined,
-    originalColor: new Cesium.Color(),
-}
-// An entity object which will hold info about the currently selected feature for infobox display
-const selectedEntity = new Cesium.Entity();
-// Get default left click handler for when a feature is not picked on left click
-const clickHandler = viewer.screenSpaceEventHandler.getInputAction(
-    Cesium.ScreenSpaceEventType.LEFT_CLICK
-);
+viewer.selectedEntityChanged.addEventListener(
+    function(selectedEntity){
+        if(Cesium.defined(selectedEntity)){
+            if(Cesium.defined(selectedEntity.id)){
+                let cell_id = selectedEntity.id;
+                console.log('Selected ' + selectedEntity.id);
+                selectedEntity.description =
+                    '<table class="cesium-infoBox-defaultTable"><tbody>' +
+                        '<div class="canvas-container" id="chart-container">' +
+                            '<canvas id="trumpetChart" height="190"></canvas>' +
+                        '</div>' +
+                    '<tr><th>ID</th><td>' +
+                    selectedEntity.id +
+                    '</td></tr>' +
+                    '<tr><th>Name</th><td>' +
+                    selectedEntity.name +
+                    '</td></tr>' +
+                    '<div class="canvas-container">' +
+                        '<canvas id="trumpetChart" height="190"></canvas>' +
+                    '</div>';
+                getCellData(cell_id);
+            } else {
+                console.log('Unknown entity selected.');
+            }
+        } else {
+            console.log('Deselected.');
+        }
+    });
 
-// chart implementation
-setTimeout(function(){
-    var cssLink = document.createElement("link");
-    cssLink.href = Cesium.buildModuleUrl('/static/acgmap/arctic_style.css');
-    cssLink.rel = "stylesheet";
-    cssLink.type = "text/css";
-    viewer.infoBox.frame.contentDocument.head.appendChild(cssLink);
-}, 5000);
+/**
+ajax function to get data for selected grid cell and updating corresponding chart
+**/
+    function getCellData(cell_id){
+        $.ajax({
+            url: 'get_cell_data/',
+            type: 'POST',
+            data: {idx:cell_id},
+            dataType: "json"
+        })
+        .done(function(response){
+            // if request is successful update data in changeData function
+            let gridID = cell_id;
 
-
-
+            var query_data = response[0].cg_data;
+            console.log('query data: ', query_data.data);
+            updateData(cell_id, query_data.data);
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
 
 /**
 getting 2d context and creating charts via function call
@@ -370,43 +399,26 @@ function for creating trumpet chart, contains config data for chart
 /**
 function to update trumpet chart with requested data -> is called in ajax function
 **/
-    function updateData(newData, yearID){
-        var min = [];
-        var max = [];
-        var mean = [];
-        var median = [];
-        var max_quantile = [];
-        var min_quantile = [];
+    function updateData(cell_id, newData){
+        var av_historical_51 = [];
+        var max_historical_51 = [];
+        var min_historical_51 = [];
+        var av_preindustrial_51 = [];
+        var max_preindustrial_51 = [];
+        var min_preindustrial_51 = [];
+        var av_iceage_51 = [];
+        var max_iceage_51 = [];
+        var min_iceage_51 = [];
         var bgCol1;
         var bgCol2;
-        var years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+        var years = ['ice age', 'pre industrial', 'historical']
 
         // divide values into different sets
         for (var i = 1; i < 16; i++){
-            min.push(newData[i]['min']);
-            max.push(newData[i]['max']);
-            mean.push(newData[i]['mean']);
-            median.push(newData[i]['median']);
-            max_quantile.push(newData[i]['max_quantile']);
-            min_quantile.push(newData[i]['min_quantile'])
+            av_preindustrial_51.push(newData['arr_av_preindustrial_51']);
+            max_preindustrial_51.push(newData['arr_max_preindustrial_51']);
+            min_preindustrial_51.push(newData['arr_min_preindustrial_51']);
         }
 
-        // set colors for different sets
-        if ( yearID === 1){
-            bgCol1 = 'rgba(45,156,219,0.1)';
-            bgCol2 = 'rgba(45,156,219,0.2)';
-        } else if ( yearID === 5) {
-            bgCol1 = 'rgba(242,201,76,0.1)';
-            bgCol2 = 'rgba(242,201,76,0.2)';
-        } else if ( yearID === 7) {
-            bgCol1 = 'rgba(242,153,74,0.1)';
-            bgCol2 = 'rgba(242,153,74,0.2)';
-        } else if ( yearID === 9) {
-            bgCol1 = 'rgba(235,87,87,0.1)';
-            bgCol2 = 'rgba(235,87,87,0.2)';
-        } else if ( yearID === 3) {
-            bgCol1 = 'rgba(111,207,151,0.1)';
-            bgCol2 = 'rgba(111,207,151,0.2)';
-        }
         trumpetChart.update(); // update chart
     }
