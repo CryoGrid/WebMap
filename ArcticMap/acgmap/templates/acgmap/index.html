@@ -40,6 +40,7 @@
     <!-- to get access from view in external js files -->
     {{grid_data|json_script:"grid_data"}}
     {{cg_data|json_script:"cg_data"}}
+    {{depth_levels|json_script:"depth_levels"}}
 
     <!-- js code for spherical map-->
     <script type="module" src="{% static 'Cesium/Cesium.js' %}"></script>
@@ -80,19 +81,11 @@
 {% block content %}
 <div id="map-wrapper">
     <div id="cesiumContainer"></div>
-    <div class="nav chart-container" id="tab-nav" style="display: none;">
-        <ul class="nav nav-pills nav-jt">
-            <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Trumpet Curve</a></li>
-            <li class="nav-item"><a class="nav-link" id="close-btn" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
-        </ul>
-        <div class="tab-content" id="tab-content">
-            <div id="first" class="tab-pane fade in active show">
-                <div class="canvas-container" id="chart-container">
-                    <canvas id="trumpetChart" height="190"></canvas>
-                </div>
-            </div>
+    <table class="cesium-infoBox-defaultTable"><tbody>
+        <div class="canvas-container" id="chart-container" style="display: none;">
+            <canvas id="trumpetChart" height="190"></canvas>
         </div>
-    </div>
+    </tbody></table>
 </div>
    <!-- <body onload="initialize()">
         <div id="map-wrapper">

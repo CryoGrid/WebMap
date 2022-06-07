@@ -40,6 +40,8 @@ parsing data from backend
 **/
 var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
 var cg = JSON.parse(document.getElementById('cg_data').textContent);
+var depth_list = JSON.parse(document.getElementById('depth_levels').textContent);
+console.log('depth list: ', depth_list, ' data type: ', typeof(depth_list));
 var geoJsonArray = [];
 /**
 populating geojson array with db data
@@ -185,20 +187,18 @@ viewer.selectedEntityChanged.addEventListener(
             if(Cesium.defined(selectedEntity.id)){
                 let cell_id = selectedEntity.id;
                 console.log('Selected ' + selectedEntity.id);
-                selectedEntity.description =
-                    '<table class="cesium-infoBox-defaultTable"><tbody>' +
-                        '<div class="canvas-container" id="chart-container">' +
-                            '<canvas id="trumpetChart" height="190"></canvas>' +
-                        '</div>' +
-                    '<tr><th>ID</th><td>' +
-                    selectedEntity.id +
-                    '</td></tr>' +
-                    '<tr><th>Name</th><td>' +
-                    selectedEntity.name +
-                    '</td></tr>' +
-                    '<div class="canvas-container">' +
-                        '<canvas id="trumpetChart" height="190"></canvas>' +
-                    '</div>';
+                let chart_container = $('#tab-nav');
+                selectedEntity.description =`
+                    <table class="cesium-infoBox-defaultTable"><tbody>
+                        ${chart_container.innerHTML = ctx}
+                    <tr><th>ID</th><td>
+                        ${selectedEntity.id}
+                    </td></tr>
+                    <tr><th>Name</th><td>
+                        ${selectedEntity.name}
+                    </td></tr>
+                    </tbody></table>
+                    `;
                 getCellData(cell_id);
             } else {
                 console.log('Unknown entity selected.');
@@ -244,7 +244,7 @@ createTrumpetChart();
 function for creating trumpet chart, contains config data for chart
 **/
     function createTrumpetChart(){
-        const labels = [0.01, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 ];
+        const labels = Object.values(depth_list);
         const data = {
             labels: labels,
             datasets: [],
@@ -304,10 +304,10 @@ function for creating trumpet chart, contains config data for chart
                             title: function(context){
                                 for( var i = 0; i < context.length; i++){
                                     var lbl = context[i].label;
-                                    if (lbl.includes('.')){
+                                    /**if (lbl.includes('.')){
                                         lbl = parseFloat(lbl)/0.01;
                                         return context[i].label = ' in ' + lbl + ' cm';
-                                    }
+                                    }**/
                                     return context[i].label = ' in ' + lbl + ' m';
                                 }
                             },
@@ -319,10 +319,10 @@ function for creating trumpet chart, contains config data for chart
                                     let max = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
                                     label += ' : ' + Math.round(context.raw * 10) / 10 + '°/'+ Math.round(max * 10) / 10 + '°';
                                 }
-                                else if (label.includes('10%/90%')){
+                                /**else if (label.includes('10%/90%')){
                                     let min = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
                                     label += ' : ' + Math.round(min  * 10) / 10 + '°/'+ Math.round(context.raw  * 10) / 10 + '°';
-                                }
+                                }**/
                                 else{
                                     // other labels for tooltips
                                     var val = Math.round(context.raw  * 10) / 10;
@@ -383,10 +383,10 @@ function for creating trumpet chart, contains config data for chart
 
                             callback: function(val, index) {
                                 var lbl = this.getLabelForValue(index).toString();
-                                    if (lbl.includes('.')){
+                                    /**if (lbl.includes('.')){
                                         lbl = parseFloat(lbl)/0.01;
                                         return lbl + ' cm';
-                                    }
+                                    }**/
                                 return this.getLabelForValue(index) + ' m';
                             },
                         },
@@ -400,25 +400,57 @@ function for creating trumpet chart, contains config data for chart
 function to update trumpet chart with requested data -> is called in ajax function
 **/
     function updateData(cell_id, newData){
-        var av_historical_51 = [];
-        var max_historical_51 = [];
-        var min_historical_51 = [];
-        var av_preindustrial_51 = [];
-        var max_preindustrial_51 = [];
-        var min_preindustrial_51 = [];
-        var av_iceage_51 = [];
-        var max_iceage_51 = [];
-        var min_iceage_51 = [];
-        var bgCol1;
-        var bgCol2;
+        // divide values into different sets
+        var av_historical_51 = newData['arr_av_historical_51'];
+        var max_historical_51 = newData['arr_max_historical_51'];
+        var min_historical_51 = newData['arr_min_historical_51'];
+        var av_preindustrial_51 = newData['arr_av_preindustrial_51'];
+        var max_preindustrial_51 = newData['arr_max_preindustrial_51'];
+        var min_preindustrial_51 = newData['arr_min_preindustrial_51'];
+        var av_iceage_51 = newData['arr_av_iceage_51'];
+        var max_iceage_51 = newData['arr_max_iceage_51'];
+        var min_iceage_51 = newData['arr_min_iceage_51'];
         var years = ['ice age', 'pre industrial', 'historical']
 
-        // divide values into different sets
-        for (var i = 1; i < 16; i++){
-            av_preindustrial_51.push(newData['arr_av_preindustrial_51']);
-            max_preindustrial_51.push(newData['arr_max_preindustrial_51']);
-            min_preindustrial_51.push(newData['arr_min_preindustrial_51']);
-        }
-
+        console.log('vals: ', max_preindustrial_51);
+        // setup datasets with new data for the trumpet curve
+        trumpetChart.data.datasets.push({
+                data: min_preindustrial_51,
+                label: 'Min/Max ' +years[1],
+                fill: '+1',
+                backgroundColor: 'rgba(242,201,76,0.1)',
+                borderColor: '#F2C94C',
+            },
+            {
+                data: max_preindustrial_51,
+                label: '_Max_ ' +years[1],
+                fill: false,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: av_preindustrial_51,
+                label: 'Average ' +years[1],
+                fill: false,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: min_iceage_51,
+                label: 'Min/Max ' +years[0],
+                fill: '+1',
+                backgroundColor: 'rgba(10,146,232,0.1)',
+                borderColor: '#0A92E8',
+            },
+            {
+                data: max_iceage_51,
+                label: '_Max_ ' +years[0],
+                fill: false,
+                borderColor: '#0A92E8',
+            },
+            {
+                data: av_iceage_51,
+                label: 'Average ' +years[0],
+                fill: false,
+                borderColor: '#0A92E8',
+            });
         trumpetChart.update(); // update chart
     }

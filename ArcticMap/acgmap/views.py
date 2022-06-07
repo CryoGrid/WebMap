@@ -19,11 +19,10 @@ class MapView(TemplateView):
     def get(self, request, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         start_date = int(Date.objects.get(year='1850-01-01 00:00:00+01').id)
-        end_date = int(Date.objects.get(year='1900-01-01 00:00:00+01').id)
-        print('start date id: ', start_date, ' end date id: ', end_date)
         # depth level is set to 38, for the standard depth of 9.95 m
         context['depth_level'] = 38
         context['cg_data'] = {}
+        context['depth_list'] = {}
         # date_id = int(self.date_idx.id)
 
         # postgreSQL DB index starts at 1
@@ -33,6 +32,9 @@ class MapView(TemplateView):
             depth = cursor.fetchone()
             # cursor.execute("SELECT grid_id, alt FROM acgmap_cryogriddata;")
             # alt = cursor.fetchall()
+            cursor.execute("SELECT * FROM acgmap_depthlevel;")
+            depth_level = cursor.fetchall()
+            context['depth_list'].update(depth_level)
             cursor.execute(
                 "SELECT grid_id, name, t_av_preindustrial_51[%s], t_max_preindustrial_51[%s], t_min_preindustrial_51[%s] FROM acgmap_cryogriddata" % (
                     depth_id, depth_id, depth_id
@@ -57,7 +59,7 @@ class MapView(TemplateView):
             #    context['cg_data'][val[0]]['alt'] = float(val[1])
         # query to get shape data for grid map
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')
-        return render(request, self.template_name, {'grid_data': geojson, 'cg_data': context['cg_data']})
+        return render(request, self.template_name, {'grid_data': geojson, 'cg_data': context['cg_data'], 'depth_levels': context['depth_list']})
 
     # request function to get data for selected cell for the chart
     @csrf_exempt
