@@ -81,13 +81,13 @@
 {% block content %}
 <div id="map-wrapper">
     <div id="cesiumContainer"></div>
-    <table class="cesium-infoBox-defaultTable"><tbody>
-        <div class="canvas-container" id="chart-container" style="display: none;">
-            <canvas id="trumpetChart" height="190"></canvas>
-        </div>
-    </tbody></table>
 </div>
-   <!-- <body onload="initialize()">
+<div id="chart-overlay" style="display: none;">
+    <div class="canvas-container" id="chart-container">
+        <canvas id="trumpetChart" height="190"></canvas>
+    </div>
+</div><!--
+    <body onload="initialize()">
         <div id="map-wrapper">
             <div id="earth_div"></div>
 
@@ -100,3 +100,4 @@
         </div>
     </body>-->
 {% endblock content %}
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt

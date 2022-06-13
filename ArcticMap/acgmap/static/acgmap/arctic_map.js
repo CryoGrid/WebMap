@@ -2,10 +2,8 @@
 // This is the default access token from your ion account
 /**import * as Cesium from '/static/Cesium';
 import "/static/Cesium/Build/Cesium/Widgets/widgets.css";
-
-Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMTU2OWE4Mi01YjkwLTRiZjYtOWYxMC00M2NmYjI2MTgzOWUiLCJpZCI6ODc1OTgsImlhdCI6MTY0ODcxNzgyNn0.QCtgrJaz2qBi-y4d02uLG-W5tfKitz1UlANQxhV7-2E';
-//Cesium.Ion.defaultAccessToken = null; //'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkMTU2OWE4Mi01YjkwLTRiZjYtOWYxMC00M2NmYjI2MTgzOWUiLCJpZCI6ODc1OTgsImlhdCI6MTY0ODcxNzgyNn0.QCtgrJaz2qBi-y4d02uLG-W5tfKitz1UlANQxhV7-2E';
 **/
+
 const BingMapsApi = 'AvgY2m7VyKZj6P0MLanxAsLwy6gN4OdbJWKoXkIRQSbcPWRMa0wtHc3pVFFHA1to';
 
 // Initialize the Cesium Viewer in the HTML element with the `cesiumContainer` ID.
@@ -34,14 +32,14 @@ viewer.skyBox = new Cesium.SkyBox({
         negativeZ : negativeZ
     }
 });
-
+var iframe = document.getElementsByClassName('cesium-infoBox-iframe')[0];
+iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');
 /**
 parsing data from backend
 **/
 var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
 var cg = JSON.parse(document.getElementById('cg_data').textContent);
 var depth_list = JSON.parse(document.getElementById('depth_levels').textContent);
-console.log('depth list: ', depth_list, ' data type: ', typeof(depth_list));
 var geoJsonArray = [];
 /**
 populating geojson array with db data
@@ -144,7 +142,7 @@ function getColor(t, min, max) {
     const h = getHue(t, min, max);
     return hsltohex(h, s, l);
 }
-
+// create a cesium entity
 function createEntity(data, mat_col, line_col){
     return new Cesium.Entity({
         id: data.properties.id,
@@ -181,16 +179,23 @@ for(var v = 0; v < geoJsonArray.length; v++){
 }
 viewer.dataSources.add(customDataSource)
 
+// event listener for cesium entity
 viewer.selectedEntityChanged.addEventListener(
     function(selectedEntity){
         if(Cesium.defined(selectedEntity)){
             if(Cesium.defined(selectedEntity.id)){
                 let cell_id = selectedEntity.id;
-                console.log('Selected ' + selectedEntity.id);
-                let chart_container = $('#tab-nav');
+                 // remove existing data
+                trumpetChart.data.datasets.forEach((dataset) => {
+                    dataset.data.pop();
+                });
+                trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
+                trumpetChart.update();
+                // get new data
+                getCellData(cell_id);
+
                 selectedEntity.description =`
                     <table class="cesium-infoBox-defaultTable"><tbody>
-                        ${chart_container.innerHTML = ctx}
                     <tr><th>ID</th><td>
                         ${selectedEntity.id}
                     </td></tr>
@@ -199,11 +204,15 @@ viewer.selectedEntityChanged.addEventListener(
                     </td></tr>
                     </tbody></table>
                     `;
-                getCellData(cell_id);
+                var div = document.getElementById('chart-overlay');
+                div.style.display = "flex";
+
             } else {
                 console.log('Unknown entity selected.');
             }
         } else {
+            var div = document.getElementById('chart-overlay');
+            div.style.display = "none";
             console.log('Deselected.');
         }
     });
@@ -223,7 +232,6 @@ ajax function to get data for selected grid cell and updating corresponding char
             let gridID = cell_id;
 
             var query_data = response[0].cg_data;
-            console.log('query data: ', query_data.data);
             updateData(cell_id, query_data.data);
         })
         .fail(function(){
@@ -235,11 +243,11 @@ ajax function to get data for selected grid cell and updating corresponding char
 getting 2d context and creating charts via function call
 **/
 const ctx = document.getElementById('trumpetChart').getContext('2d');
+
 // declaring charts
 var trumpetChart;
 // creating charts
 createTrumpetChart();
-
 /**
 function for creating trumpet chart, contains config data for chart
 **/
@@ -272,7 +280,7 @@ function for creating trumpet chart, contains config data for chart
                     },
                     legend: {
                         display: true,
-                        position: 'right',
+                        position: 'bottom',
                         align: 'middle',
                         labels: {
                             boxHeight: 2,
@@ -363,7 +371,7 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title:{
                             display: true,
-                            text: 'Temperatur'
+                            text: 'Temperature'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -376,7 +384,7 @@ function for creating trumpet chart, contains config data for chart
                         display: true,
                         title: {
                             display: true,
-                            text: 'Tiefe'
+                            text: 'Depth'
                         },
                         ticks: {
                             // For a category axis, the val is the index so the lookup via getLabelForValue is needed
@@ -412,7 +420,6 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var min_iceage_51 = newData['arr_min_iceage_51'];
         var years = ['ice age', 'pre industrial', 'historical']
 
-        console.log('vals: ', max_preindustrial_51);
         // setup datasets with new data for the trumpet curve
         trumpetChart.data.datasets.push({
                 data: min_preindustrial_51,
