@@ -273,6 +273,11 @@ function for creating trumpet chart, contains config data for chart
                     axis: 'y',
                     intersect: false,
                 },
+                elements: {
+                    point: {
+                        radius: 0
+                    }
+                },
                 plugins: {
                     title: {
                         display: true,
@@ -422,17 +427,36 @@ function to update trumpet chart with requested data -> is called in ajax functi
 
         // setup datasets with new data for the trumpet curve
         trumpetChart.data.datasets.push({
+                data: min_iceage_51,
+                label: 'Min/Max ' +years[0],
+                fill: '+1',
+                backgroundColor: 'rgba(10,146,232,0.1)',
+                borderColor: 'rgba(10,146,232,0.3)',
+            },
+            {
+                data: max_iceage_51,
+                label: '_Max_ ' +years[0],
+                fill: false,
+                borderColor: 'rgba(10,146,232,0.3)',
+            },
+            {
+                data: av_iceage_51,
+                label: 'Average ' +years[0],
+                fill: false,
+                borderColor: '#0A92E8',
+            },
+            {
                 data: min_preindustrial_51,
                 label: 'Min/Max ' +years[1],
                 fill: '+1',
                 backgroundColor: 'rgba(242,201,76,0.1)',
-                borderColor: '#F2C94C',
+                borderColor: 'rgba(242,201,76,0.3)',
             },
             {
                 data: max_preindustrial_51,
                 label: '_Max_ ' +years[1],
                 fill: false,
-                borderColor: '#F2C94C',
+                borderColor: 'rgba(242,201,76,0.3)',
             },
             {
                 data: av_preindustrial_51,
@@ -441,23 +465,23 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 borderColor: '#F2C94C',
             },
             {
-                data: min_iceage_51,
+                data: min_historical_51,
                 label: 'Min/Max ' +years[0],
                 fill: '+1',
-                backgroundColor: 'rgba(10,146,232,0.1)',
-                borderColor: '#0A92E8',
+                backgroundColor: 'rgba(201,106,223,0.1)',
+                borderColor: 'rgba(201,106,223,0.3)',
             },
             {
-                data: max_iceage_51,
+                data: max_historical_51,
                 label: '_Max_ ' +years[0],
                 fill: false,
-                borderColor: '#0A92E8',
+                borderColor: 'rgba(201,106,223,0.3)',
             },
             {
-                data: av_iceage_51,
+                data: av_historical_51,
                 label: 'Average ' +years[0],
                 fill: false,
-                borderColor: '#0A92E8',
+                borderColor: '#c96adf',
             });
         trumpetChart.update(); // update chart
     }
