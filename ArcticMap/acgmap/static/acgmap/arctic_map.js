@@ -328,14 +328,10 @@ function for creating trumpet chart, contains config data for chart
                                 var label = context.dataset.label;
                                 var data = context.dataset.data;
                                 // update tooltip temperature data with lower and upper limits
-                                if (label.includes('Min/Max')){
+                                if (label.includes('Range')){
                                     let max = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
                                     label += ' : ' + Math.round(context.raw * 10) / 10 + '°/'+ Math.round(max * 10) / 10 + '°';
                                 }
-                                /**else if (label.includes('10%/90%')){
-                                    let min = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
-                                    label += ' : ' + Math.round(min  * 10) / 10 + '°/'+ Math.round(context.raw  * 10) / 10 + '°';
-                                }**/
                                 else{
                                     // other labels for tooltips
                                     var val = Math.round(context.raw  * 10) / 10;
@@ -423,12 +419,12 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var av_iceage_51 = newData['arr_av_iceage_51'];
         var max_iceage_51 = newData['arr_max_iceage_51'];
         var min_iceage_51 = newData['arr_min_iceage_51'];
-        var years = ['ice age', 'pre industrial', 'historical']
+        var years = ['ice age (1751 - 1800)', 'pre industrial (1850 - 1900)', 'historical (1951 - 2000)']
 
         // setup datasets with new data for the trumpet curve
         trumpetChart.data.datasets.push({
                 data: min_iceage_51,
-                label: 'Min/Max ' +years[0],
+                label: 'Range ' +years[0],
                 fill: '+1',
                 backgroundColor: 'rgba(10,146,232,0.1)',
                 borderColor: 'rgba(10,146,232,0.3)',
@@ -441,13 +437,13 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 data: av_iceage_51,
-                label: 'Average ' +years[0],
+                label: 'Mean ' +years[0],
                 fill: false,
                 borderColor: '#0A92E8',
             },
             {
                 data: min_preindustrial_51,
-                label: 'Min/Max ' +years[1],
+                label: 'Range ' +years[1],
                 fill: '+1',
                 backgroundColor: 'rgba(242,201,76,0.1)',
                 borderColor: 'rgba(242,201,76,0.3)',
@@ -460,26 +456,26 @@ function to update trumpet chart with requested data -> is called in ajax functi
             },
             {
                 data: av_preindustrial_51,
-                label: 'Average ' +years[1],
+                label: 'Mean ' +years[1],
                 fill: false,
                 borderColor: '#F2C94C',
             },
             {
                 data: min_historical_51,
-                label: 'Min/Max ' +years[0],
+                label: 'Range ' +years[2],
                 fill: '+1',
                 backgroundColor: 'rgba(201,106,223,0.1)',
                 borderColor: 'rgba(201,106,223,0.3)',
             },
             {
                 data: max_historical_51,
-                label: '_Max_ ' +years[0],
+                label: '_Max_ ' +years[2],
                 fill: false,
                 borderColor: 'rgba(201,106,223,0.3)',
             },
             {
                 data: av_historical_51,
-                label: 'Average ' +years[0],
+                label: 'Mean ' +years[2],
                 fill: false,
                 borderColor: '#c96adf',
             });
