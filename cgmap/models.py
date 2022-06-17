@@ -53,8 +53,16 @@ class SoilType(models.Model):
     db_table = 'soil_type'
     name = models.CharField(max_length=50)
     description = models.TextField()
-    min_depth = models.PositiveBigIntegerField()
-    max_depth = models.PositiveBigIntegerField()
+    min_depth = models.DecimalField(max_digits=6,
+        decimal_places=3,
+        default=None,
+        blank=True,
+        null=True,)
+    max_depth = models.DecimalField(max_digits=6,
+        decimal_places=3,
+        default=None,
+        blank=True,
+        null=True,)
 
     def __str__(self):
         return self.name
@@ -71,8 +79,16 @@ class SoilCharacteristics(models.Model):
         blank=False,
         null=False,
     )
-    min_depth = models.PositiveBigIntegerField()
-    max_depth = models.PositiveBigIntegerField()
+    min_depth = models.DecimalField(max_digits=6,
+        decimal_places=3,
+        default=None,
+        blank=True,
+        null=True,)
+    max_depth = models.DecimalField(max_digits=6,
+        decimal_places=3,
+        default=None,
+        blank=True,
+        null=True,)
 
     def __str__(self):
         return self.name

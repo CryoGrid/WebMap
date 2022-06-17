@@ -941,7 +941,16 @@ a {
     flex: none;
 }
 
-#tab-content{
+#tab-nav-soiltype2{
+    align-items: center;
+    background: #FAFCFE;
+    border: 1px solid rgba(0, 32, 74, 0.05);
+    border-radius: 12px;
+
+    flex: none;
+}
+
+.tab-content{
     align-items: center;
     background: #FAFCFE;
     border: 1px solid rgba(0, 32, 74, 0.05);
@@ -1012,7 +1021,7 @@ a {
   background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
 }
 
-#depth_temp_scale{
+.depth_temp_scale{
   background: linear-gradient(0.25turn, var(--subtle_text), var(--accent));
 }
 
@@ -1116,7 +1125,7 @@ a {
 }
 
 /* hide input thumb for chart legend range*/
-#depth_temp_scale::-webkit-slider-thumb{
+.depth_temp_scale::-webkit-slider-thumb{
   display: none;
   border: none;
   -webkit-appearance: none;
@@ -1125,7 +1134,7 @@ a {
   height: 0;
 }
 
-#depth_temp_scale[type=range]::-moz-range-thumb {
+.depth_temp_scale[type=range]::-moz-range-thumb {
   display: none;
   border: none;
   -webkit-appearance: none;

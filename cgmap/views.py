@@ -103,17 +103,25 @@ class MapView(TemplateView):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             today = datetime.date.today()
-            # date_idx = Date.objects.get(time=today).id
             # definition of interval
             start_interval = int(Date.objects.get(time='2020-01-01').id)  # id for 2020-01-01
             end_interval = int(Date.objects.get(time='2020-12-31').id)  # id for 2020-12-31
             depth_level = int(self.POST.get('url_data'))
             idx = self.POST.get('idx')
+            soil_id = int(self.POST.get('soilID'))
+            table_name = ''
+            # set table name with corresponding soil id
+            if soil_id == 1:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 2:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 3:
+                table_name = 'temperature_depth_level'
             with connection.cursor() as cursor:
                 cursor.execute(
-                    "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
+                    "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM %s WHERE grid_id = %s;" % (
                         depth_level, start_interval, end_interval, start_interval, end_interval, start_interval,
-                        end_interval, start_interval, end_interval, idx
+                        end_interval, start_interval, end_interval, table_name, idx
                     )
                 )
                 cg = cursor.fetchall()
@@ -137,19 +145,29 @@ class MapView(TemplateView):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             idx = self.POST.get('idx')
-            yID = int(self.POST.get('yID'))
+            yID = int(self.POST.get('yID'))  # id for year
+            soil_id = int(self.POST.get('soilID'))  # id for soil characteristics
             # start_date = 14611  # id for 2020-01-01
             # end_date = start_interval + 365  # id for 2020-12-31
             # determined by the send id for the year
             years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2099']
+            # soil_chars = ['Soil Type 1', 'Soil Type 2', 'Soil Type 3']
             start_date = Date.objects.get(time=str(years[yID] + '-01-01')).id
             end_date = Date.objects.get(time=str(years[yID + 2] + '-12-31')).id
             depth_list = {}
+            table_name = ''
+            # set table name with corresponding soil id
+            if soil_id == 1:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 2:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 3:
+                table_name = 'temperature_depth_level'
             with connection.cursor() as cursor:
                 for x in range(1, 16):
                     cursor.execute(
-                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                            x, start_date, end_date, idx
+                        "SELECT depth_level%s[%s:%s] FROM %s WHERE grid_id = %s;" % (
+                            x, start_date, end_date, table_name, idx
                         )
                     )
                     cg = cursor.fetchall()
@@ -177,14 +195,23 @@ class MapView(TemplateView):
         if self.method == 'POST':
             print('___________Request: ', self.method, ' with type ', type(self), ' ___________')
             idx = self.POST.get('idx')
+            soil_id = int(self.POST.get('soilID'))
             start_interval = int(Date.objects.get(time='2019-12-30').id)  # id for 2019-12-30 Monday
             end_interval = start_interval + 365 + 5  # id for 2020-12-31 -> id for 2021-01-03
             depth_list = {}
+            table_name = ''
+            # set table name with corresponding soil id
+            if soil_id == 1:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 2:
+                table_name = 'temperature_depth_level'
+            elif soil_id == 3:
+                table_name = 'temperature_depth_level'
             with connection.cursor() as cursor:
                 for x in range(1, 11):
                     cursor.execute(
-                        "SELECT depth_level%s[%s:%s] FROM temperature_depth_level WHERE grid_id = %s;" % (
-                            x, start_interval, end_interval, idx
+                        "SELECT depth_level%s[%s:%s] FROM %s WHERE grid_id = %s;" % (
+                            x, start_interval, end_interval, table_name, idx
                         )
                     )
                     cg = cursor.fetchall()

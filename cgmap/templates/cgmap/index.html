@@ -69,16 +69,39 @@
             console.log("container has been closed");
             document.getElementById('tab-nav').style.display = "none";
         });
+        $('#close-btn2').on('click', function(){
+            console.log("container has been closed");
+            document.getElementById('tab-nav-soiltype2').style.display = "none";
+        });
 
-        function open_graph(){
-            console.log("container has been opened");
-            var div = document.getElementById('tab-nav');
-            let body = document.querySelector('body');
-            if (div.style.display === "none") {
-                div.style.display = "flex";
-            } else {
-                div.style.display = "none";
+
+        function open_graph(clickID){
+            if (clickID=="graph-btn-type1") {
+                var div = document.getElementById('tab-nav');
+                if (div.style.display === "none") {
+                    div.style.display = "flex";
+                } else {
+                    div.style.display = "none";
+                }
+            } else if (clickID=="graph-btn-type2") {
+                var typeID = 2;
+                var div = document.getElementById('tab-nav-soiltype2');
+                if (div.style.display === "none") {
+                    div.style.display = "flex";
+                } else {
+                    div.style.display = "none";
+                }
+                console.log('id: ', clickID);
+            } else if (clickID=="graph-btn-type3") {
+                var typeID = 3;
+                var div = document.getElementById('tab-nav-soiltype2');
+                if (div.style.display === "none") {
+                    div.style.display = "flex";
+                } else {
+                    div.style.display = "none";
+                }
             }
+
         };
 
         $(document).ready(function() {
@@ -149,7 +172,6 @@
             </div>
         </div>
         <div class="nav chart-container" id="tab-nav" style="display: none;">
-
             <ul class="nav nav-pills nav-jt">
                 <li class="nav-item"><a class="nav-link active" id="bs-tab1" href="#first" data-toggle="tab">Jährliches Bodentemperatur Diagramm</a></li>
                 <li class="nav-item"><a class="nav-link" id="bs-tab2" href="#second" data-toggle="tab">Bodentemperaturprofil</a></li>
@@ -158,29 +180,69 @@
             </ul>
             <div class="tab-content" id="tab-content">
                 <div id="first" class="tab-pane fade in active show">
-                    <div class="canvas-container" id="chart-container">
+                    <div class="canvas-container">
                         <canvas id="tempChart" height="190"></canvas>
                     </div>
                 </div>
                 <div id="second" class="tab-pane fade">
-                    <div class="canvas-container" id="chart2-container" >
+                    <div class="canvas-container">
                         <canvas id="trumpetChart" height="190"></canvas>
                         <hr>
-                        <div id="year_selector">
-                            <input class="btn btn-secondary active" type="button" name="year" id="year1" value="2000 - 2020">
-                            <input class="btn btn-secondary" type="button" name="year" id="year3" value="2020 - 2040">
-                            <input class="btn btn-secondary" type="button" name="year" id="year5" value="2040 - 2060">
-                            <input class="btn btn-secondary" type="button" name="year" id="year7" value="2060 - 2080">
-                            <input class="btn btn-secondary" type="button" name="year" id="year9" value="2080 - 2100">
+                        <div class="year_selector" id="year_selector">
+                            <input class="btn btn-secondary active" type="button" name="year1" id="year1_1" value="2000 - 2020">
+                            <input class="btn btn-secondary" type="button" name="year3" id="year1_3" value="2020 - 2040">
+                            <input class="btn btn-secondary" type="button" name="year5" id="year1_5" value="2040 - 2060">
+                            <input class="btn btn-secondary" type="button" name="year7" id="year1_7" value="2060 - 2080">
+                            <input class="btn btn-secondary" type="button" name="year9" id="year1_9" value="2080 - 2100">
                         </div>
                     </div>
                 </div>
                 <div id="third" class="tab-pane fade">
-                    <div class="canvas-container" id="chart3-container" >
+                    <div class="canvas-container">
                         <canvas id="groundProfile" height="190"></canvas>
                         <div class="scale-container" style="margin-left: 8; width: fit-content">
                             <div class="scale-group-depth" id="depth_temperature" style="width: 766px">
-                                <input type="range" min="-5" max="35" step="1" value="0" class="slider" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+                                <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+                                <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav chart-container" id="tab-nav-soiltype2" style="display: none;">
+            <ul class="nav nav-pills nav-jt">
+                <li class="nav-item"><a class="nav-link active" id="bs-tab4" href="#forth" data-toggle="tab">Jährliches Bodentemperatur Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab5" href="#fifth" data-toggle="tab">Bodentemperaturprofil</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab6" href="#sixth" data-toggle="tab">Tiefen-Zeit Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="close-btn2" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="forth" class="tab-pane fade in active show">
+                    <div class="canvas-container" id="chart-container">
+                        <canvas id="tempChart2" height="190"></canvas>
+                    </div>
+                </div>
+                <div id="fifth" class="tab-pane fade">
+                    <div class="canvas-container">
+                        <canvas id="trumpetChart2" height="190"></canvas>
+                        <hr>
+                        <div class="year_selector" id="year_selector2">
+                            <input class="btn btn-secondary active" type="button" name="year1" id="year2_1" value="2000 - 2020">
+                            <input class="btn btn-secondary" type="button" name="year3" id="year2_3" value="2020 - 2040">
+                            <input class="btn btn-secondary" type="button" name="year5" id="year2_5" value="2040 - 2060">
+                            <input class="btn btn-secondary" type="button" name="year7" id="year2_7" value="2060 - 2080">
+                            <input class="btn btn-secondary" type="button" name="year9" id="year2_9" value="2080 - 2100">
+                        </div>
+                    </div>
+                </div>
+                <div id="sixth" class="tab-pane fade">
+                    <div class="canvas-container">
+                        <canvas id="groundProfile2" height="190"></canvas>
+                        <div class="scale-container" style="margin-left: 8; width: fit-content">
+                            <div class="scale-group-depth" style="width: 766px">
+                                <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale2" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
                                 <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
                                 </div>
                             </div>
@@ -216,50 +278,7 @@
                 </div>
             </div>
         </div>
-        <!--<div class="timeline-container">
-            <div class="btn-group btn-group-toggle justify-content-start" id="timeline-nav" data-toggle="buttons">
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="previous" autocomplete="off" value="previous">
-                    <span class="material-icons md-24">skip_previous</span>
-                </label>
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="start" autocomplete="off" value="start">
-                    <span class="material-icons md-24">play_arrow</span>
-                </label>
-                <label class="btn btn-secondary">
-                    <input type="radio" name="options" id="next" autocomplete="off" value="next">
-                    <span class="material-icons md-24">skip_next</span>
-                </label>
-            </div>
-            <div class="timeline">
-                <div class="timeline-group">
-                    <div class="timeline-element" id="1-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-circle"></div>
-                    </div>
-                    <div class="timeline-element" id="2-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-circle"></div>
-                    </div>
-                    <div class="timeline-element" id="3-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-circle"></div>
-                    </div>
-                    <div class="timeline-element" id="4-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-circle"></div>
-                    </div>
-                    <div class="timeline-element" id="5-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-circle"></div>
-                    </div>
-                    <div class="timeline-element" id="6-timeline-element">
-                        <div class="timeline-element-line"></div>
-                        <div class="timeline-element-arrow"></div>
-                    </div>
-                </div>
-            </div>
-        </div>-->
+
     </div>
 
 {% endblock content %}

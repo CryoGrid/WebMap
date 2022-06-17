@@ -66,21 +66,77 @@ $(window).on('map:init', function (e) {
     /**
     button setup with related function for setting responding id and add event listeners
     **/
-    const y2010 = document.getElementById('year1');
-    const y2030 = document.getElementById('year3');
-    const y2050 = document.getElementById('year5');
-    const y2070 = document.getElementById('year7');
-    const y2090 = document.getElementById('year9');
-    y2010.addEventListener('click', function(){const id = 1; addYear(id, gridID)});
-    y2030.addEventListener('click', function(){const id = 3; addYear(id, gridID)});
-    y2050.addEventListener('click', function(){const id = 5; addYear(id, gridID)});
-    y2070.addEventListener('click', function(){const id = 7; addYear(id, gridID)});
-    y2090.addEventListener('click', function(){const id = 9; addYear(id, gridID)});
+    var y2010 = document.getElementsByName('year1');
+    var y2030 = document.getElementsByName('year3');
+    var y2050 = document.getElementsByName('year5');
+    var y2070 = document.getElementsByName('year7');
+    var y2090 = document.getElementsByName('year9');
+    //ToDo: fix buttons for selecting the years for each soil type
+    y2010.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 2)})
+        }
+    })
+    y2030.forEach(element => {
+       if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 2)})
+        }
+    })
+    y2050.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
+        }
+    })
+    y2070.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
+        }
+    })
+    y2090.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
+        }
+    })
 
     /**
     getting 2d context and creating charts via function call
     **/
     const ctx = document.getElementById('tempChart').getContext('2d');
+    //const ctx = document.getElementById('tempChart2').getContext('2d');
     const ctx2 = document.getElementById('trumpetChart').getContext('2d');
     const ctx3 = document.getElementById('groundProfile').getContext('2d');
     // declaring charts
@@ -92,12 +148,12 @@ $(window).on('map:init', function (e) {
     createTrumpetChart();
     createGroundProfile();
     // add datasets to trumpet chart
-    function addYear(id, gridID){
+    function addYear(id, gridID, soilID){
         if(!activeYears.length){ // if array is empty -> add
-            getMaxMin(gridID, id);
+            getMaxMin(gridID, id, soilID);
         }
         else if(!activeYears.includes(id)){ // if id is not set in array -> add
-            getMaxMin(gridID, id);
+            getMaxMin(gridID, id, soilID);
         }
         else if(activeYears.includes(id)){ // if id is already in array -> remove and update chart
             let setSize = 6; // number of displayed data fields
@@ -106,10 +162,9 @@ $(window).on('map:init', function (e) {
             trumpetChart.update();
         }
     };
-
-    $('#bs-tab2').on("shown.bs.tab", function() {
+    $('#bs-tab1').on("shown.bs.tab", function() {
         createChart();
-        $('#bs-tab2').off(); //to remove the bound event after initial rendering
+        $('#bs-tab1').off(); //to remove the bound event after initial rendering
     });
     $('#bs-tab2').on("shown.bs.tab", function() {
         createTrumpetChart();
@@ -118,6 +173,18 @@ $(window).on('map:init', function (e) {
     $('#bs-tab3').on("shown.bs.tab", function() {
         createGroundProfile();
         $('#bs-tab3').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab3').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab3').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab4').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab4').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab5').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab5').off(); //to remove the bound event after initial rendering
     });
     /**
     populating geojson array with db data
@@ -255,7 +322,13 @@ $(window).on('map:init', function (e) {
         }
         var content = `
             <h3 class=header3>Zelle ${ data.id }
-                <button type='button' onclick='open_graph();' class='btn btn-primary btn-sm graph-btn' style='position: absolute; right: 20px;' id='graph-btn'>
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 20px;' value='type1' id='graph-btn-type1'>
+                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                </button>
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 50px;' value='type2' id='graph-btn-type2'>
+                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                </button>
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 80px;' value='type3' id='graph-btn-type3'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
                 </button>
             </h3>
@@ -287,15 +360,15 @@ $(window).on('map:init', function (e) {
             .setContent(content)
             .openOn(detail.map);
 
-        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id);
+        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, 1);
         trumpetChart.data.datasets.forEach((dataset) => {
             dataset.data.pop();
         });
         trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
         activeYears.splice(0, activeYears.length);
         trumpetChart.update();
-        var maxMin = getMaxMin(e.target.feature.properties.id, 1);
-        var gP = getGroundProfile(e.target.feature.properties.id);
+        var maxMin = getMaxMin(e.target.feature.properties.id, 1, 1);
+        var gP = getGroundProfile(e.target.feature.properties.id, 1);
     }
 
     function onEachFeature(feature, layer) {
@@ -348,6 +421,7 @@ $(window).on('map:init', function (e) {
 
 /**
     jquery for dynamically updating the temperature data of the selected level for all grid cells
+    ToDo: update depth select with soil types -> check which chart is active? update accordingly
 **/
     $(document).ready(function(){
         var slider = document.getElementById('depth_range');
@@ -409,11 +483,11 @@ $(window).on('map:init', function (e) {
 /**
 ajax function to get data for selected grid cell and updating corresponding chart
 **/
-    function getCellData(depth_level, cell_id){
+    function getCellData(depth_level, cell_id, soil_id){
         $.ajax({
             url: 'get_cell_data/',
             type: 'POST',
-            data: {url_data:depth_level, idx:cell_id},
+            data: {url_data:depth_level, idx:cell_id, soilID:soil_id},
             dataType: "json"
         })
         .done(function(response){
@@ -432,10 +506,10 @@ ajax function to get data for selected grid cell and updating corresponding char
 /**
 ajax function to get ground profile data for selected grid cell and updating corresponding chart
 **/
-    function getGroundProfile(cell_id){
+    function getGroundProfile(cell_id, soil_id){
         $.ajax({
             url: 'get_ground_profile/',
-            data: {idx:cell_id},
+            data: {idx:cell_id, soilID:soil_id},
             type: 'POST',
         })
         .done(function(response){
@@ -451,17 +525,17 @@ ajax function to get ground profile data for selected grid cell and updating cor
 /**
 ajax function to get min, max and mean values for selected grid cell and updating corresponding chart
 **/
-    function getMaxMin(cell_id, yearID){
+    function getMaxMin(cell_id, year_id, soil_id){
         $.ajax({
             url: 'get_max_min/',
-            data: {idx:cell_id, yID: yearID},
+            data: {idx:cell_id, yID: year_id, soilID:soil_id},
             type: 'POST',
         })
         .done(function(response){
             // if request is successful update data in updateData
             var data = response[0]['depth_list'];
-            activeYears.push(yearID);
-            updateData(data, yearID);
+            activeYears.push(year_id);
+            updateData(data, year_id);
         })
         .fail(function(){
             console.log('Failed!')
@@ -1070,7 +1144,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     },
                     legend: {
                         display: true,
-                        position: 'right',
+                        position: 'bottom',
                         align: 'middle',
                         labels: {
                             boxHeight: 2,
