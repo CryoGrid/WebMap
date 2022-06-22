@@ -17,7 +17,7 @@ const viewer = new Cesium.Viewer('cesiumContainer', {
     requestRenderMode: true,
     maximumRenderTimeChange: Infinity,
     timeline: false,
-    animation: false,
+    animation: true,
     baseLayerPicker: false,
     sceneModePicker: false,
 });
@@ -40,38 +40,12 @@ parsing data from backend
 var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
 var cg = JSON.parse(document.getElementById('cg_data').textContent);
 var depth_list = JSON.parse(document.getElementById('depth_levels').textContent);
-var geoJsonArray = [];
-/**
-populating geojson array with db data
-**/
-for (var i = 0; i < data.features.length; i++){
-    if (data.features[i].properties.left < 0.0){
-        var left = 181.0 + data.features[i].properties.left*(-1.0);
-        var right = 181.0 + data.features[i].properties.right*(-1.0);
-        data.features[i].properties.left = left;
-        data.features[i].properties.right = right;
-    }
+// range function
+const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
 
-    geoJsonArray.push({"type": "Feature",
-        "properties": {"id": data.features[i].properties.id,
-                       "name": cg[data.features[i].properties.id].file_name,
-                       "popupContent": " This is a Cell number: " + data.features[i].properties.id},
-        "geometry": {"type": "Polygon", "coordinates": [
-            [[data.features[i].properties.left, data.features[i].properties.top],
-            [data.features[i].properties.right, data.features[i].properties.top],
-            [data.features[i].properties.right, data.features[i].properties.bottom],
-            [data.features[i].properties.left, data.features[i].properties.bottom]]
-            ]}
-        });
-        if(cg[data.features[i].properties.id] != null){
-            geoJsonArray[i].properties["av_preindustrial_51"] = cg[data.features[i].properties.id].av_preindustrial_51;
-            geoJsonArray[i].properties["max_preindustrial_51"] = cg[data.features[i].properties.id].max_preindustrial_51;
-            geoJsonArray[i].properties["min_preindustrial_51"] = cg[data.features[i].properties.id].min_preindustrial_51;
-            geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
-            geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
-            geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
-        };
-    };
+var geoJsonArray = [];
+temperatureScale(cg);
+createGridMap(data);
 
 // hsl to hex converter
 function hsltohex(h, s, l){
@@ -116,7 +90,7 @@ function getHexCol(t){
     const s = 100;
     const l = 50;
     var h = 0;
-    if( t > 0.0){
+    if( t >= 0.0){
         // color between yellow and red
         var min = 1;
         var max = 10;
@@ -124,7 +98,7 @@ function getHexCol(t){
         var hslMin = 440;
         h = getHue(t, min, max, hslMax, hslMin);
     }
-    else if( t <= 0.0){
+    else if( t < 0.0){
         // color between white and blue/purple
         var min = -30;
         var max = 0;
@@ -142,14 +116,59 @@ function getColor(t, min, max) {
     const h = getHue(t, min, max);
     return hsltohex(h, s, l);
 }
+
+/**
+set dynamic temperature values for range slider and a gradient background
+update temperature scale data with requested cg data
+**/
+function temperatureScale(cgData){
+    // set min, max, value slider values
+    let cg_arr = Object.values(cgData);
+
+    let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.av_preindustrial_51) > Math.round(obj.av_preindustrial_51)) ? max : obj).av_preindustrial_51);
+    let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.av_preindustrial_51) < Math.round(obj.av_preindustrial_51)) ? min : obj).av_preindustrial_51);
+    let r = range(parseInt(minObj), parseInt(maxObj), 1);
+
+    let col_r = []
+    /** calculate color for range slider **/
+    for( var j = 0; j < r.length; j++){
+        col_r.push(getHexCol(r[j]));
+    }
+
+    let maxCol = getHexCol(maxObj);
+    let minCol = getHexCol(minObj);
+
+    // set values in ui element
+    document.getElementById('depth_temp_scale').min = minObj;
+    document.getElementById('depth_temp_scale').max = maxObj;
+    document.getElementById('depth_temp_scale').value = maxObj;
+
+    let col_st = '';
+    col_r.forEach(c => col_st += ' ,' + c );
+    document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
+
+    let spn = '';
+    var newArr = [];
+    for(var i = 0; i < r.length; i=i+2) {
+        newArr.push(r[i]);
+    }
+    newArr.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
+    document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
+}
 // create a cesium entity
-function createEntity(data, mat_col, line_col){
+function createEntity(data, mat_col, line_col) {
     return new Cesium.Entity({
         id: data.properties.id,
         name: data.properties.name,
+        average_iceage: data.properties.av_iceage_51,
+        min_iceage: data.properties.min_iceage_51,
+        max_iceage: data.properties.max_iceage_51,
         average_preindustrial: data.properties.av_preindustrial_51,
         min_preindustrial: data.properties.min_preindustrial_51,
         max_preindustrial: data.properties.max_preindustrial_51,
+        average_historical: data.properties.av_historical_51,
+        min_historical: data.properties.min_historical_51,
+        max_historical: data.properties.max_historical_51,
         polygon: {
             hierarchy: Cesium.Cartesian3.fromDegreesArray([
                 data.geometry.coordinates[0][0][0], data.geometry.coordinates[0][0][1],
@@ -166,56 +185,151 @@ function createEntity(data, mat_col, line_col){
         entityCollection: 'GeoJsonData',
     });
 }
-
-/** create features**/
-var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
-for(var v = 0; v < geoJsonArray.length; v++){
-    let hex_col = getHexCol(geoJsonArray[v].properties["av_preindustrial_51"]);
-    let rgba_col = hexToRgbA(hex_col);
-    var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
-    entity.addProperty('name');
-    entity.name = geoJsonArray[v].properties.name;
-    customDataSource.entities.add(entity);
-}
-viewer.dataSources.add(customDataSource)
-
-// event listener for cesium entity
-viewer.selectedEntityChanged.addEventListener(
-    function(selectedEntity){
-        if(Cesium.defined(selectedEntity)){
-            if(Cesium.defined(selectedEntity.id)){
-                let cell_id = selectedEntity.id;
-                 // remove existing data
-                trumpetChart.data.datasets.forEach((dataset) => {
-                    dataset.data.pop();
-                });
-                trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
-                trumpetChart.update();
-                // get new data
-                getCellData(cell_id);
-
-                selectedEntity.description =`
-                    <table class="cesium-infoBox-defaultTable"><tbody>
-                    <tr><th>ID</th><td>
-                        ${selectedEntity.id}
-                    </td></tr>
-                    <tr><th>Name</th><td>
-                        ${selectedEntity.name}
-                    </td></tr>
-                    </tbody></table>
-                    `;
-                var div = document.getElementById('chart-overlay');
-                div.style.display = "flex";
-
-            } else {
-                console.log('Unknown entity selected.');
-            }
-        } else {
-            var div = document.getElementById('chart-overlay');
-            div.style.display = "none";
-            console.log('Deselected.');
+function createGridMap(data){
+    /**
+    populating geojson array with db data
+    **/
+    for (var i = 0; i < data.features.length; i++){
+        if (data.features[i].properties.left < 0.0){
+            var left = 181.0 + data.features[i].properties.left*(-1.0);
+            var right = 181.0 + data.features[i].properties.right*(-1.0);
+            data.features[i].properties.left = left;
+            data.features[i].properties.right = right;
         }
-    });
+
+        geoJsonArray.push({"type": "Feature",
+            "properties": {"id": data.features[i].properties.id,
+                           "name": cg[data.features[i].properties.id].file_name,
+                           "popupContent": " This is a Cell number: " + data.features[i].properties.id},
+            "geometry": {"type": "Polygon", "coordinates": [
+                [[data.features[i].properties.left, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.bottom],
+                [data.features[i].properties.left, data.features[i].properties.bottom]]
+                ]}
+            });
+            if(cg[data.features[i].properties.id] != null){
+                geoJsonArray[i].properties["av_iceage_51"] = cg[data.features[i].properties.id].av_iceage_51;
+                geoJsonArray[i].properties["max_iceage_51"] = cg[data.features[i].properties.id].max_iceage_51;
+                geoJsonArray[i].properties["min_iceage_51"] = cg[data.features[i].properties.id].min_iceage_51;
+                geoJsonArray[i].properties["av_preindustrial_51"] = cg[data.features[i].properties.id].av_preindustrial_51;
+                geoJsonArray[i].properties["max_preindustrial_51"] = cg[data.features[i].properties.id].max_preindustrial_51;
+                geoJsonArray[i].properties["min_preindustrial_51"] = cg[data.features[i].properties.id].min_preindustrial_51;
+                geoJsonArray[i].properties["av_historical_51"] = cg[data.features[i].properties.id].av_historical_51;
+                geoJsonArray[i].properties["max_historical_51"] = cg[data.features[i].properties.id].max_historical_51;
+                geoJsonArray[i].properties["min_historical_51"] = cg[data.features[i].properties.id].min_historical_51;
+                geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
+                geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
+                geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
+            };
+        };
+    /** create features**/
+    var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
+    for(var v = 0; v < geoJsonArray.length; v++){
+        let hex_col = getHexCol(geoJsonArray[v].properties["av_preindustrial_51"]);
+        let rgba_col = hexToRgbA(hex_col);
+        var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
+        entity.addProperty('name');
+        entity.name = geoJsonArray[v].properties.name;
+        customDataSource.entities.add(entity);
+    }
+    viewer.dataSources.add(customDataSource);
+}
+
+function addEvent(selectedEntity){
+    if(Cesium.defined(selectedEntity)){
+        if(Cesium.defined(selectedEntity.id)){
+            let cell_id = selectedEntity.id;
+             // remove existing data
+            trumpetChart.data.datasets.forEach((dataset) => {
+                dataset.data.pop();
+            });
+            trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
+            trumpetChart.update();
+            // get new data
+            getCellData(cell_id);
+
+            selectedEntity.description =`
+                <table class="cesium-infoBox-defaultTable"><tbody>
+                <tr><th>ID</th><td>
+                    ${selectedEntity.id}
+                </td></tr>
+                <tr><th></th>
+                <th>average</th><th>min</th><th>max</th>
+                </tr>
+                <tr><td>End of 18 c.</td><td>
+                    ${selectedEntity.average_iceage}
+                </td><td>
+                    ${selectedEntity.min_iceage}
+                </td><td>
+                    ${selectedEntity.max_iceage}
+                </td></tr>
+                <tr><td>Pre Industrial</td><td>
+                    ${selectedEntity.average_preindustrial}
+                </td><td>
+                    ${selectedEntity.min_preindustrial}
+                </td><td>
+                    ${selectedEntity.max_preindustrial}
+                </td></tr>
+                <tr><td>Historical</td><td>
+                    ${selectedEntity.average_historical}
+                </td><td>
+                    ${selectedEntity.min_historical}
+                </td><td>
+                    ${selectedEntity.max_historical}
+                </td></tr>
+                </tbody></table>
+                `;
+            // activate chart when cell is activated
+            var div = document.getElementById('chart-overlay');
+            div.style.display = "flex";
+
+        } else {
+            console.log('Unknown entity selected.');
+        }
+    } else {
+        var div = document.getElementById('chart-overlay');
+        // hide chart when cell is deselected
+        div.style.display = "none";
+    }
+}
+// event listener for cesium entity
+viewer.selectedEntityChanged.addEventListener(function(selectedEntity){addEvent(selectedEntity)});
+/**
+ajax function to update grid cells with new data
+**/
+document.getElementById('ic-clck').onclick = function(){updateGridData(1)};
+document.getElementById('pi-clck').onclick = function(){updateGridData(2)};
+document.getElementById('hst-clck').onclick = function(){updateGridData(3)};
+
+function updateGridData(time_id){
+    var table = '';
+    if( time_id == 1 ){
+        table = 'av_iceage_51';
+    }
+    else if ( time_id == 2 ){
+        table = 'av_preindustrial_51';
+    }
+    else if ( time_id == 3 ){
+        table = 'av_historical_51';
+    }
+    viewer.dataSources.removeAll(true);
+    var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
+    for(var v = 0; v < geoJsonArray.length; v++){
+        //entity = customDataSource.entities.getById(v);
+        //viewer.entities.remove(entity);
+        let hex_col = getHexCol(geoJsonArray[v].properties[table]);
+        let rgba_col = hexToRgbA(hex_col);
+        //viewer.dataSources.get('GeoJsonData').entities.getById(v).polygon.material = Cesium.Color.fromCssColorString(rgba_col);
+        //viewer.dataSources.get('GeoJsonData').entities.getById(v).polygon.outlineuColor = Cesium.Color.fromCssColorString(hex_col);
+        var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
+        entity.addProperty('name');
+        entity.name = geoJsonArray[v].properties.name;
+        customDataSource.entities.add(entity);
+    }
+    viewer.dataSources.add(customDataSource);
+    viewer.selectedEntityChanged.addEventListener(function(selectedEntity){addEvent(selectedEntity)});
+}
 
 /**
 ajax function to get data for selected grid cell and updating corresponding chart
@@ -383,6 +497,7 @@ function for creating trumpet chart, contains config data for chart
                     },
                     y: {
                         display: true,
+                        max: 59,
                         title: {
                             display: true,
                             text: 'Depth'
@@ -419,7 +534,7 @@ function to update trumpet chart with requested data -> is called in ajax functi
         var av_iceage_51 = newData['arr_av_iceage_51'];
         var max_iceage_51 = newData['arr_max_iceage_51'];
         var min_iceage_51 = newData['arr_min_iceage_51'];
-        var years = ['ice age (1751 - 1800)', 'pre industrial (1850 - 1900)', 'historical (1951 - 2000)']
+        var years = ['end of 18th (1750 - 1800)', 'pre industrial (1850 - 1900)', 'historical (1950 - 2000)']
 
         // setup datasets with new data for the trumpet curve
         trumpetChart.data.datasets.push({

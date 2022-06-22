@@ -36,8 +36,10 @@ class MapView(TemplateView):
             depth_level = cursor.fetchall()
             context['depth_list'].update(depth_level)
             cursor.execute(
-                "SELECT grid_id, name, t_av_preindustrial_51[%s], t_max_preindustrial_51[%s], t_min_preindustrial_51[%s] FROM acgmap_cryogriddata" % (
-                    depth_id, depth_id, depth_id
+                "SELECT grid_id, name, t_av_iceage_51[%s], t_max_iceage_51[%s], t_min_iceage_51[%s], "
+                "t_av_preindustrial_51[%s], t_max_preindustrial_51[%s], t_min_preindustrial_51[%s],"
+                "t_av_historical_51[%s], t_max_historical_51[%s], t_min_historical_51[%s] FROM acgmap_cryogriddata" % (
+                    depth_id, depth_id, depth_id, depth_id, depth_id, depth_id, depth_id, depth_id, depth_id
                 ))
             cg = cursor.fetchall()
             # turn query data into json data
@@ -45,9 +47,15 @@ class MapView(TemplateView):
                 json_data = {
                     'grid_id': cg_data[0],
                     'file_name': cg_data[1],
-                    'av_preindustrial_51': cg_data[2],
-                    'max_preindustrial_51': cg_data[3],
-                    'min_preindustrial_51': cg_data[4],
+                    'av_iceage_51': cg_data[2],
+                    'max_iceage_51': cg_data[3],
+                    'min_iceage_51': cg_data[4],
+                    'av_preindustrial_51': cg_data[5],
+                    'max_preindustrial_51': cg_data[6],
+                    'min_preindustrial_51': cg_data[7],
+                    'av_historical_51': cg_data[8],
+                    'max_historical_51': cg_data[9],
+                    'min_historical_51': cg_data[10],
                     'depth_idx': depth_id,
                     'depth_level': depth,
                     'date': start_date,
@@ -60,6 +68,44 @@ class MapView(TemplateView):
         # query to get shape data for grid map
         geojson = serialize('geojson', MapGrid.objects.all(), geometry_field='feature')
         return render(request, self.template_name, {'grid_data': geojson, 'cg_data': context['cg_data'], 'depth_levels': context['depth_list']})
+
+    @csrf_exempt
+    def update_grid_data(self):
+        if self.method == 'POST':
+            print('___________Request: ', self.method, ' with type ', type(self), '___________')
+            idx = int(self.POST.get('timeID'))
+            # depth level is set to 38, for the standard depth of 9.95 m
+            # postgreSQL DB index starts at 1
+            depth_id = 38
+            tmp = {'cg_data': {}}
+            table_name = ''
+            if idx == 1:
+                table_name = 'iceage'
+            elif idx == 2:
+                table_name = 'preindustrial'
+            elif idx == 3:
+                table_name = 'historical'
+
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT grid_id, t_av_%s_51[%s], t_max_%s_51[%s], t_min_%s_51[%s] FROM acgmap_cryogriddata" % (
+                        table_name, depth_id, table_name, depth_id, table_name, depth_id
+                    ))
+                cg = cursor.fetchall()
+                # turn query data into json data
+                for cg_data in cg:
+                    json_data = {
+                        'grid_id': cg_data[0],
+                        'av_51': cg_data[1],
+                        'max_51': cg_data[2],
+                        'min_51': cg_data[3],
+
+                    }
+                    tmp['cg_data'].update({cg_data[0]: json_data})
+            return JsonResponse([{'cg_data': tmp['cg_data']}], safe=False)
+        else:
+            return HttpResponseBadRequest('This view can not handle method {0}'. \
+                                          format(self.method), status=405)
 
     # request function to get data for selected cell for the chart
     @csrf_exempt

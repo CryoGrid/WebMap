@@ -74,6 +74,12 @@
             };
             console.log('geo json array: ', geoJsonArray);
         }
+        $(document).ready(function(){
+            $('.button-nav').click(function(){
+                $('.button-nav').removeClass('active');
+                $(this).addClass('active');
+            });
+        });
     </script>
 {% endblock footer_javascript_page %}
 
@@ -86,8 +92,21 @@
     <div class="canvas-container" id="chart-container">
         <canvas id="trumpetChart" height="190"></canvas>
     </div>
-</div><!--
-    <body onload="initialize()">
+</div>
+<div class="map-menu">
+    <div class="btn-group text-center" id="decade-button-nav">
+        <button type="button" class="btn btn-secondary button-nav" id="ic-clck" value="1">end of 18th c. (1750 - 1800)</button>
+        <button type="button" class="btn btn-secondary button-nav active" id="pi-clck" value="2">pre industrial (1850 - 1900)</button>
+        <button type="button" class="btn btn-secondary button-nav" id="hst-clck" value="3">historical (1950 - 2000)</button>
+    </div>
+    <div class="scale-container" style="margin-left: 8; width: fit-content">
+        <div class="scale-group-depth" id="depth_temperature">
+            <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+            <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;"></div>
+        </div>
+    </div>
+</div>
+<!--<body onload="initialize()">
         <div id="map-wrapper">
             <div id="earth_div"></div>
 
