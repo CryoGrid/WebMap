@@ -224,9 +224,19 @@ function createGridMap(data){
             };
         };
     /** create features**/
-    var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
+    var firstDataSource = new Cesium.CustomDataSource('preindustrial');
+    var secondDataSource = new Cesium.CustomDataSource('iceage');
+    var thirdDataSource = new Cesium.CustomDataSource('historical');
+    addDataSource(firstDataSource, 'av_preindustrial_51');
+    addDataSource(secondDataSource, 'av_iceage_51');
+    secondDataSource.show = false;
+    addDataSource(thirdDataSource, 'av_historical_51');
+    thirdDataSource.show = false;
+}
+
+function addDataSource(customDataSource, tableName){
     for(var v = 0; v < geoJsonArray.length; v++){
-        let hex_col = getHexCol(geoJsonArray[v].properties["av_preindustrial_51"]);
+        let hex_col = getHexCol(geoJsonArray[v].properties[tableName]);
         let rgba_col = hexToRgbA(hex_col);
         var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
         entity.addProperty('name');
@@ -306,29 +316,26 @@ function updateGridData(time_id){
     var table = '';
     if( time_id == 1 ){
         table = 'av_iceage_51';
+        viewer.dataSources.getByName('iceage')[0].show = true;
+        viewer.dataSources.getByName('preindustrial')[0].show = false;
+        viewer.dataSources.getByName('historical')[0].show = false;
+        console.log('datasource collection: ', viewer.dataSources);
+        console.log('iceage datasource: ', viewer.dataSources.getByName('iceage')[0]);
     }
     else if ( time_id == 2 ){
         table = 'av_preindustrial_51';
+        viewer.dataSources.getByName('iceage')[0].show = false;
+        viewer.dataSources.getByName('preindustrial')[0].show = true;
+        viewer.dataSources.getByName('historical')[0].show = false;
+        console.log('iceage datasource: ', viewer.dataSources.getByName('iceage'));
     }
     else if ( time_id == 3 ){
         table = 'av_historical_51';
+        viewer.dataSources.getByName('iceage')[0].show = false;
+        viewer.dataSources.getByName('preindustrial')[0].show = false;
+        viewer.dataSources.getByName('historical')[0].show = true;
+        console.log('iceage datasource: ', viewer.dataSources.getByName('iceage'));
     }
-    viewer.dataSources.removeAll(true);
-    var customDataSource = new Cesium.CustomDataSource('GeoJsonData');
-    for(var v = 0; v < geoJsonArray.length; v++){
-        //entity = customDataSource.entities.getById(v);
-        //viewer.entities.remove(entity);
-        let hex_col = getHexCol(geoJsonArray[v].properties[table]);
-        let rgba_col = hexToRgbA(hex_col);
-        //viewer.dataSources.get('GeoJsonData').entities.getById(v).polygon.material = Cesium.Color.fromCssColorString(rgba_col);
-        //viewer.dataSources.get('GeoJsonData').entities.getById(v).polygon.outlineuColor = Cesium.Color.fromCssColorString(hex_col);
-        var entity = createEntity(geoJsonArray[v], rgba_col, hex_col);
-        entity.addProperty('name');
-        entity.name = geoJsonArray[v].properties.name;
-        customDataSource.entities.add(entity);
-    }
-    viewer.dataSources.add(customDataSource);
-    viewer.selectedEntityChanged.addEventListener(function(selectedEntity){addEvent(selectedEntity)});
 }
 
 /**
