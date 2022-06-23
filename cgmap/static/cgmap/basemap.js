@@ -26,16 +26,16 @@ $(window).on('map:init', function (e) {
     // range function
     const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
     // initiate values for dynamic temperature scale
-    temperatureScale(cg);
+    temperatureScale(Object.values(cg), 'temp_scale');
 
     /**
     set dynamic temperature values for range slider and a gradient background
     update temperature scale data with requested cg data
     **/
-    function temperatureScale(cgData){
+    function temperatureScale(cgData, ui_element){
 
         // set min, max, value slider values
-        let cg_arr = Object.values(cgData);
+        let cg_arr = cgData;
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
 
@@ -51,17 +51,17 @@ $(window).on('map:init', function (e) {
         let minCol = getColor(minObj, -10, 15);
 
         // set values in ui element
-        document.getElementById('temp_scale').min = minObj;
-        document.getElementById('temp_scale').max = maxObj;
-        document.getElementById('temp_scale').value = maxObj;
+        document.getElementById(ui_element).min = minObj;
+        document.getElementById(ui_element).max = maxObj;
+        document.getElementById(ui_element).value = maxObj;
 
         let col_st = '';
         col_r.forEach(c => col_st += ' ,' + c );
-        document.getElementById('temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
+        document.getElementById(ui_element).style = 'background: linear-gradient(0.25turn'+ col_st +');';
 
         let spn = '';
-        r.forEach(element => spn += '<p><span class="temp">' + element + '</span></p>');
-        document.getElementsByClassName('sliderticks temp_scale')[0].innerHTML = spn;
+        r.forEach(element => spn += '<p><span class=' + ui_element + '>' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks ' + ui_element)[0].innerHTML = spn;
     }
     /**
     button setup with related function for setting responding id and add event listeners
@@ -133,21 +133,33 @@ $(window).on('map:init', function (e) {
     })
 
     /**
-    getting 2d context and creating charts via function call
+    getting 2d context and creating charts via function call for all soil types
     **/
     const ctx = document.getElementById('tempChart').getContext('2d');
-    //const ctx = document.getElementById('tempChart2').getContext('2d');
+    const ctx_tmp2 = document.getElementById('tempChart2').getContext('2d');
+    const ctx_tmp3 = document.getElementById('tempChart3').getContext('2d');
     const ctx2 = document.getElementById('trumpetChart').getContext('2d');
+    const ctx_tc2 = document.getElementById('trumpetChart2').getContext('2d');
+    const ctx_tc3 = document.getElementById('trumpetChart3').getContext('2d');
     const ctx3 = document.getElementById('groundProfile').getContext('2d');
-    // declaring charts
+    const ctx_gp2 = document.getElementById('groundProfile2').getContext('2d');
+    const ctx_gp3 = document.getElementById('groundProfile3').getContext('2d');
+    // declaring charts for all soil types
     var tempChart;
+    var tempChart2;
+    var tempChart3;
     var trumpetChart;
+    var trumpetChart2;
+    var trumpetChart3;
     var groundProfile;
+    var groundProfile2;
+    var groundProfile3;
     // creating charts
     createChart();
     createTrumpetChart();
     createGroundProfile();
     // add datasets to trumpet chart
+    // ToDo change activeYears array to dict, so it can contain ids for all three soil types
     function addYear(id, gridID, soilID){
         if(!activeYears.length){ // if array is empty -> add
             getMaxMin(gridID, id, soilID);
@@ -157,11 +169,25 @@ $(window).on('map:init', function (e) {
         }
         else if(activeYears.includes(id)){ // if id is already in array -> remove and update chart
             let setSize = 6; // number of displayed data fields
-            trumpetChart.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
-            activeYears.splice(activeYears.indexOf(id), 1);
-            trumpetChart.update();
+            if( soilID == 1){
+                trumpetChart.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart.update();
+            }
+            else if( soilID == 2){
+                trumpetChart2.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart2.update();
+            }
+            else if( soilID == 3){
+                trumpetChart3.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart3.update();
+            }
+
         }
     };
+    // soil type 1
     $('#bs-tab1').on("shown.bs.tab", function() {
         createChart();
         $('#bs-tab1').off(); //to remove the bound event after initial rendering
@@ -174,17 +200,31 @@ $(window).on('map:init', function (e) {
         createGroundProfile();
         $('#bs-tab3').off(); //to remove the bound event after initial rendering
     });
-    $('#bs-tab3').on("shown.bs.tab", function() {
-        createChart();
-        $('#bs-tab3').off(); //to remove the bound event after initial rendering
-    });
+    // soil type 2
     $('#bs-tab4').on("shown.bs.tab", function() {
-        createTrumpetChart();
+        createChart();
         $('#bs-tab4').off(); //to remove the bound event after initial rendering
     });
     $('#bs-tab5').on("shown.bs.tab", function() {
-        createGroundProfile();
+        createTrumpetChart();
         $('#bs-tab5').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab6').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab6').off(); //to remove the bound event after initial rendering
+    });
+    // soil type 3
+    $('#bs-tab7').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab7').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab8').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab8').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab9').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab9').off(); //to remove the bound event after initial rendering
     });
     /**
     populating geojson array with db data
@@ -323,10 +363,10 @@ $(window).on('map:init', function (e) {
         var content = `
             <h3 class=header3>Zelle ${ data.id }
                 <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 20px;' value='type1' id='graph-btn-type1'>
-                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                    <span class='material-icons md-18 right' id='show_chart'>terrain</span>
                 </button>
                 <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 50px;' value='type2' id='graph-btn-type2'>
-                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                    <span class='material-icons md-18 right' id='show_chart'>grass</span>
                 </button>
                 <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 80px;' value='type3' id='graph-btn-type3'>
                     <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
@@ -367,8 +407,14 @@ $(window).on('map:init', function (e) {
         trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
         activeYears.splice(0, activeYears.length);
         trumpetChart.update();
+        // set values for trumpet chart values for each soil type
         var maxMin = getMaxMin(e.target.feature.properties.id, 1, 1);
-        var gP = getGroundProfile(e.target.feature.properties.id, 1);
+        var maxMin_st2 = getMaxMin(e.target.feature.properties.id, 1, 2);
+        var maxMin_st3 = getMaxMin(e.target.feature.properties.id, 1, 3);
+        // set values for ground profile chart values for each soil type
+        var groundProfile = getGroundProfile(e.target.feature.properties.id, 1);
+        var groundProfile_st2 = getGroundProfile(e.target.feature.properties.id, 2);
+        var groundProfile_st3 = getGroundProfile(e.target.feature.properties.id, 3);
     }
 
     function onEachFeature(feature, layer) {
@@ -516,7 +562,15 @@ ajax function to get ground profile data for selected grid cell and updating cor
             // if request is successful update data in updateProfileData function
             var data = response[0]['depth_list'];
             var interval = response[1]['date_interval'];
-            updateProfileData(data, interval);
+            if( soil_id == 1){
+                updateProfileData(groundProfile, data, interval);
+            }
+            else if( soil_id == 2){
+                updateProfileData(groundProfile2, data, interval);
+            }
+            else if( soil_id == 3){
+                updateProfileData(groundProfile3, data, interval);
+            }
         })
         .fail(function(){
             console.log('Failed!')
@@ -535,7 +589,15 @@ ajax function to get min, max and mean values for selected grid cell and updatin
             // if request is successful update data in updateData
             var data = response[0]['depth_list'];
             activeYears.push(year_id);
-            updateData(data, year_id);
+            if( soil_id == 1){
+                updateData(trumpetChart, data, year_id);
+            }
+            else if( soil_id == 2){
+                updateData(trumpetChart2, data, year_id);
+            }
+            else if( soil_id == 2){
+                updateData(trumpetChart3, data, year_id);
+            }
         })
         .fail(function(){
             console.log('Failed!')
@@ -550,7 +612,8 @@ function for creating trumpet chart, contains config data for chart
             labels: labels,
             datasets: [],
         };
-        trumpetChart = new Chart(ctx2, {
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
             type: 'line',
             data: data,
             options: {
@@ -694,13 +757,15 @@ function for creating trumpet chart, contains config data for chart
                     }
                 }
             }
-        });
+        };
+        trumpetChart = new Chart(ctx2, config);
+        trumpetChart2 = new Chart(ctx_tc2, config);
     }
 
 /**
 function to update trumpet chart with requested data -> is called in ajax function
 **/
-    function updateData(newData, yearID){
+    function updateData(newData, yearID, soilID){
         var min = [];
         var max = [];
         var mean = [];
@@ -959,8 +1024,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 },
             }]
         };
-
-        groundProfile = new Chart(ctx3, {
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
             type: 'line',
             data: data,
             options: {
@@ -1024,7 +1089,10 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     },
                 },
             }
-        });
+        };
+
+        groundProfile = new Chart(ctx3, config);
+        groundProfile2 = new Chart(ctx_gp2, config);
     }
     /* gets the size of an object*/
     Object.size = function(obj) {
@@ -1052,22 +1120,36 @@ function to update trumpet chart with requested data -> is called in ajax functi
 /**
     update ground profile data and set colors for graph
 **/
-    function updateProfileData(data, interval){
-        groundProfile.data.labels = [].concat.apply([], interval);
+    function updateProfileData(chart, data, interval){
+        console.log('chart: ', chart.ctx.canvas.id);
+        chart.data.labels = [].concat.apply([], interval);
         let flat_arr = [];
 
         for( var i = 0; i < 10; i++){
-            groundProfile.data.datasets[i].data = data[i+1].data;
-            let color = addColor(groundProfile.data.datasets[i].data, data, i);
-            groundProfile.data.datasets[i].pointBackgroundColor = color;
-            groundProfile.data.datasets[i].borderColor = color;
-            groundProfile.data.datasets[i].backgroundColor = color;
-            groundProfile.data.datasets[i].segment.fillColor = color;
+            chart.data.datasets[i].data = data[i+1].data;
+            let color = addColor(chart.data.datasets[i].data, data, i);
+            chart.data.datasets[i].pointBackgroundColor = color;
+            chart.data.datasets[i].borderColor = color;
+            chart.data.datasets[i].backgroundColor = color;
+            chart.data.datasets[i].segment.fillColor = color;
             flat_arr.push(data[i+1].data);
         }
 
         /** set background color of range slider to a gradient **/
         let cg_arr = [].concat.apply([], flat_arr);
+        if(chart.ctx.canvas.id == 'groundProfile'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale');
+        }
+        else if (chart.ctx.canvas.id == 'groundProfile2'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale2');
+        }
+        else if (chart.ctx.canvas.id == 'groundProfile3'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale3');
+        }
+        chart.update();
+    }
+
+    function updateTemperatureScale(cg_arr, ui_element){
         let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
         let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
 
@@ -1078,17 +1160,15 @@ function to update trumpet chart with requested data -> is called in ajax functi
             col_r.push(getColor(r[j], -15, 20));
         }
         /** set values for range slider**/
-        document.getElementById('depth_temp_scale').min = minObj;
-        document.getElementById('depth_temp_scale').max = maxObj;
-        document.getElementById('depth_temp_scale').value = minObj;
+        document.getElementById(ui_element).min = minObj;
+        document.getElementById(ui_element).max = maxObj;
+        document.getElementById(ui_element).value = minObj;
         let col_st = '';
         col_r.forEach(c => col_st += ' ,' + c );
-        document.getElementById('depth_temp_scale').style = 'background: linear-gradient(0.25turn'+ col_st +');';
+        document.getElementById(ui_element).style = 'background: linear-gradient(0.25turn'+ col_st +');';
         let spn = '';
         r.forEach(element => spn += '<p><span>' + element + '</span></p>');
-        document.getElementsByClassName('sliderticks')[0].innerHTML = spn;
-
-        groundProfile.update();
+        document.getElementsByClassName('sliderticks ' + ui_element)[0].innerHTML = spn;
     }
 
 /**
@@ -1127,7 +1207,8 @@ function to update trumpet chart with requested data -> is called in ajax functi
                 tension: 0.1
             }],
         };
-        tempChart = new Chart(ctx, {
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
             type: 'line',
             data: data,
             options: {
@@ -1188,7 +1269,9 @@ function to update trumpet chart with requested data -> is called in ajax functi
                     }
                 }
             }
-        });
+        };
+        tempChart = new Chart(ctx, config);
+        tempChart2 = new Chart(ctx_tmp2, config);
     };
 /**
     change data of temperature graph -> will be updated when new depth is selected

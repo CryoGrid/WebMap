@@ -187,8 +187,8 @@
                 <div id="second" class="tab-pane fade">
                     <div class="canvas-container">
                         <canvas id="trumpetChart" height="190"></canvas>
-                        <hr>
-                        <div class="year_selector" id="year_selector">
+                        <hr style="margin: 8px;">
+                        <div class="year-selector" id="year_selector">
                             <input class="btn btn-secondary active" type="button" name="year1" id="year1_1" value="2000 - 2020">
                             <input class="btn btn-secondary" type="button" name="year3" id="year1_3" value="2020 - 2040">
                             <input class="btn btn-secondary" type="button" name="year5" id="year1_5" value="2040 - 2060">
@@ -200,10 +200,10 @@
                 <div id="third" class="tab-pane fade">
                     <div class="canvas-container">
                         <canvas id="groundProfile" height="190"></canvas>
-                        <div class="scale-container" style="margin-left: 8; width: fit-content">
-                            <div class="scale-group-depth" id="depth_temperature" style="width: 766px">
+                        <div class="scale-container" style="width: 100%">
+                            <div class="scale-group-depth" id="depth_temperature" style="width: 100%">
                                 <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
-                                <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
+                                <div class="sliderticks depth_temp_scale" style="padding-left: 2px; padding-right: 2px; background: #FAFCFE">
                                 </div>
                             </div>
                         </div>
@@ -221,14 +221,54 @@
             <div class="tab-content">
                 <div id="forth" class="tab-pane fade in active show">
                     <div class="canvas-container" id="chart-container">
-                        <canvas id="tempChart2" height="190"></canvas>
+                        <canvas id="tempChart3" height="190"></canvas>
                     </div>
                 </div>
                 <div id="fifth" class="tab-pane fade">
                     <div class="canvas-container">
+                        <canvas id="trumpetChart3" height="190"></canvas>
+                        <hr>
+                        <div class="year-selector" id="year_selector3">
+                            <input class="btn btn-secondary active" type="button" name="year1" id="year3_1" value="2000 - 2020">
+                            <input class="btn btn-secondary" type="button" name="year3" id="year3_3" value="2020 - 2040">
+                            <input class="btn btn-secondary" type="button" name="year5" id="year3_5" value="2040 - 2060">
+                            <input class="btn btn-secondary" type="button" name="year7" id="year3_7" value="2060 - 2080">
+                            <input class="btn btn-secondary" type="button" name="year9" id="year3_9" value="2080 - 2100">
+                        </div>
+                    </div>
+                </div>
+                <div id="sixth" class="tab-pane fade">
+                    <div class="canvas-container">
+                        <canvas id="groundProfile3" height="190"></canvas>
+                        <div class="scale-container" style="width: 100%">
+                            <div class="scale-group-depth" style="width: 100%">
+                                <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale2" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+                                <div class="sliderticks depth_temp_scale2" style="padding-left: 2px; padding-right: 2px; background: #FAFCFE">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="nav chart-container" id="tab-nav-soiltype3" style="display: none;">
+            <ul class="nav nav-pills nav-jt">
+                <li class="nav-item"><a class="nav-link active" id="bs-tab7" href="#seventh" data-toggle="tab">Jährliches Bodentemperatur Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab8" href="#eighth" data-toggle="tab">Bodentemperaturprofil</a></li>
+                <li class="nav-item"><a class="nav-link" id="bs-tab9" href="#ninth" data-toggle="tab">Tiefen-Zeit Diagramm</a></li>
+                <li class="nav-item"><a class="nav-link" id="close-btn3" href="#" data-toggle="tab"><span class="material-icons md-18 close">close</span></a></li>
+            </ul>
+            <div class="tab-content">
+                <div id="seventh" class="tab-pane fade in active show">
+                    <div class="canvas-container">
+                        <canvas id="tempChart2" height="190"></canvas>
+                    </div>
+                </div>
+                <div id="eighth" class="tab-pane fade">
+                    <div class="canvas-container">
                         <canvas id="trumpetChart2" height="190"></canvas>
                         <hr>
-                        <div class="year_selector" id="year_selector2">
+                        <div class="year-selector" id="year_selector2">
                             <input class="btn btn-secondary active" type="button" name="year1" id="year2_1" value="2000 - 2020">
                             <input class="btn btn-secondary" type="button" name="year3" id="year2_3" value="2020 - 2040">
                             <input class="btn btn-secondary" type="button" name="year5" id="year2_5" value="2040 - 2060">
@@ -237,13 +277,13 @@
                         </div>
                     </div>
                 </div>
-                <div id="sixth" class="tab-pane fade">
+                <div id="ninth" class="tab-pane fade">
                     <div class="canvas-container">
                         <canvas id="groundProfile2" height="190"></canvas>
-                        <div class="scale-container" style="margin-left: 8; width: fit-content">
-                            <div class="scale-group-depth" style="width: 766px">
-                                <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale2" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
-                                <div class="sliderticks" style="padding-left: 2px; padding-right: 2px;">
+                        <div class="scale-container" style="width: 100%">
+                            <div class="scale-group-depth" style="width: 100%">
+                                <input type="range" min="-5" max="35" step="1" value="0" class="slider depth_temp_scale" id="depth_temp_scale3" data-popup-enabled="true" ng-class="{'disabled-range':isDisabled()}">
+                                <div class="sliderticks depth_temp_scale2" style="padding-left: 2px; padding-right: 2px; background: #FAFCFE">
                                 </div>
                             </div>
                         </div>
@@ -263,15 +303,15 @@
                     <div class="scale-group-temperature">
                         <input type="range" min="-14" max="0" step="0.1" value="0" class="slider" id="temp_scale" data-popup-enabled="true" orient="vertical">
                         <div class="sliderticks temp_scale" style="padding-left: 5px; padding-right: 8px;">
-                            <p><span class="temp">3</span></p>
-                            <p><span class="temp">4</span></p>
-                            <p><span class="temp">5</span></p>
-                            <p><span class="temp">6</span></p>
-                            <p><span class="temp">7</span></p>
-                            <p><span class="temp">8</span></p>
-                            <p><span class="temp">9</span></p>
-                            <p><span class="temp">10</span></p>
-                            <p><span class="temp">11</span></p>
+                            <p><span class="temp_scale">3</span></p>
+                            <p><span class="temp-scale">4</span></p>
+                            <p><span class="temp-scale">5</span></p>
+                            <p><span class="temp-scale">6</span></p>
+                            <p><span class="temp-scale">7</span></p>
+                            <p><span class="temp-scale">8</span></p>
+                            <p><span class="temp-scale">9</span></p>
+                            <p><span class="temp-scale">10</span></p>
+                            <p><span class="temp-scale">11</span></p>
                         </div>
                         <div id="tooltip"></div>
                     </div>

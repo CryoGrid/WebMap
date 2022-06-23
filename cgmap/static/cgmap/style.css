@@ -601,7 +601,7 @@ hr {
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 8px 8px;
+    /*padding: 8px 8px;*/
 
     position: static;
     /* width: 72px; */
@@ -928,8 +928,8 @@ a {
 }
 
 .canvas-container{
-    height: 600px;
-    width: 800px;
+    height: fit-content;
+    width: 750px;
 }
 
 #tab-nav{
@@ -957,6 +957,10 @@ a {
     border-radius: 12px;
 
     flex: none;
+}
+
+.year-selector {
+    text-align: center;
 }
 
 #tempChart{
@@ -1043,7 +1047,7 @@ a {
   line-height: 40px;
   margin: 0 0 20px 0;
 }
-.sliderticks .temp{
+.sliderticks .temp_scale{
   transform: rotate(90deg);
   transform-origin: right, top;
   -ms-transform: rotate(90deg);
