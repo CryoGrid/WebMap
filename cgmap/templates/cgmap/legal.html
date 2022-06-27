@@ -1,0 +1,135 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+
+{% block title %} Soil Temperature Map {% endblock %}
+{% block head_meta_page %}
+
+{% endblock head_meta_page %}
+
+{% block head_css_page %}
+
+{% endblock head_css_page %}
+
+{% block footer_javascript_page %}
+
+{% endblock footer_javascript_page %}
+
+{% block Navbar %}
+    {% with nav_tmpl="nav_header.html" %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block content %}
+<div></div>
+<div class="container m-t-md" style="background: var(--accent)">
+    <div class="row" role="main">
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-main">
+            <div class="bodytext">
+                <h2 class="header2">Datenschutzerklärung</h2>
+                <p>
+                    In dieser Datenschutzerklärung werden Sie informiert über die Verarbeitung personenbezogener Daten
+                    bei der Nutzung dieser Website.
+                </p>
+                <ol>
+                    <li class="header3">Verantwortliche</li>
+                    <p>
+                        Ansprechpartner und sogenannter Verantwortlicher für die Verarbeitung Ihrer personenbezogenen
+                        Daten bei Besuch dieser Website im Sinne der EU-Datenschutzgrundverordnung (DSGVO) ist der
+                    </p>
+                    <p>
+                        Alfred-Wegner-Institut für Polar- und Meeresforschung (AWI)
+                    </p>
+                    <p>
+                        Telegrafenberg, 14473 Potsdam
+                    </p>
+                    <li class="header3">Name und Anschrift des Datenschutzbeauftragten</li>
+                    <p>
+                        Den Datenschutzbeauftragten des für die Verarbeitung Verantwortlichen erreichen Sie unter folgenden Kontaktdaten:
+                    </p>
+                    <p>
+                        Adresse!
+                    </p>
+                    <p>
+                        Jede betroffene Person kann sich jederzeit bei allen Fragen und Anregungen zum Datenschutz
+                        direkt an unseren Datenschutzbeauftragten wenden.
+                    </p>
+                    <li class="header3">Rechtsgrundlage für die Verarbeitung personenbezogener Daten</li>
+                    <p>
+                        Soweit wir für Verarbeitungsvorgänge personenbezogener Daten eine Einwilligung der betroffenen
+                        Person einholen, dient Art. 6 Abs. 1 lit. a EU-Datenschutzgrundverordnung (DSGVO) als Rechtsgrundlage.
+                        Bei der Verarbeitung von personenbezogenen Daten, die zur Erfüllung eines Vertrages, dessen Vertragspartei
+                        die betroffene Person ist, erforderlich ist, dient Art. 6 Abs. 1 lit. b DSGVO als Rechtsgrundlage.
+                        Dies gilt auch für Verarbeitungsvorgänge, die zur Durchführung vorvertraglicher Maßnahmen erforderlich sind.
+                    </p>
+                    <p>
+                        Soweit eine Verarbeitung personenbezogener Daten zur Erfüllung einer rechtlichen Verpflichtung
+                        erforderlich ist, der unser Unternehmen unterliegt, dient Art. 6 Abs. 1 lit. c DSGVO als Rechtsgrundlage.
+                        Für den Fall, dass lebenswichtige Interessen der betroffenen Person oder einer anderen natürlichen Person
+                        eine Verarbeitung personenbezogener Daten erforderlich machen, dient Art. 6 Abs. 1 lit. d DSGVO als Rechtsgrundlage.
+                        Ist die Verarbeitung zur Wahrung eines berechtigten Interesses unseres Unternehmens oder eines Dritten erforderlich
+                        und überwiegen die Interessen, Grundrechte und Grundfreiheiten des Betroffenen das erstgenannte Interesse nicht,
+                        so dient Art. 6 Abs. 1 lit. f DSGVO als Rechtsgrundlage für die Verarbeitung.
+                    </p>
+                    <li class="header3">Datenlöschung und Speicherdauer</li>
+                    <p>
+                        Die personenbezogenen Daten der betroffenen Person werden gelöscht oder gesperrt,
+                        sobald der Zweck der Speicherung entfällt. Eine Speicherung kann darüber hinaus erfolgen,
+                        wenn dies durch den europäischen oder nationalen Gesetzgeber in unionsrechtlichen Verordnungen,
+                        Gesetzen oder sonstigen Vorschriften, denen der Verantwortliche unterliegt, vorgesehen wurde.
+                        Eine Sperrung oder Löschung der Daten erfolgt auch dann, wenn eine durch die genannten Normen
+                        vorgeschriebene Speicherfrist abläuft, es sei denn, dass eine Erforderlichkeit zur weiteren
+                        Speicherung der Daten für einen Vertragsabschluss oder eine Vertragserfüllung besteht.
+                    </p>
+                    <li class="header3">Bereitstellung der Website und Erstellung von Logfiles</li>
+                    <ol>
+                        <li>Beschreibung und Umfang der Datenverarbeitung</li>
+                        <p>
+                            Bei jedem Aufruf unserer Internetseite erfasst unser System automatisiert Daten und
+                            Informationen vom Computersystem des aufrufenden Rechners.
+                        </p>
+                        <p>
+                            Folgende Daten werden hierbei erhoben:
+                            <ul>
+                                <li>Browsertyp und Browserversion</li>
+                                <li>Verwendetes Betriebssystem</li>
+                                <li>Referrer-URL (die zuvor besuchte Seite)</li>
+                                <li>Hostname des zugreifenden Rechners (IP-Adresse)</li>
+                                <li>Uhrzeit der Serveranfrage</li>
+                            </ul>
+                        </p>
+                        <p>Die Daten werden ebenfalls in den Logfiles unseres Systems gespeichert. </p>
+
+                        <li>Rechtsgrundlage für die Datenverarbeitung</li>
+                        <p>
+                            Rechtsgrundlage für die vorübergehende Speicherung der Daten und der Logfiles ist Art. 6
+                            Abs. 1 lit. f DSGVO, basierend auf unserem berechtigten Interesse an der Datenerhebung zur
+                            Bereitstellung der Website.
+                        </p>
+
+                        <li>Zweck der Datenverarbeitung</li>
+                        <p>
+                            Die vorübergehende Speicherung der IP-Adresse durch das System ist notwendig, um eine
+                            Auslieferung der Website an den Rechner des Nutzers zu ermöglichen. Hierfür muss die
+                            IP-Adresse des Nutzers für die Dauer der Sitzung gespeichert bleiben.
+                        </p>
+
+                        <li>Dauer der Speicherung</li>
+                        <p>Die Daten werden nach einem Zeitraum von sieben Tagen gelöscht.</p>
+
+                        <li>Widerspruchs- und Beseitigungsmöglichkeit</li>
+                        <p>
+                            Die Erfassung der Daten zur Bereitstellung der Website und die Speicherung der Daten in
+                            Logfiles ist für den Betrieb der Internetseite zwingend erforderlich. Es besteht folglich
+                            seitens des Nutzers keine Widerspruchsmöglichkeit.
+                        </p>
+                    </ol>
+                </ol>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

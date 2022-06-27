@@ -1,0 +1,16 @@
+{# contains the header and menu bar #}
+<header>
+    <div class="btn-group" role="group" aria-label="Navbar" id="nav-menu">
+        <div class="dropdown">
+            <button class="btn btn-secondary" type="button" id="dropdownMenu" data-toggle="dropdown" data-display="static"  aria-haspopup="true" aria-expanded="false">
+                <span class="material-icons" aria-hidden="true">&#xe5d2;</span>
+            </button>
+            <div class="dropdown-menu dropdown-menu-lg-left" aria-labelledby="dropdownMenu">
+                <button class="dropdown-item" type="button"><a href="{% url 'index' %}">Map</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'about' %}">Über das Projekt</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'legal' %}">Datenschutz</a></button>
+                <button class="dropdown-item" type="button"><a href="{% url 'contact' %}">Impressum</a></button>
+            </div>
+        </div>
+    </div>
+</header>

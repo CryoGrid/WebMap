@@ -1,0 +1,1295 @@
+/**
+javascript file for the basemap related javascript code
+**/
+
+$(window).on('map:init', function (e) {
+    var detail = e.originalEvent ?
+                 e.originalEvent.detail : e.detail;
+
+    var layerGroup = new L.layerGroup();
+    var gridLayer;
+    var gridID;
+    var prevSelectedLayer = null;
+
+    var geojson;
+    var boundArray = [];
+    var polygonArray = [];
+    var geoJsonArray = [];
+    var activeYears = [];
+
+    /**
+    parsing data from backend
+    **/
+    var data = JSON.parse(JSON.parse(document.getElementById('grid_data').textContent));
+    var depth_level = JSON.parse(document.getElementById('context').textContent);
+    var cg = JSON.parse(document.getElementById('cg_data').textContent);
+    // range function
+    const range = (start, stop, step) => Array.from({ length: (stop - start) / step + 1}, (_, i) => start + (i * step));
+    // initiate values for dynamic temperature scale
+    temperatureScale(Object.values(cg), 'temp_scale');
+
+    /**
+    set dynamic temperature values for range slider and a gradient background
+    update temperature scale data with requested cg data
+    **/
+    function temperatureScale(cgData, ui_element){
+
+        // set min, max, value slider values
+        let cg_arr = cgData;
+        let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.soil_temp) > Math.round(obj.soil_temp)) ? max : obj).soil_temp);
+        let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.soil_temp) < Math.round(obj.soil_temp)) ? min : obj).soil_temp);
+
+        let r = range(parseInt(minObj), parseInt(maxObj), 1);
+
+        let col_r = []
+        /** calculate color for range slider **/
+        for( var j = 0; j < r.length; j++){
+            col_r.push(getColor(r[j], -10, 15));
+        }
+
+        let maxCol = getColor(maxObj, -10, 15);
+        let minCol = getColor(minObj, -10, 15);
+
+        // set values in ui element
+        document.getElementById(ui_element).min = minObj;
+        document.getElementById(ui_element).max = maxObj;
+        document.getElementById(ui_element).value = maxObj;
+
+        let col_st = '';
+        col_r.forEach(c => col_st += ' ,' + c );
+        document.getElementById(ui_element).style = 'background: linear-gradient(0.25turn'+ col_st +');';
+
+        let spn = '';
+        r.forEach(element => spn += '<p><span class=' + ui_element + '>' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks ' + ui_element)[0].innerHTML = spn;
+    }
+    /**
+    button setup with related function for setting responding id and add event listeners
+    **/
+    var y2010 = document.getElementsByName('year1');
+    var y2030 = document.getElementsByName('year3');
+    var y2050 = document.getElementsByName('year5');
+    var y2070 = document.getElementsByName('year7');
+    var y2090 = document.getElementsByName('year9');
+    //ToDo: fix buttons for selecting the years for each soil type
+    y2010.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 2)})
+        }
+    })
+    y2030.forEach(element => {
+       if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            console.log('element: ', element);
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 2)})
+        }
+    })
+    y2050.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
+        }
+    })
+    y2070.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
+        }
+    })
+    y2090.forEach(element => {
+        if(element.id.includes("year1")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 1)})
+        }
+        else if(element.id.includes("year2")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
+        }
+        else if(element.id.includes("year3")){
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
+        }
+    })
+
+    /**
+    getting 2d context and creating charts via function call for all soil types
+    **/
+    const ctx = document.getElementById('tempChart').getContext('2d');
+    const ctx_tmp2 = document.getElementById('tempChart2').getContext('2d');
+    const ctx_tmp3 = document.getElementById('tempChart3').getContext('2d');
+    const ctx2 = document.getElementById('trumpetChart').getContext('2d');
+    const ctx_tc2 = document.getElementById('trumpetChart2').getContext('2d');
+    const ctx_tc3 = document.getElementById('trumpetChart3').getContext('2d');
+    const ctx3 = document.getElementById('groundProfile').getContext('2d');
+    const ctx_gp2 = document.getElementById('groundProfile2').getContext('2d');
+    const ctx_gp3 = document.getElementById('groundProfile3').getContext('2d');
+    // declaring charts for all soil types
+    var tempChart;
+    var tempChart2;
+    var tempChart3;
+    var trumpetChart;
+    var trumpetChart2;
+    var trumpetChart3;
+    var groundProfile;
+    var groundProfile2;
+    var groundProfile3;
+    // creating charts
+    createChart();
+    createTrumpetChart();
+    createGroundProfile();
+    // add datasets to trumpet chart
+    // ToDo change activeYears array to dict, so it can contain ids for all three soil types
+    function addYear(id, gridID, soilID){
+        if(!activeYears.length){ // if array is empty -> add
+            getMaxMin(gridID, id, soilID);
+        }
+        else if(!activeYears.includes(id)){ // if id is not set in array -> add
+            getMaxMin(gridID, id, soilID);
+        }
+        else if(activeYears.includes(id)){ // if id is already in array -> remove and update chart
+            let setSize = 6; // number of displayed data fields
+            if( soilID == 1){
+                trumpetChart.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart.update();
+            }
+            else if( soilID == 2){
+                trumpetChart2.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart2.update();
+            }
+            else if( soilID == 3){
+                trumpetChart3.data.datasets.splice(activeYears.indexOf(id)*setSize, setSize);
+                activeYears.splice(activeYears.indexOf(id), 1);
+                trumpetChart3.update();
+            }
+
+        }
+    };
+    // soil type 1
+    $('#bs-tab1').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab1').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab2').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab2').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab3').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab3').off(); //to remove the bound event after initial rendering
+    });
+    // soil type 2
+    $('#bs-tab4').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab4').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab5').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab5').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab6').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab6').off(); //to remove the bound event after initial rendering
+    });
+    // soil type 3
+    $('#bs-tab7').on("shown.bs.tab", function() {
+        createChart();
+        $('#bs-tab7').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab8').on("shown.bs.tab", function() {
+        createTrumpetChart();
+        $('#bs-tab8').off(); //to remove the bound event after initial rendering
+    });
+    $('#bs-tab9').on("shown.bs.tab", function() {
+        createGroundProfile();
+        $('#bs-tab9').off(); //to remove the bound event after initial rendering
+    });
+    /**
+    populating geojson array with db data
+    **/
+    for (var i = 0; i < data.features.length; i++){
+        geoJsonArray.push({"type": "Feature",
+            "properties": {"id": data.features[i].properties.id,
+                           "popupContent": " This is a Cell number: " + data.features[i].properties.id},
+            "geometry": {"type": "Polygon", "coordinates": [
+                [[data.features[i].properties.left, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.top],
+                [data.features[i].properties.right, data.features[i].properties.bottom],
+                [data.features[i].properties.left, data.features[i].properties.bottom]]
+                ]}
+            });
+        if(cg[data.features[i].properties.id] != null){
+            geoJsonArray[i].properties["soil_temp"] = cg[data.features[i].properties.id].soil_temp;
+            geoJsonArray[i].properties["air_temp"] = cg[data.features[i].properties.id].air_temp;
+            geoJsonArray[i].properties["depth_level"] = cg[data.features[i].properties.id].depth_level;
+            geoJsonArray[i].properties["depth_idx"] = cg[data.features[i].properties.id].depth_idx;
+            geoJsonArray[i].properties["date"] = cg[data.features[i].properties.id].date;
+            geoJsonArray[i].properties["alt"] = cg[data.features[i].properties.id].alt;
+        };
+    };
+
+    // hsl to hex converter
+    function hsltohex(h, s, l){
+         l /= 100;
+        const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => {
+            const k = (n + h / 30) % 12;
+            const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+            return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+        };
+        return `#${f(0)}${f(8)}${f(4)}`;
+    }
+
+    // source: https://stackoverflow.com/questions/49482002/javascript-map-a-temperature-to-a-particular-hsl-hue-value
+    function getHue(t, min, max){
+        let maxHsl = 0; // maxHsl maps to max temp (here: 20deg past 360)
+        let minHsl = 360; //  minhsl maps to min temp counter clockwise
+        let rngHsl = maxHsl - minHsl; // = 210
+        let maxTemp = max;
+        let minTemp = min;
+        let rngTemp = maxTemp - minTemp; // 60
+        let degCnt = maxTemp - t; // 0
+        let hslsDeg = rngHsl / rngTemp;  //210 / 125 = 1.68 Hsl-degs to Temp-degs
+        let returnHue = (360 - ((degCnt * hslsDeg) - (maxHsl - 360)));
+        return returnHue;
+    }
+
+    // color for grid cells
+    function getColor(t, min, max) {
+        const s = 100;
+        const l = 50;
+        const h = getHue(t, min, max);
+        return hsltohex(h, s, l);
+    }
+    // style for grid cells
+    function style(feature) {
+        let cellColor = '#FFEDA0';
+        if(feature.properties.soil_temp != null){
+            cellColor = getColor(feature.properties.soil_temp, -10, 15)
+        }
+        return {
+            fillColor: cellColor,
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.4
+        };
+    }
+
+    var geojsonMarkerOptions = {
+        radius: 8,
+        fillColor: "#ff7800",
+        color: "#000",
+        weight: 1,
+        opacity: 1,
+        fillOpacity: 0.65
+    };
+
+    var marker = {};
+    var popup = L.popup();
+    /**
+        get open street map geo search provider
+        Source: https://github.com/smeijer/leaflet-geosearch
+    **/
+    const search = new GeoSearch.GeoSearchControl({
+        provider: new GeoSearch.OpenStreetMapProvider(),
+        style: 'button',
+        showMarker: false,
+        marker: marker,
+    });
+    detail.map.addControl(search);
+    // set marker and populate the content with db data
+    detail.map.on('geosearch/showlocation', function(e) {
+        if(popup){
+            detail.map.removeLayer(popup);
+        }
+        var lat = Math.round((e.location.y + Number.EPSILON) * 100) / 100;
+        var long = Math.round((e.location.x + Number.EPSILON) * 100) / 100;
+        for (var i = 0; i < geoJsonArray.length; i++){
+            var lat_min = geoJsonArray[i].geometry.coordinates[0][2][1];
+            var lat_max = geoJsonArray[i].geometry.coordinates[0][0][1];
+            var lng_min = geoJsonArray[i].geometry.coordinates[0][0][0];
+            var lng_max = geoJsonArray[i].geometry.coordinates[0][1][0];
+            if((lat >= lat_min && lat <= lat_max) && (long >= lng_min && long <= lng_max)){
+                e.target["feature"] = {"properties": geoJsonArray[i].properties};
+            }
+        }
+        createGridMarker(lat, long, e);
+    });
+
+    // grid cell click event: set marker and open popup window.
+    function whenClicked(e) {
+        var lat = e.latlng.lat;
+        var long = e.latlng.lng;
+        createGridMarker(lat, long, e);
+        var div = document.getElementById('tab-nav');
+        if (div.style.display === "none") {
+            div.style.display = "flex";
+        }
+    }
+
+    function setPopupContent(data, lat, long){
+        // content for popup window -> includes the button for activating the charts
+        let lbl = parseFloat(data.depth_level[0]);
+        if (lbl < 1.0) {
+            lbl = lbl/0.01 + ' cm';
+        }
+        else{
+            lbl = lbl + ' m';
+        }
+        var content = `
+            <h3 class=header3>Zelle ${ data.id }
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 20px;' value='type1' id='graph-btn-type1'>
+                    <span class='material-icons md-18 right' id='show_chart'>terrain</span>
+                </button>
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 50px;' value='type2' id='graph-btn-type2'>
+                    <span class='material-icons md-18 right' id='show_chart'>grass</span>
+                </button>
+                <button type='button' onclick='open_graph(this.id);' class='btn btn-primary btn-sm graph-btn soil-btn' style='position: absolute; right: 80px;' value='type3' id='graph-btn-type3'>
+                    <span class='material-icons md-18 right' id='show_chart'>show_chart</span>
+                </button>
+            </h3>
+            <div><hr>Die Zelle wurde ausgewählt an den Koordinaten: ( ${lat.toFixed(2)} | ${long.toFixed(2)}  ), mit einer Durchschnittshöhe von ${parseFloat(data.alt).toFixed(0)} m </div>
+            <div>mit einer kalkulierten Bodentemperatur von: ${parseFloat(data.soil_temp).toFixed(1)}°C in einer Tiefe von ${lbl} .</div>
+            <div>mit einer angenommenen Lufttemperatur:  ${parseFloat(data.air_temp).toFixed(1)}°C in Höhe von 2 m für den Zeitraum vom 1.1.2000 bis 31.12.2020.</div>
+            <div>Aktuelle Temperaturen finden sie auf der DWD-Seite
+                <a href='https://www.dwd.de/DE/wetter/wetterundklima_vorort/_node.html' target='_blank'>hier</a>
+                und Bodentemperaturen
+                <a href='https://www.dwd.de/DE/leistungen/bodentemperatur/bodentemperatur.html' target='_blank'>hier</a>.
+            </div>
+
+        `;
+
+        return content;
+    }
+
+    // creates a grid marker for selected coordinates with db data
+    function createGridMarker(lat, long, e){
+        const content = setPopupContent(e.target.feature.properties, lat, long);
+
+    // delete existing marker
+        if(popup){
+            detail.map.removeLayer(popup);
+        };
+        /** add popup with content to map**/
+        popup
+            .setLatLng(e.latlng)
+            .setContent(content)
+            .openOn(detail.map);
+
+        var cell_data = getCellData(e.target.feature.properties.depth_idx, e.target.feature.properties.id, 1);
+        trumpetChart.data.datasets.forEach((dataset) => {
+            dataset.data.pop();
+        });
+        trumpetChart.data.datasets.splice(0, trumpetChart.data.datasets.length);
+        activeYears.splice(0, activeYears.length);
+        trumpetChart.update();
+        // set values for trumpet chart values for each soil type
+        var maxMin = getMaxMin(e.target.feature.properties.id, 1, 1);
+        var maxMin_st2 = getMaxMin(e.target.feature.properties.id, 1, 2);
+        var maxMin_st3 = getMaxMin(e.target.feature.properties.id, 1, 3);
+        // set values for ground profile chart values for each soil type
+        var groundProfile = getGroundProfile(e.target.feature.properties.id, 1);
+        var groundProfile_st2 = getGroundProfile(e.target.feature.properties.id, 2);
+        var groundProfile_st3 = getGroundProfile(e.target.feature.properties.id, 3);
+    }
+
+    function onEachFeature(feature, layer) {
+        layer.on({
+            mouseover: highlightFeature,
+            mouseout: resetHighlight,
+            click: whenClicked,
+        });
+    }
+
+    //mouseover event
+    function highlightFeature(e) {
+        var layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+            layer.bringToFront();
+        }
+    }
+
+    //mouseout event
+    function resetHighlight(e) {
+        gridLayer.resetStyle(e.target);
+    }
+
+    //zooms to the cell -> not used
+    function zoomToFeature(e) {
+        detail.map.fitBounds(e.target.getBounds());
+    }
+
+    // populate grid layer
+    gridLayer = L.geoJSON(geoJsonArray, {
+        style: style,
+        onEachFeature: onEachFeature,
+        pointToLayer: function (feature, latlng) {
+            return L.circleMarker(latlng, geojsonMarkerOptions)
+        }
+    }).addTo(layerGroup).addTo(detail.map);
+
+    //assign grid layer to the control layer
+    const layerControl = new L.Control.Layers(null, {
+        'Grid Layer': gridLayer,
+    }).addTo(detail.map);
+
+/**
+    jquery for dynamically updating the temperature data of the selected level for all grid cells
+    ToDo: update depth select with soil types -> check which chart is active? update accordingly
+**/
+    $(document).ready(function(){
+        var slider = document.getElementById('depth_range');
+        var depth_level;
+        $('#depth_range').change(function(event) {
+            event.preventDefault();
+            depth_level = slider.value;
+            depth_level  = Math.abs(depth_level);
+
+            $.ajax({
+                url: 'get_depth_level_data/',
+                type: 'POST',
+                data: {url_data:depth_level},
+                dataType: 'json'
+            })
+            .done(function(response){
+                // if request is successful update grid layers
+                $('#context').html(response[1].depth_level);
+                for (var i = 0; i < geoJsonArray.length; i++){
+                    var id = geoJsonArray[i].properties['id'];
+                    if(geoJsonArray[i].properties['soil_temp'] != null){
+                        geoJsonArray[i].properties['depth_level'] = response[0].cg_data[id].depth_level;
+                        geoJsonArray[i].properties['depth_idx'] = response[0].cg_data[id].depth_idx;
+                        geoJsonArray[i].properties['soil_temp'] = response[0].cg_data[id].soil_temp;
+                    }
+                };
+                // remove old grid layer from map and layer control
+                gridLayer.remove();
+                layerControl.removeLayer(gridLayer);
+                // draw grid layer and add to map as well as to the layer control
+                gridLayer = L.geoJSON(geoJsonArray, {
+                    style: style,
+                    onEachFeature: onEachFeature,
+                    pointToLayer: function (feature, latlng) {
+                        return L.circleMarker(latlng, geojsonMarkerOptions)
+                    }
+                }).addTo(layerGroup).addTo(detail.map);
+                layerControl.addOverlay(gridLayer, 'Grid Layer');
+                // get new data for marker popup window
+                // var id =  parseInt(marker.getPopup().getContent().split(/[\s]+/)[3]);
+                var id =  parseInt(popup.getContent().split(/[\s]+/)[3]); // --> has to be changed for later updates, when id is not displayed anymore
+                var obj = geoJsonArray.find(o => o.properties.id === id);
+                var lat = popup.getLatLng().lat;
+                var lng = popup.getLatLng().lng;
+                // set content of popup and update popup
+                popup.setContent(setPopupContent(obj.properties, lat, lng));
+                popup.update();
+                // update temperature scale after depth selection
+                temperatureScale(response[0].cg_data);
+                // update charts after depth selection
+                getCellData(depth_level+1, id);
+            })
+            .fail(function(){
+                console.log('Failed!')
+            });
+        });
+    });
+
+/**
+ajax function to get data for selected grid cell and updating corresponding chart
+**/
+    function getCellData(depth_level, cell_id, soil_id){
+        $.ajax({
+            url: 'get_cell_data/',
+            type: 'POST',
+            data: {url_data:depth_level, idx:cell_id, soilID:soil_id},
+            dataType: "json"
+        })
+        .done(function(response){
+            // if request is successful update data in changeData function
+            gridID = cell_id;
+
+            var query_data = response[0].cell_data;
+            var depth_lvl = response[1].depth_level[0][0];
+            var interval = response[2].date_interval;
+            changeData(query_data, interval, depth_lvl);
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
+/**
+ajax function to get ground profile data for selected grid cell and updating corresponding chart
+**/
+    function getGroundProfile(cell_id, soil_id){
+        $.ajax({
+            url: 'get_ground_profile/',
+            data: {idx:cell_id, soilID:soil_id},
+            type: 'POST',
+        })
+        .done(function(response){
+            // if request is successful update data in updateProfileData function
+            var data = response[0]['depth_list'];
+            var interval = response[1]['date_interval'];
+            if( soil_id == 1){
+                updateProfileData(groundProfile, data, interval);
+            }
+            else if( soil_id == 2){
+                updateProfileData(groundProfile2, data, interval);
+            }
+            else if( soil_id == 3){
+                updateProfileData(groundProfile3, data, interval);
+            }
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
+/**
+ajax function to get min, max and mean values for selected grid cell and updating corresponding chart
+**/
+    function getMaxMin(cell_id, year_id, soil_id){
+        $.ajax({
+            url: 'get_max_min/',
+            data: {idx:cell_id, yID: year_id, soilID:soil_id},
+            type: 'POST',
+        })
+        .done(function(response){
+            // if request is successful update data in updateData
+            var data = response[0]['depth_list'];
+            activeYears.push(year_id);
+            if( soil_id == 1){
+                updateData(trumpetChart, data, year_id);
+            }
+            else if( soil_id == 2){
+                updateData(trumpetChart2, data, year_id);
+            }
+            else if( soil_id == 2){
+                updateData(trumpetChart3, data, year_id);
+            }
+        })
+        .fail(function(){
+            console.log('Failed!')
+        });
+    };
+/**
+function for creating trumpet chart, contains config data for chart
+**/
+    function createTrumpetChart(){
+        const labels = [0.01, 0.05, 0.1, 0.2, 0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0 ];
+        const data = {
+            labels: labels,
+            datasets: [],
+        };
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                response: true,
+                tension: 0.2,
+                indexAxis: 'y',
+                title: {
+                    display: true,
+                    text: 'Bodentemperatur über das Jahr 2020'
+                },
+                interaction: {
+                    mode: 'index',
+                    axis: 'y',
+                    intersect: false,
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Bodentemperaturprofil in 20 Jahresschritten'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        align: 'middle',
+                        labels: {
+                            boxHeight: 2,
+                            filter: function(item, chart) {
+                                return !item.text.includes('_');
+                            }
+                        },
+                        onClick: function(e, legendItem) { // need to hide index +1
+                            var index = legendItem.datasetIndex;
+                            var ci = this.chart;
+                            var alreadyHidden = (ci.getDatasetMeta(index).hidden === null) ? false : ci.getDatasetMeta(index).hidden;
+                            var meta = ci.getDatasetMeta(index);
+                            if ( index === 0 || index === 4) {
+                                var meta_hi = ci.getDatasetMeta(index + 1);
+                                if (!alreadyHidden) {
+                                    meta.hidden = true;
+                                    meta_hi.hidden = true;
+                                } else {
+                                    meta.hidden = null;
+                                    meta_hi.hidden = null;
+                                }
+                            }
+                            ci.update();
+                        },
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            title: function(context){
+                                for( var i = 0; i < context.length; i++){
+                                    var lbl = context[i].label;
+                                    if (lbl.includes('.')){
+                                        lbl = parseFloat(lbl)/0.01;
+                                        return context[i].label = ' in ' + lbl + ' cm';
+                                    }
+                                    return context[i].label = ' in ' + lbl + ' m';
+                                }
+                            },
+                            label: function(context){
+                                var label = context.dataset.label;
+                                var data = context.dataset.data;
+                                // update tooltip temperature data with lower and upper limits
+                                if (label.includes('Min/Max')){
+                                    let max = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
+                                    label += ' : ' + Math.round(context.raw * 10) / 10 + '°/'+ Math.round(max * 10) / 10 + '°';
+                                }
+                                else if (label.includes('10%/90%')){
+                                    let min = trumpetChart.data.datasets[parseInt(context.datasetIndex) + 1].data[parseInt(context.dataIndex)];
+                                    label += ' : ' + Math.round(min  * 10) / 10 + '°/'+ Math.round(context.raw  * 10) / 10 + '°';
+                                }
+                                else{
+                                    // other labels for tooltips
+                                    var val = Math.round(context.raw  * 10) / 10;
+                                    label += ' : ' + val + '°';
+                                }
+                                return label;
+                            },
+                            labelColor: function(context){
+                                return{
+                                    borderColor: context.dataset.borderColor,
+                                    backgroundColor: context.dataset.borderColor,
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                };
+                            },
+                            labelTextColor: function(context) {
+                                let bgColor = context.dataset.backgroundColor;
+                                if (typeof bgColor != 'undefined'){
+                                    var a = bgColor.split("(")[1].split(")")[0].split(",");
+                                    a.splice(-1)
+                                    var b = 'rgb(' + a[0] + ', ' + a[1] + ', ' + a[2] + ')';
+                                    return b;
+                                } else {
+                                    return '#FAFCFE';
+                                }
+                            },
+                        },
+                        filter: function(context) {
+                            var label = context.dataset.label;
+                            var data = context.dataset.data;
+
+                            return !label.includes('_');
+                        }
+                    },
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        title:{
+                            display: true,
+                            text: 'Temperatur'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(val, index) {
+                                return val + '°';
+                            },
+                        },
+                    },
+                    y: {
+                        display: true,
+                        title: {
+                            display: true,
+                            text: 'Tiefe'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+
+                            callback: function(val, index) {
+                                var lbl = this.getLabelForValue(index).toString();
+                                    if (lbl.includes('.')){
+                                        lbl = parseFloat(lbl)/0.01;
+                                        return lbl + ' cm';
+                                    }
+                                return this.getLabelForValue(index) + ' m';
+                            },
+                        },
+                    }
+                }
+            }
+        };
+        trumpetChart = new Chart(ctx2, config);
+        trumpetChart2 = new Chart(ctx_tc2, config);
+    }
+
+/**
+function to update trumpet chart with requested data -> is called in ajax function
+**/
+    function updateData(newData, yearID, soilID){
+        var min = [];
+        var max = [];
+        var mean = [];
+        var median = [];
+        var max_quantile = [];
+        var min_quantile = [];
+        var bgCol1;
+        var bgCol2;
+        var years = ['1990', '2000', '2010', '2020', '2030', '2040', '2050', '2060', '2070', '2080', '2090', '2100']
+
+        // divide values into different sets
+        for (var i = 1; i < 16; i++){
+            min.push(newData[i]['min']);
+            max.push(newData[i]['max']);
+            mean.push(newData[i]['mean']);
+            median.push(newData[i]['median']);
+            max_quantile.push(newData[i]['max_quantile']);
+            min_quantile.push(newData[i]['min_quantile'])
+        }
+
+        // set colors for different sets
+        if ( yearID === 1){
+            bgCol1 = 'rgba(45,156,219,0.1)';
+            bgCol2 = 'rgba(45,156,219,0.2)';
+        } else if ( yearID === 5) {
+            bgCol1 = 'rgba(242,201,76,0.1)';
+            bgCol2 = 'rgba(242,201,76,0.2)';
+        } else if ( yearID === 7) {
+            bgCol1 = 'rgba(242,153,74,0.1)';
+            bgCol2 = 'rgba(242,153,74,0.2)';
+        } else if ( yearID === 9) {
+            bgCol1 = 'rgba(235,87,87,0.1)';
+            bgCol2 = 'rgba(235,87,87,0.2)';
+        } else if ( yearID === 3) {
+            bgCol1 = 'rgba(111,207,151,0.1)';
+            bgCol2 = 'rgba(111,207,151,0.2)';
+        }
+
+        // setup datasets with new data for the trumpet curve
+        trumpetChart.data.datasets.push({
+                data: min,
+                label: 'Min/Max ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: '+1',
+                backgroundColor: bgCol1,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: max,
+                label: '_Max_ ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#F2C94C',
+            },
+            {
+                data: max_quantile,
+                label: 'Quantile 10%/90%',
+                fill: false,
+                fill: '+1',
+                backgroundColor: bgCol2,
+                borderColor: '#EB8702',
+                borderDash: [5, 5],
+            },
+            {
+                data: min_quantile,
+                label: '_Quantile_ ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#EB8702',
+                borderDash: [5, 5],
+            },
+            {
+                data: mean,
+                label: 'Mean ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#693D00',
+            },
+            {
+                data: median,
+                label: 'Median ' +years[yearID] +'-'+ years[parseInt(yearID)+2],
+                fill: false,
+                borderColor: '#BA700B',
+                borderDash: [5, 5],
+            });
+
+        trumpetChart.update(); // update chart
+    }
+    /**
+    function for creating a color gradient
+    **/
+    function getGradient(ctx, chartArea){
+        var width, height, gradient = null;
+        const chartWidth = chartArea.right - chartArea.left;
+        const chartHeight = chartArea.bottom - chartArea.top;
+        if(gradient === null || width !== chartWidth || height !== chartHeight){
+            width = chartWidth;
+            height = chartHeight;
+            gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+            gradient.addColorStop(0, '#2D9CDB');
+            gradient.addColorStop(0.25, '#6FCF97');
+            gradient.addColorStop(0.5, '#F2C94C');
+            gradient.addColorStop(0.75, '#F2994A');
+            gradient.addColorStop(1, '#EB5757');
+        }
+        return gradient;
+    }
+
+    /**
+    calculate line gradient for the depth time chart with respect to each point -> not working right now
+    **/
+    function getLineGradient(startPoint, origin, idx){
+        var gradient = null;
+        //let y_label = startPoint.y + ' m';
+        //let legend_id = groundProfile.legend.legendItems
+        let y_id = idx + 2;
+        let x_id = parseInt(startPoint.x) - 1;
+
+        if( y_id > 10){
+            y_id = 1;
+        }
+
+        let coords = origin[y_id].data[x_id];
+        gradient = ctx3.createLinearGradient(startPoint.x, startPoint.y, coords.x, coords.y);
+        gradient.addColorStop(0, getColor(startPoint.r, -15, 20));
+        gradient.addColorStop(1, getColor(coords.r, -15, 20));
+
+        return gradient;
+    }
+    /**
+    function for ground profile chart settings and options for drawing the chart
+    **/
+    function createGroundProfile(){
+
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        /* const up checks if the next point has a different color as the current -> in datasets the color will be changed accordingly */
+        const up = (ctx, value) => ctx.p0.options.borderColor != ctx.p1.options.borderColor ? value : undefined;
+        const down = (ctx, value) => ctx.p0.options.borderColor == ctx.p1.options.borderColor ? value : undefined;
+        const data = {
+            labels: labels,
+            datasets: [
+            {
+                label: '0.01 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                },
+            },
+            {
+                label: '0.05 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                },
+            },
+            {
+                label: '0.1 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
+            },
+            {
+                label: '0.2 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
+            },
+            {
+                label: '0.5 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
+            },
+            {
+                label: '1 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
+            },
+            {
+                label: '2 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                },
+            },
+            {
+                label: '3 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill:'+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.borderColor,
+                },
+            },
+            {
+                label: '4 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: '+1',
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx =>ctx.p0.options.borderColor,
+                },
+            },
+            {
+                label: '5 m',
+                data: [],
+                pointBackgroundColor: [],
+                backgroundColor: [],
+                borderColor: [],
+                fill: {value: 6},
+                segment: {
+                    borderColor: ctx => ctx.p0.options.borderColor,
+                    backgroundColor: ctx => ctx.p0.options.backgroundColor,
+                },
+            }]
+        };
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Tiefen-Zeit Diagramm für 2020'
+                    },
+                    tooltip: {
+                        mode: 'x',
+                        callbacks: {
+                            title: function(context){
+                                for( var i = 0; i < context.length; i++){
+                                    return context[i].label = 'Woche ' + context[i].label;
+                                }
+                            },
+                            label: function(context){
+                                var label = context.dataset.label;
+                                var val = Math.round(context.raw.r  * 10) / 10;
+                                label += ' : ' + val + '°';
+                                return label;
+                            },
+                        },
+                    },
+                    legend: {
+                        display: false,
+                        position: 'right',
+                        align: 'middle'
+                    },
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Wochen'
+                        },
+                    },
+                    y: {
+                        reverse: true,
+                        title: {
+                            display: true,
+                            text: 'Tiefe'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(val, index) {
+                                return val + ' m';
+                            },
+                        },
+                    }
+                },
+                elements: {
+                    point: {
+                        radius: 0
+                    },
+                },
+            }
+        };
+
+        groundProfile = new Chart(ctx3, config);
+        groundProfile2 = new Chart(ctx_gp2, config);
+    }
+    /* gets the size of an object*/
+    Object.size = function(obj) {
+        var size = 0,
+        key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
+
+/**
+    depending on temperature set color
+**/
+    function addColor(data, origin, idx){
+        var color = [];
+
+        for( var i = 0; i < data.length; i++){
+            let col = getLineGradient(data[i], origin, idx);
+            //color.push(col);
+            color.push(getColor(data[i].r, -15, 20));
+        }
+        return color
+    }
+/**
+    update ground profile data and set colors for graph
+**/
+    function updateProfileData(chart, data, interval){
+        console.log('chart: ', chart.ctx.canvas.id);
+        chart.data.labels = [].concat.apply([], interval);
+        let flat_arr = [];
+
+        for( var i = 0; i < 10; i++){
+            chart.data.datasets[i].data = data[i+1].data;
+            let color = addColor(chart.data.datasets[i].data, data, i);
+            chart.data.datasets[i].pointBackgroundColor = color;
+            chart.data.datasets[i].borderColor = color;
+            chart.data.datasets[i].backgroundColor = color;
+            chart.data.datasets[i].segment.fillColor = color;
+            flat_arr.push(data[i+1].data);
+        }
+
+        /** set background color of range slider to a gradient **/
+        let cg_arr = [].concat.apply([], flat_arr);
+        if(chart.ctx.canvas.id == 'groundProfile'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale');
+        }
+        else if (chart.ctx.canvas.id == 'groundProfile2'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale2');
+        }
+        else if (chart.ctx.canvas.id == 'groundProfile3'){
+            updateTemperatureScale(cg_arr, 'depth_temp_scale3');
+        }
+        chart.update();
+    }
+
+    function updateTemperatureScale(cg_arr, ui_element){
+        let maxObj = Math.ceil(cg_arr.reduce((max, obj) => (Math.round(max.r) > Math.round(obj.r)) ? max : obj).r);
+        let minObj = Math.floor(cg_arr.reduce((min, obj) => (Math.round(min.r) < Math.round(obj.r)) ? min : obj).r);
+
+        let r = range(parseInt(Math.floor(minObj)), parseInt(Math.ceil(maxObj)), 1);
+        let col_r = []
+        /** calculate color for range slider **/
+        for( var j = 0; j < r.length; j++){
+            col_r.push(getColor(r[j], -15, 20));
+        }
+        /** set values for range slider**/
+        document.getElementById(ui_element).min = minObj;
+        document.getElementById(ui_element).max = maxObj;
+        document.getElementById(ui_element).value = minObj;
+        let col_st = '';
+        col_r.forEach(c => col_st += ' ,' + c );
+        document.getElementById(ui_element).style = 'background: linear-gradient(0.25turn'+ col_st +');';
+        let spn = '';
+        r.forEach(element => spn += '<p><span>' + element + '</span></p>');
+        document.getElementsByClassName('sliderticks ' + ui_element)[0].innerHTML = spn;
+    }
+
+/**
+    functions for temperature graph settings and options for drawing the chart
+**/
+    function createChart(){
+        const labels = [];
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: '1 m Bodentemperatur',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#F2C94C',
+                tension: 0.1
+            },
+            {
+                label: '2 m Bodentemperatur',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#BA700B',
+                tension: 0.1
+            },
+            {
+                label: 'depth in m',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#EB8702',
+                tension: 0.1
+            },
+            {
+                label: '2 m Lufttemperatur',
+                data: [0, 0.1],
+                fill: false,
+                borderColor: '#2D9CDB',
+                tension: 0.1
+            }],
+        };
+        // chart configurations, eg.: tooltips, legend etc.
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                interaction: {
+                    mode: 'index',
+                    axis: 'x',
+                    intersect: false,
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: (ctx) => 'Bodentemperatur für 2020'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        align: 'middle',
+                        labels: {
+                            boxHeight: 2,
+                        },
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        callbacks: {
+                            label: function(context){
+                                var label = context.dataset.label;
+                                var val = Math.round(context.raw  * 10) / 10;
+                                label += ' : ' + val + '°';
+                                return label;
+                            },
+                            labelColor: function(context){
+                                return{
+                                    borderColor: context.dataset.borderColor,
+                                    backgroundColor: context.dataset.borderColor,
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                };
+                            },
+                        },
+                    },
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        display: true,
+                        title:{
+                            display: true,
+                            text: 'Temperatur'
+                        },
+                        ticks: {
+                            // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                            callback: function(val, index) {
+                                // Hide the label of every 2nd dataset
+                                return val + '°';
+                            },
+                        },
+                    }
+                }
+            }
+        };
+        tempChart = new Chart(ctx, config);
+        tempChart2 = new Chart(ctx_tmp2, config);
+    };
+/**
+    change data of temperature graph -> will be updated when new depth is selected
+**/
+    function changeData(q_data, interval, lvl){
+        tempChart.data.labels = [].concat.apply([], interval);
+        tempChart.data.datasets[0].data = q_data[0][1];
+        tempChart.data.datasets[1].data = q_data[0][2];
+        tempChart.data.datasets[2].data = q_data[0][0];
+        var lbl = parseFloat(lvl);
+        if (lbl < 1.0) {
+            lbl = lbl/0.01 + ' cm Bodentemperatur';
+        }
+        else{
+            lbl = lbl + ' m Bodentemperatur';
+        }
+        tempChart.data.datasets[2].label = lbl;
+        tempChart.data.datasets[3].data = q_data[0][3];
+        tempChart.update();
+    }
+});

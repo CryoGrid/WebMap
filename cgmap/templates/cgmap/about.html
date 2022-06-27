@@ -1,0 +1,48 @@
+{% extends 'base_template.html' %}
+{% load static %}
+
+
+{% block title %} Soil Temperature Map {% endblock %}
+{% block head_meta_page %}
+
+{% endblock head_meta_page %}
+
+{% block head_css_page %}
+
+{% endblock head_css_page %}
+
+{% block footer_javascript_page %}
+
+{% endblock footer_javascript_page %}
+
+{% block Navbar %}
+    {% with nav_tmpl="nav_header.html" %}
+        {{ block.super }}
+    {% endwith %}
+{% endblock %}
+
+{% block content %}
+
+<div class="container m-t-md" style="background: var(--accent)">
+    <div class="row" role="main">
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9 col-main">
+            <div class="bodytext">
+                <h1 class="header1">Über das Projekt</h1>
+                <p>
+                    Wir wollen mit unserem Projekt eine anwenderorientierte Karte zur Darstellung der Bodentemperaturen
+                    in Deutschland bereitstellen. Die interaktive Bedienbarkeit soll es den Nutzer*innen ermöglichen,
+                    Informationen über den thermischen Bodenzustand an bestimmten Standorten und in bestimmten Tiefen zu
+                    bekommen. Die verfügbar gemachten Daten bestehen auf Simulationen mit einem physikalisch-basierten
+                    Wärmeausbreitungsmodell (CryoGrid). Insbesondere werden Informationen über zu erwartende Änderungen der
+                    Bodentemperaturen durch Klimawandel bereitgestellt.
+                </p>
+                <p>
+                    Unterstützt wird unser Projekt vom <a href='https://www.awi.de/forschung/technologietransfer/stabsstelle.html' target='_blank'>AWI Technologietransfer</a>
+                    Das Projekt ist Teil der Nachwuchsgruppe <a href='https://www.awi.de/en/science/junior-groups/permarisk.html' target='_blank'>Permarisk</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}

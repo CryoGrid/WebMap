@@ -12,10 +12,27 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# geodjango setup
+if os.name == 'nt':
+    import platform
+
+    OSGEO4W = r"C:\OSGeo4W"
+    if '64' in platform.architecture()[0]:
+        OSGEO4W += "64"
+    assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+    os.environ['OSGEO4W_ROOT'] = OSGEO4W
+    os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+    os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+    os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+
+    GEOS_LIBRARY_PATH = str(os.path.join(OSGEO4W, r"bin\geos_c.dll"))
+    GDAL_LIBRARY_PATH = str(os.path.join(OSGEO4W, r"bin\gdal301.dll"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -29,6 +46,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Leaflet configurations
+LEAFLET_CONFIG = {
+    # 'SPATIAL_EXTENT': (5.0, 44.0, 7.5, 64),
+    'DEFAULT_CENTER': (52.38131276242783, 13.066351933955268),
+    'DEFAULT_ZOOM': 7,
+    'MIN_ZOOM': 3,
+    'MAX_ZOOM': 18,
+    'DEFAULT_PRECISION': 6,
+}
 
 # Application definition
 
@@ -39,10 +65,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'corsheaders',
+    'debug_toolbar',
+    'leaflet',
+    'hitcount',
+    'djgeojson',
     'cgmap',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -50,6 +84,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:8000"
 ]
 
 ROOT_URLCONF = 'CryoGridWebProject.urls'
@@ -72,6 +112,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'CryoGridWebProject.wsgi.application'
 
+# Cache config
+# https://docs.djangoproject.com/en/3.2/topics/cache/
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
@@ -79,15 +127,15 @@ WSGI_APPLICATION = 'CryoGridWebProject.wsgi.application'
 DATABASES = {
     'default': {
         # local configurations for db
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'cryogrid_db',
+        # 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'postgres',
         'USER': 'postgres',
         'PASSWORD': str(os.getenv('LOCAL_DB_KEY')),
-        'HOST': 'localhost',
+        'HOST': 'localhost',  # this works only for docker, old host 'localhost'; host for docker 'db'
         'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -107,9 +155,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
 
 LANGUAGE_CODE = 'en-us'
 
@@ -121,8 +172,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
