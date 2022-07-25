@@ -290,7 +290,7 @@ def forcing_to_db():
                 db_dict['acgmap_forcingdata'].update({"CREATED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
                 db_dict['acgmap_forcingdata'].update({"MODIFIED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
 
-                data_file_name = os.path.join("./GM_data/", record_name + '.sql')
+                data_file_name = os.path.join("../GM_Data/", record_name + '.sql')
                 print('record of: ', data_file_name)
 
                 for record in record_list:
@@ -441,7 +441,7 @@ def cryogriddata_to_db():
 
 def depth_lvl_to_db():
     record_name = 'RESULTS_ULC_006_062_depth_lvl'
-    data_file_name = os.path.join("./GM_Data/", record_name + '.sql')
+    data_file_name = os.path.join("../GM_Data/", record_name + '.sql')
 
     sql_string = 'INSERT INTO acgmap_depthlevel (z_level) VALUES'  # model has to be changed to string?
     data = Dataset(
@@ -461,7 +461,7 @@ def depth_lvl_to_db():
 
 def year_to_db():
     record_name = 'RESULTS_ULC_006_062_date'
-    data_file_name = os.path.join("./GM_Data/", record_name + '.sql')
+    data_file_name = os.path.join("../GM_Data/", record_name + '.sql')
 
     sql_string = 'INSERT INTO acgmap_date (YEAR) VALUES'  # model has to be changed to string?
     data = Dataset(

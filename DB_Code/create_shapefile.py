@@ -57,5 +57,5 @@ create_coord_list()
 crs = {'init': 'epsg:4326'}
 polygon = gpd.GeoDataFrame(shape, crs=crs)
 
-polygon.to_file(filename='ArcticMap/ArcticMap/shapefile/polygon.geojson', driver='GeoJSON')
-polygon.to_file(filename='ArcticMap/ArcticMap/shapefile/polygon.shp', driver='ESRI Shapefile')
+polygon.to_file(filename='../ArcticMap/ArcticMap/shapefile/polygon.geojson', driver='GeoJSON')
+polygon.to_file(filename='../ArcticMap/ArcticMap/shapefile/polygon.shp', driver='ESRI Shapefile')
