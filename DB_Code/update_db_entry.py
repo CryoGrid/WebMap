@@ -104,6 +104,8 @@ table_names = ['cgmap_forcingdata', 'cgmap_soiltype', 'cgmap_soilcharacteristics
 
 half_length = 0.125
 date_entry_created = True
+# set type id of simulated data here
+set_type_id = 1
 
 now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
@@ -135,6 +137,7 @@ for filename in os.listdir(directory_to_extract_to):
             record_list["LONG"] = [long]
             record_list["CREATED_AT"] = [now.strftime('%Y-%m-%d_%H:%M:%S')]
             record_list["MODIFIED_AT"] = [now.strftime('%Y-%m-%d_%H:%M:%S')]
+            record_list["SOIL_CHARACTERISTIC_ID"] = [set_type_id]
 
             # calculation of coordinates for german grid map
             top = float(lat) + half_length
@@ -146,10 +149,11 @@ for filename in os.listdir(directory_to_extract_to):
             record_list["GRID_ID"] = [db_grid_id]
 
             # adding name and grid id to forcingdata sql list
-            db_dict['cgmap_forcingdata'].update({"NAME": [record_name]})
-            db_dict['cgmap_forcingdata'].update({"GRID_ID": [db_grid_id]})
-            db_dict['cgmap_forcingdata'].update({"CREATED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
-            db_dict['cgmap_forcingdata'].update({"MODIFIED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
+            db_dict['cgmap_cryogriddata'].update({"NAME": [record_name]})
+            db_dict['cgmap_cryogriddata'].update({"GRID_ID": [db_grid_id]})
+            db_dict['cgmap_cryogriddata'].update({"CREATED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
+            db_dict['cgmap_cryogriddata'].update({"MODIFIED_AT": [now.strftime('%Y-%m-%d_%H:%M:%S')]})
+            db_dict['cgmap_cryogriddata'].update({"SOIL_CHARACTERISTIC_ID": [set_type_id]})
 
             print('dict: ', db_dict['cgmap_cryogriddata'])
 
@@ -179,7 +183,7 @@ for filename in os.listdir(directory_to_extract_to):
                         # print('value: ', col_names, 'type: ', type(records))
 
                         # join the list of values and enclose record in parenthesis
-
+                        # update dates
                         if col_names == 'TIME':
                             sql_string += 'DROP TABLE {}; \n'.format(col_names)
                             sql_string += 'INSERT INTO {} ({}) VALUES '.format(table_names, col_names)
@@ -187,17 +191,22 @@ for filename in os.listdir(directory_to_extract_to):
                             for r in records:
                                 sql_string += "(\'" + r + "\'),"
                             sql_string += ';'
-
+                        #
                         if len(records) <= 1 and col_names != 'NAME':
                             sql_string += 'UPDATE {} SET {} ='.format(table_names, col_names)
                             for r in records:
                                 sql_string += "\'" + r + "\'"
                             sql_string += ' WHERE name = \'' + record_name + '\';\n'
-
-                        if col_names == 'TAIR' or col_names == 'T_out':
+                        # update forcing data
+                        if col_names == 'TAIR':
                             sql_string += 'UPDATE {} SET {} ='.format(table_names, col_names)
                             sql_string += "'{" + ', '.join(str(r) for r in records) + "}'"
                             sql_string += ' WHERE name = \'' + record_name + '\';\n'
+                        # update cryo grid data
+                        if col_names == col_names == 'T_out':
+                            sql_string += 'UPDATE {} SET {} ='.format(table_names, col_names)
+                            sql_string += "'{" + ', '.join(str(r) for r in records) + "}'"
+                            sql_string += ' WHERE name = {} AND soil_characteristic_id = {};'.format(record_name, set_type_id)
         sql_string = sql_string.replace("[", "{")
         sql_string = sql_string.replace("T_out", "TSOIL")
         sql_string = sql_string.replace(", nan]", "}")
