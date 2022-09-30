@@ -82,7 +82,7 @@ $(window).on('map:init', function (e) {
         }
         else if(element.id.includes("year3")){
             console.log('element: ', element);
-            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 2)})
+            element.addEventListener('click', function(){const id = 1; addYear(id, gridID, 3)})
         }
     })
     y2030.forEach(element => {
@@ -95,7 +95,7 @@ $(window).on('map:init', function (e) {
         }
         else if(element.id.includes("year3")){
             console.log('element: ', element);
-            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 2)})
+            element.addEventListener('click', function(){const id = 3; addYear(id, gridID, 3)})
         }
     })
     y2050.forEach(element => {
@@ -106,7 +106,7 @@ $(window).on('map:init', function (e) {
             element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
         }
         else if(element.id.includes("year3")){
-            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 2)})
+            element.addEventListener('click', function(){const id = 5; addYear(id, gridID, 3)})
         }
     })
     y2070.forEach(element => {
@@ -117,7 +117,7 @@ $(window).on('map:init', function (e) {
             element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
         }
         else if(element.id.includes("year3")){
-            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 2)})
+            element.addEventListener('click', function(){const id = 7; addYear(id, gridID, 3)})
         }
     })
     y2090.forEach(element => {
@@ -128,7 +128,7 @@ $(window).on('map:init', function (e) {
             element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
         }
         else if(element.id.includes("year3")){
-            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 2)})
+            element.addEventListener('click', function(){const id = 9; addYear(id, gridID, 3)})
         }
     })
 

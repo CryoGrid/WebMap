@@ -114,9 +114,9 @@ class MapView(TemplateView):
             if soil_id == 1:
                 table_name = 'temperature_depth_level'
             elif soil_id == 2:
-                table_name = 'temperature_depth_level'
+                table_name = 'temperature_depth_level_type2'
             elif soil_id == 3:
-                table_name = 'temperature_depth_level'
+                table_name = 'temperature_depth_level_type3'
             with connection.cursor() as cursor:
                 cursor.execute(
                     "SELECT depth_level%s[%s:%s], depth_level6[%s:%s], depth_level7[%s:%s], tair[%s:%s] FROM %s WHERE grid_id = %s;" % (
@@ -204,9 +204,9 @@ class MapView(TemplateView):
             if soil_id == 1:
                 table_name = 'temperature_depth_level'
             elif soil_id == 2:
-                table_name = 'temperature_depth_level'
+                table_name = 'temperature_depth_level_type2'
             elif soil_id == 3:
-                table_name = 'temperature_depth_level'
+                table_name = 'temperature_depth_level_type3'
             with connection.cursor() as cursor:
                 for x in range(1, 11):
                     cursor.execute(
