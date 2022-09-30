@@ -104,8 +104,8 @@ table_names = ['cgmap_forcingdata', 'cgmap_soiltype', 'cgmap_soilcharacteristics
 
 half_length = 0.125
 date_entry_created = True
-# set type id of simulated data here
-set_type_id = 1
+# set type id of simulated data here id: 4, 5, 6
+set_type_id = 4
 
 now = datetime.now()
 dt_string = now.strftime("%d-%m-%Y_%H-%M-%S")
